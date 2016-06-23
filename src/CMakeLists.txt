@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 file(GLOB SOURCES "*.cpp" "*.c")
 
-add_executable(Wx ${SOURCES})
+add_executable(systhemer ${SOURCES})
 
 #find_package(wxWidgets COMPONENTS net gl core base)
 #if(wxWidgets_FOUND)

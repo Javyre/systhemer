@@ -60,39 +60,39 @@ CMAKE_SOURCE_DIR = /home/javier/Code/cpp/systhemer/src
 CMAKE_BINARY_DIR = /home/javier/Code/cpp/systhemer/build
 
 #=============================================================================
-# Target rules for target CMakeFiles/Wx.dir
+# Target rules for target CMakeFiles/systhemer.dir
 
 # All Build rule for target.
-CMakeFiles/Wx.dir/all:
-	$(MAKE) -f CMakeFiles/Wx.dir/build.make CMakeFiles/Wx.dir/depend
-	$(MAKE) -f CMakeFiles/Wx.dir/build.make CMakeFiles/Wx.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=1,2 "Built target Wx"
-.PHONY : CMakeFiles/Wx.dir/all
+CMakeFiles/systhemer.dir/all:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/depend
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=1,2 "Built target systhemer"
+.PHONY : CMakeFiles/systhemer.dir/all
 
 # Include target in all.
-all: CMakeFiles/Wx.dir/all
+all: CMakeFiles/systhemer.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/Wx.dir/rule: cmake_check_build_system
+CMakeFiles/systhemer.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/javier/Code/cpp/systhemer/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Wx.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/systhemer.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/javier/Code/cpp/systhemer/build/CMakeFiles 0
-.PHONY : CMakeFiles/Wx.dir/rule
+.PHONY : CMakeFiles/systhemer.dir/rule
 
 # Convenience name for target.
-Wx: CMakeFiles/Wx.dir/rule
+systhemer: CMakeFiles/systhemer.dir/rule
 
-.PHONY : Wx
-
-# clean rule for target.
-CMakeFiles/Wx.dir/clean:
-	$(MAKE) -f CMakeFiles/Wx.dir/build.make CMakeFiles/Wx.dir/clean
-.PHONY : CMakeFiles/Wx.dir/clean
+.PHONY : systhemer
 
 # clean rule for target.
-clean: CMakeFiles/Wx.dir/clean
+CMakeFiles/systhemer.dir/clean:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/clean
+.PHONY : CMakeFiles/systhemer.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/systhemer.dir/clean
 
 .PHONY : clean
 

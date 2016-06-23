@@ -1,0 +1,1 @@
+/usr/bin/gcc     CMakeFiles/systhemer.dir/main.c.o  -o systhemer -rdynamic 

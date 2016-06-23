@@ -47,7 +47,8 @@ void parseArgs(int argc, char *argv[]) {
     fprintf(stderr, "This program needs arguments....\n\n");
     print_help(1);
   }
-  
+
+  //Main loop that checks each toggle and argument
   while ((opt = getopt_long(argc, argv, "hVv", long_options, NULL)) != -1) {
     switch(opt) {
     case 'h':

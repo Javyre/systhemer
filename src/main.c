@@ -2,17 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <unistd.h>
 #include <getopt.h>
 
 //Local includes
 #include "main.h"
-
-//Package defines and dev options
-#define PACKAGE "SysThemer"
-#define VERSION "0.0.1"
-#define EXIT_ON_ERR false
 
 int main(int argc, char *argv[]) {
   parseArgs(argc, argv);
@@ -21,7 +15,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void print_help(int exval) {
+void printHelp(int exval) {
   printf("%s,%s show working getopt example\n", PACKAGE, VERSION); 
   printf("%s [-h] [-V]\n\n", PACKAGE);
 
@@ -45,14 +39,14 @@ void parseArgs(int argc, char *argv[]) {
   //If arg count is 1 because the first argument in argv is the command itself
   if(argc == 1) {
     fprintf(stderr, "This program needs arguments....\n\n");
-    print_help(1);
+    printHelp(1);
   }
 
   //Main loop that checks each toggle and argument
   while ((opt = getopt_long(argc, argv, "hVv", long_options, NULL)) != -1) {
     switch(opt) {
     case 'h':
-      print_help(0);
+      printHelp(0);
       break;
     case 'V':
       printf("%s %s\n\n", PACKAGE, VERSION); 
@@ -64,7 +58,7 @@ void parseArgs(int argc, char *argv[]) {
     default:
     case '?':
       fprintf(stderr, "%s: Error - No such option: `%c'\n\n", PACKAGE, optopt);
-      print_help(1);
+      printHelp(1);
     }
   }
 }

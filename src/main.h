@@ -13,7 +13,8 @@
 bool verboseMode = false;
 
 //Function declarations
-void printHelp(int);
-void parseArgs(int argc, char *argv[]);
+void printHelp(const int);
+void parseArgs(int, char* []);
+void verboseMessage(const char*);
 
 #endif

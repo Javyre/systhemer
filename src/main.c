@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void printHelp(int exval) {
+void printHelp(const int exval) {
   printf("%s,%s show working getopt example\n", PACKAGE, VERSION); 
   printf("%s [-h] [-V]\n\n", PACKAGE);
 
@@ -25,6 +25,10 @@ void printHelp(int exval) {
 
   if (!exval || EXIT_ON_ERR)
     exit(exval);
+}
+
+void verboseMessage(const char* message){
+  if (verboseMode) printf("%s[verbose]: %s\n", PACKAGE, message);
 }
 
 void parseArgs(int argc, char *argv[]) {
@@ -53,7 +57,9 @@ void parseArgs(int argc, char *argv[]) {
       exit(0);
       break;
     case 'v':
-      printf("%s: Verbose option is set `%c'\n", PACKAGE, optopt);
+      verboseMode = true;
+      printf("%s: Verbose option is set '%c'\n", PACKAGE, optopt);
+      verboseMessage("Testing...");
       break;
     default:
     case '?':

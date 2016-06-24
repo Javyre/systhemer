@@ -1,7 +1,6 @@
 // C includes
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <getopt.h>
 
@@ -28,7 +27,7 @@ void printHelp(const int exval) {
 }
 
 void verboseMessage(const char* message){
-  if (verboseMode) printf("%s[verbose]: %s\n", PACKAGE, message);
+  if (verboseMode) printf("\e[1;34m%s: %s\e[m\n", PACKAGE, message);
 }
 
 void parseArgs(int argc, char *argv[]) {

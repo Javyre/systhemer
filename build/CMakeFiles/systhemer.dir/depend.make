@@ -3,4 +3,13 @@
 
 CMakeFiles/systhemer.dir/main.c.o: /home/javier/Code/cpp/systhemer/src/main.c
 CMakeFiles/systhemer.dir/main.c.o: /home/javier/Code/cpp/systhemer/src/main.h
+CMakeFiles/systhemer.dir/main.c.o: /home/javier/Code/cpp/systhemer/src/tests.h
+CMakeFiles/systhemer.dir/main.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
+
+CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/tests.c
+CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/tests.h
+CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
+
+CMakeFiles/systhemer.dir/utils.c.o: /home/javier/Code/cpp/systhemer/src/utils.c
+CMakeFiles/systhemer.dir/utils.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
 

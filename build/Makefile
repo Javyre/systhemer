@@ -150,6 +150,60 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/main.c.s
 .PHONY : main.c.s
 
+tests.o: tests.c.o
+
+.PHONY : tests.o
+
+# target to build an object file
+tests.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/tests.c.o
+.PHONY : tests.c.o
+
+tests.i: tests.c.i
+
+.PHONY : tests.i
+
+# target to preprocess a source file
+tests.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/tests.c.i
+.PHONY : tests.c.i
+
+tests.s: tests.c.s
+
+.PHONY : tests.s
+
+# target to generate assembly for a file
+tests.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/tests.c.s
+.PHONY : tests.c.s
+
+utils.o: utils.c.o
+
+.PHONY : utils.o
+
+# target to build an object file
+utils.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/utils.c.o
+.PHONY : utils.c.o
+
+utils.i: utils.c.i
+
+.PHONY : utils.i
+
+# target to preprocess a source file
+utils.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/utils.c.i
+.PHONY : utils.c.i
+
+utils.s: utils.c.s
+
+.PHONY : utils.s
+
+# target to generate assembly for a file
+utils.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/utils.c.s
+.PHONY : utils.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,6 +216,12 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... tests.o"
+	@echo "... tests.i"
+	@echo "... tests.s"
+	@echo "... utils.o"
+	@echo "... utils.i"
+	@echo "... utils.s"
 .PHONY : help
 
 

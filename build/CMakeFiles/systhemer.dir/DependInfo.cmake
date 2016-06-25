@@ -5,6 +5,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
   "/home/javier/Code/cpp/systhemer/src/main.c" "/home/javier/Code/cpp/systhemer/build/CMakeFiles/systhemer.dir/main.c.o"
+  "/home/javier/Code/cpp/systhemer/src/tests.c" "/home/javier/Code/cpp/systhemer/build/CMakeFiles/systhemer.dir/tests.c.o"
+  "/home/javier/Code/cpp/systhemer/src/utils.c" "/home/javier/Code/cpp/systhemer/build/CMakeFiles/systhemer.dir/utils.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

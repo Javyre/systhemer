@@ -24,7 +24,11 @@ void printHelp(const int exval) {
 }
 
 void verboseMessage(const char* message){ //\e[1;34m and \e[m make text blue
-  if (verboseMode) printf("\e[1;34m%s: %s\e[m\n", PACKAGE, message);
+  VERBOSE_PRINT(message)
+}
+
+void testMessage(const char* message){
+  printf("\e[1;34m%s: %s\e[m\n", PACKAGE, message);
 }
 
 void parseArgs(int argc, char *argv[]) {

@@ -6,4 +6,5 @@
 
 void testTestsMode () {
   verboseMessage("Tests: TestsMode On...");
+  TEST_PRINT("TestsMode On...")
 }

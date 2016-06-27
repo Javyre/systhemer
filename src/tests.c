@@ -41,19 +41,20 @@ char* testStrTrim (char *in) {
   return out;
 }
 
+//Converts "   This\t    \t    text     " into "This text "
 void testStrTrimPointer (char *in) {
-  char *firstin = in;
-  char *source = in;
-
+  char *firstin = in; // Hold position of first char in char* in
+  char *source = in;  // Used to rewrite char* in
+  
   TEST_PRINT_VALUE(%s, in);
-  while (*in!='\0') {
+  while (*in!='\0') { // While it hasnt reached the last char
     TEST_PRINT_VALUE(%c, *in);
-    if(*in!=' '){
+    if(*in!=' ' && *in!='\t'){
       *source = *in;
-      if (*(in+1)==' ') {
+      if (*(in+1)==' ' || *(in+1)=='\t') {
 	source++;
 	in++;
-	*source = *in;
+	*source = ' ';
       }
       source++;
       in++;

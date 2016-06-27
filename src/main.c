@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
 
   if (testsMode) {
     testTestsMode();
-    char *string = malloc(strlen("    Hello   world              :D    ")+1);
-    strcpy(string, "    Hello   world              :D    ");
+    char *string = malloc(strlen("    Hello\t\t   world\t              :D    ")+1);
+    strcpy(string, "    Hello\t\t   world\t              :D    ");
     //string = testStrTrim(string);
     testStrTrimPointer(string);
     VERBOSE_PRINT_VALUE(%s, string);

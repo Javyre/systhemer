@@ -1,6 +1,7 @@
 // C includes
-//#include <stdio.h>
-//#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 //#include <unistd.h>
 //#include <getopt.h>
 
@@ -12,8 +13,16 @@
 int main(int argc, char *argv[]) {
   parseArgs(argc, argv);
 
-  if (testsMode)
+  if (testsMode) {
     testTestsMode();
+    char *string = malloc(strlen("    Hello   world              :D    ")+1);
+    strcpy(string, "    Hello   world              :D    ");
+    //string = testStrTrim(string);
+    testStrTrimPointer(string);
+    VERBOSE_PRINT_VALUE(%s, string);
+    //testFileIO();
+  }
+
   
   return 0;
 }

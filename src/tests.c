@@ -41,7 +41,7 @@ char* testStrTrim (char *in) {
   return out;
 }
 
-//Converts "   This\t    \t    text     " into "This text "
+//Converts "   This\t    \t    text     " into "This text"
 void testStrTrimPointer (char *in) {
   char *firstin = in; // Hold position of first char in char* in
   char *source = in;  // Used to rewrite char* in
@@ -62,16 +62,41 @@ void testStrTrimPointer (char *in) {
       in++;
     }
   }
-  *source = '\0';
+  if (*(source-1)==' ')
+    *(source-1)='\0';
+  else
+    *source='\0';
+  
   in = firstin;
   TEST_PRINT_VALUE(%s, in);
+}
+
+void testStrTrimPointerNew (char *in) {
+  char *out = malloc(strlen(in)+1);
+  char *token;
+
+  token = strtok(in, " \t");
+  while (token!=NULL) {
+    TEST_PRINT_VALUE(%s, token);
+    strcat(out, token);
+    strcat(out, " ");
+    token = strtok(NULL, " \t");
+  }
+  
+  char *outlast = out;
+  while (*outlast++);
+  outlast-=2;
+  *outlast = '\0';
+  TEST_PRINT_VALUE(%s, out);
+  strcpy(in, out);
+  free(out);
 }
 
 
 void testFileIO () {
   /* 
-     client.focused 
-     client.unfocused
+     client.focused something something something
+     client.unfocused ... ... ...
      client.focused_inactive
      client.urgent
 
@@ -90,6 +115,8 @@ void testFileIO () {
   while ((s = fgets(buff, sizeof(buff), fp)) != NULL){
     if (buff[0] == '\n' || buff[0] == '#')
       continue;
+
+    
 
     
   }

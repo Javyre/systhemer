@@ -15,11 +15,15 @@ int main(int argc, char *argv[]) {
 
   if (testsMode) {
     testTestsMode();
-    char *string = malloc(strlen("    Hello\t\t   world\t              :D    ")+1);
-    strcpy(string, "    Hello\t\t   world\t              :D    ");
-    //string = testStrTrim(string);
-    testStrTrimPointer(string);
+
+    char *string = malloc(strlen("    Hello\t\t   world\t              :D    \t")+1);
+    strcpy(string, "    Hello\t\t   world\t              :D    \t");
+
+    //testStrTrimPointer(string);
+    testStrTrimPointerNew(string);
+    //string should now be "Hello world :D"
     VERBOSE_PRINT_VALUE(%s, string);
+    
     //testFileIO();
   }
 

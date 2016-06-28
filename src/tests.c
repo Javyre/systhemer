@@ -86,7 +86,7 @@ void testStrTrimPointerNew (char *in) {
   char *outlast = out;
   while (*outlast++);
   outlast-=2;
-  *outlast = '\0';
+  if (*outlast==' ') *outlast = '\0';
   TEST_PRINT_VALUE(%s, out);
   strcpy(in, out);
   free(out);

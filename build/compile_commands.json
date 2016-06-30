@@ -1,17 +1,17 @@
 [
 {
   "directory": "/home/javier/Code/cpp/systhemer/build",
-  "command": "/usr/bin/gcc    -Wall -g   -o CMakeFiles/systhemer.dir/tests.c.o   -c /home/javier/Code/cpp/systhemer/src/tests.c",
+  "command": "/usr/bin/cc_args.py  gcc     -o CMakeFiles/systhemer.dir/tests.c.o   -c /home/javier/Code/cpp/systhemer/src/tests.c",
   "file": "/home/javier/Code/cpp/systhemer/src/tests.c"
 },
 {
   "directory": "/home/javier/Code/cpp/systhemer/build",
-  "command": "/usr/bin/gcc    -Wall -g   -o CMakeFiles/systhemer.dir/utils.c.o   -c /home/javier/Code/cpp/systhemer/src/utils.c",
+  "command": "/usr/bin/cc_args.py  gcc     -o CMakeFiles/systhemer.dir/utils.c.o   -c /home/javier/Code/cpp/systhemer/src/utils.c",
   "file": "/home/javier/Code/cpp/systhemer/src/utils.c"
 },
 {
   "directory": "/home/javier/Code/cpp/systhemer/build",
-  "command": "/usr/bin/gcc    -Wall -g   -o CMakeFiles/systhemer.dir/main.c.o   -c /home/javier/Code/cpp/systhemer/src/main.c",
+  "command": "/usr/bin/cc_args.py  gcc     -o CMakeFiles/systhemer.dir/main.c.o   -c /home/javier/Code/cpp/systhemer/src/main.c",
   "file": "/home/javier/Code/cpp/systhemer/src/main.c"
 }
 ]

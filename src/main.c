@@ -1,14 +1,14 @@
 // C includes
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 //#include <unistd.h>
 //#include <getopt.h>
 
-//Local includes
+// Local includes
 #include "main.h"
-#include "utils.h"
 #include "tests.h"
+#include "utils.h"
 
 int main(int argc, char *argv[]) {
   parseArgs(argc, argv);
@@ -16,17 +16,18 @@ int main(int argc, char *argv[]) {
   if (testsMode) {
     testTestsMode();
 
-    char *string = malloc(strlen("    Hello\t\t   world\t              :D    \t")+1);
+    char *string =
+        malloc(strlen("    Hello\t\t   world\t              :D    \t") + 1);
     strcpy(string, "    Hello\t\t   world\t              :D    \t");
 
-    //testStrTrimPointer(string);
-    testStrTrimPointerNew(string);
-    //string should now be "Hello world :D"
-    VERBOSE_PRINT_VALUE(%s, string);
-    
-    //testFileIO();
+    // strc
+    // testStrTrimPointer(string);
+    // testStrTrimPointerNew(string);
+    // string should now be "Hello world :D"
+    // VERBOSE_PRINT_VALUE(%s, string);
+
+    testFileIO();
   }
 
-  
   return 0;
 }

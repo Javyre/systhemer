@@ -1,0 +1,21 @@
+#+TITLE: SysThemer
+#+AUTHOR: Javier Pollak
+
+** Description
+SysThemer is (will be) a system-wide theming utility for linux users who 
+don't want to spend hours on changing every one of their program's configs 
+one by one. It uses its own universal theme format and does all the hard 
+work for you!
+
+
+
+
+** Dev priorities
+|-------------------------------------------------------------+----------+--------------------------------------|
+| Feature                                                     | Priority | Status                               |
+|-------------------------------------------------------------+----------+--------------------------------------|
+| Read from universal theme file                              | High     | Started                              |
+| Read from a config file (to configure the systhemer itself) | Medium   |                                      |
+| Extract GTK theme into a universal theme                    | Low      |                                      |
+| Support for the i3wm configs                                | Medium   | Started (for testing other features) |
+| Support for other programs... (list to be continued)        |          |                                      |

@@ -2,16 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <unistd.h>
-//#include <getopt.h>
 
 // Local includes
 #include "main.h"
 #include "tests.h"
 #include "utils.h"
+#include "unitheme.h"
 
 int main(int argc, char *argv[]) {
   parseArgs(argc, argv);
+  loadUniTheme("");
 
   if (testsMode) {
     testTestsMode();
@@ -28,6 +28,8 @@ int main(int argc, char *argv[]) {
 
     testFileIO();
   }
+
+
 
   return 0;
 }

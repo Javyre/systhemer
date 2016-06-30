@@ -19,3 +19,23 @@ work for you!
 | Extract GTK theme into a universal theme                    | Low      |                                      |
 | Support for the i3wm configs                                | Medium   | Started (for testing other features) |
 | Support for other programs... (list to be continued)        |          |                                      |
+
+** Usage
+This section is more for myself and planning out how the code is gonna work in
+the future but it serves as a good foundation for later actual documentation for
+this program.
+
+*** Unitheme files
+Unitheme files end with the extension .uth and it car store the following
+things:
+#+begin_src
+# comments
+$variables
+~program's name~include-"somehow include something from another file (not yet decided)"
+~program's name~tokens-"<token that the parser looks for> %s %s"
+~program's name~path-"path/to/config/file"
+~program's name~exec-before-"shell command to execute before SysThemer changes anything in the config"
+<token(s)> <value(s)>
+~program's name~end
+~program's name~exec-after-"shell command to execute after SysThemer finishes modifying the config"
+#+end_src

@@ -8,7 +8,7 @@
 
 //Default options (dynamic)
 bool verboseMode = true;
-bool testsMode = true;
+bool testsMode = false;
 
 void printHelp(const int exval) {
   printf("%s,%s show working getopt example\n", PACKAGE, VERSION); 
@@ -42,10 +42,10 @@ void parseArgs(int argc, char *argv[]) {
   int opt;
   
   //Checks for commands
-  if(argc == 1) {
+  /* if(argc == 1) {
     fprintf(stderr, "This program needs arguments....\n\n");
     printHelp(1);
-  }
+    }*/
 
   //Main loop that checks each toggle and argument
   while ((opt = getopt_long(argc, argv, "thVv", long_options, NULL)) != -1) {
@@ -66,10 +66,10 @@ void parseArgs(int argc, char *argv[]) {
       printf("%s: Verbose option is set '%c'\n", PACKAGE, optopt);
       verboseMessage("Testing...");
       break;
-    default:
     case '?':
       fprintf(stderr, "%s: Error - No such option: `%c'\n\n", PACKAGE, optopt);
       printHelp(1);
+      break;
     }
   }
 }

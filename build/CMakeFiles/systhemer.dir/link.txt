@@ -1,1 +1,1 @@
-/usr/bin/gcc     CMakeFiles/systhemer.dir/tests.c.o CMakeFiles/systhemer.dir/utils.c.o CMakeFiles/systhemer.dir/main.c.o  -o systhemer -rdynamic 
+/usr/bin/cc_args.py  gcc    CMakeFiles/systhemer.dir/tests.c.o CMakeFiles/systhemer.dir/utils.c.o CMakeFiles/systhemer.dir/main.c.o  -o systhemer -rdynamic 

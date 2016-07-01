@@ -7,19 +7,27 @@
 #IncludeRegexTransform: 
 
 /home/javier/Code/cpp/systhemer/src/main.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
 main.h
 /home/javier/Code/cpp/systhemer/src/main.h
-utils.h
-/home/javier/Code/cpp/systhemer/src/utils.h
 tests.h
 /home/javier/Code/cpp/systhemer/src/tests.h
+utils.h
+/home/javier/Code/cpp/systhemer/src/utils.h
 
 /home/javier/Code/cpp/systhemer/src/main.h
 
 /home/javier/Code/cpp/systhemer/src/tests.c
+stdio.h
+-
 stdlib.h
 -
-stdio.h
+string.h
 -
 tests.h
 /home/javier/Code/cpp/systhemer/src/tests.h

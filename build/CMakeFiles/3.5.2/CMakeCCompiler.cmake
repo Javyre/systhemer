@@ -1,5 +1,5 @@
-set(CMAKE_C_COMPILER "/usr/bin/gcc")
-set(CMAKE_C_COMPILER_ARG1 "")
+set(CMAKE_C_COMPILER "/usr/bin/cc_args.py")
+set(CMAKE_C_COMPILER_ARG1 " gcc")
 set(CMAKE_C_COMPILER_ID "GNU")
 set(CMAKE_C_COMPILER_VERSION "6.1.1")
 set(CMAKE_C_COMPILER_WRAPPER "")

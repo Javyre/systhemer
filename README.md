@@ -1,35 +1,36 @@
-#+TITLE: SysThemer
-#+AUTHOR: Javier Pollak
+SysThemer
+=========
 
-** Description
+## Description ##
 SysThemer is (will be) a system-wide theming utility for linux users who 
-don't want to spend hours on changing every one of their program's configs 
+don't want to spend hours on changing every one of their program's configs
 one by one. It uses its own universal theme format and does all the hard 
 work for you!
-
-
-
-
-** Dev priorities
-|-------------------------------------------------------------+----------+--------------------------------------|
+    
+## Dev priorities ##
 | Feature                                                     | Priority | Status                               |
-|-------------------------------------------------------------+----------+--------------------------------------|
+| ----------------------------------------------------------- | -------- | ------------------------------------ |
 | Read from universal theme file                              | High     | Started                              |
 | Read from a config file (to configure the systhemer itself) | Medium   |                                      |
 | Extract GTK theme into a universal theme                    | Low      |                                      |
 | Support for the i3wm configs                                | Medium   | Started (for testing other features) |
 | Support for other programs... (list to be continued)        |          |                                      |
-
-** Usage
-This section is more for myself and planning out how the code is gonna work in
-the future but it serves as a good foundation for later actual documentation for
-this program.
-
-*** Unitheme files
+    
+## Usage ##
+This section is more for myself and planning out how the code is gonna work
+in the future but it serves as a good foundation for later actual
+documentation for this program.
+    
+### Unitheme files ###
 Unitheme files end with the extension .uth and it car store the following
 things:
-#+begin_src
+    
+```
 # comments
+# sometimes lines can be very long so you need to seperate them \
+    into multiple \
+    lines.
+
 $variables
 ~program's name~include="somehow include something from another file (not yet decided)"
 ~program's name~tokens="<token that the parser looks for> %s %s"
@@ -38,21 +39,31 @@ $variables
 <token(s)> <value(s)>
 ~program's name~end
 ~program's name~exec-after="shell command to execute after SysThemer finishes modifying the config"
-#+end_src
+```
+    
+#### Comments ####
+Comments are written in the form `#comment`
 
-**** Comments
-Comments are written in the form =#<comment>=
-**** Variables
-Variables are declared like this : =$VariableName=Value=
-**** Program definition
-All definitions of a programs attributes begin with the prefix =~Program's
-Name~= and then followed by attribute's name and value in the form
-=Attribute="Value"= 
-
+#### Variables ####
+Variables are declared like this: `$VariableName="Value"`
+#### Program definitions ####
+All definitions of a programs attributes begin with the prefix `~Program's
+Name~` and then followed by attribute's name and value in the form
+`Attribute="Value"` 
+   
 The available attributes are: 
 - tokens: defines what SysThemer should look for when scanning the file. Written
-  =tokens==="first %s %s" "%s second %s"= Here SysThemer would look for a line that
-  starts with =first= followed by two values and a line that contains a value
-  followed by the token =second= and then another value. There can be as many
-  values and tokens in any order to check for in one line as the user wants. 
+`tokens="first %s %s" "%s second %s"` Here SysThemer would look for a line that
+starts with `first` followed by two values and a line that contains a value
+followed by the token `second` and then another value. There can be as many
+values and tokens in any order to check for in one line as the user wants. 
+    
+    
+    
+    
+    
+    
+
+
+
 

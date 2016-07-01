@@ -27,6 +27,10 @@ things:
     
 ```
 # comments
+# sometimes lines can be very long so you need to seperate them \
+    into multiple \
+    lines.
+
 $variables
 ~program's name~include="somehow include something from another file (not yet decided)"
 ~program's name~tokens="<token that the parser looks for> %s %s"

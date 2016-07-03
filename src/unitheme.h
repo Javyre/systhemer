@@ -6,6 +6,8 @@
 
 void loadUniTheme(const char *filename);
 
+void strTrim(char *in);
+
 bool hasLineExtension(char *currentBuffer);
 
 void getFullLine(char *currentBuffer, FILE *UniThemeFile);

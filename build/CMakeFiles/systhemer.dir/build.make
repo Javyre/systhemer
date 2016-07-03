@@ -57,9 +57,33 @@ include CMakeFiles/systhemer.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/systhemer.dir/flags.make
 
+CMakeFiles/systhemer.dir/unitheme.c.o: CMakeFiles/systhemer.dir/flags.make
+CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/systhemer.dir/unitheme.c.o"
+	/usr/bin/cc_args.py  gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/unitheme.c.o   -c /home/javier/Code/cpp/systhemer/src/unitheme.c
+
+CMakeFiles/systhemer.dir/unitheme.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/systhemer.dir/unitheme.c.i"
+	/usr/bin/cc_args.py  gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/javier/Code/cpp/systhemer/src/unitheme.c > CMakeFiles/systhemer.dir/unitheme.c.i
+
+CMakeFiles/systhemer.dir/unitheme.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/systhemer.dir/unitheme.c.s"
+	/usr/bin/cc_args.py  gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/javier/Code/cpp/systhemer/src/unitheme.c -o CMakeFiles/systhemer.dir/unitheme.c.s
+
+CMakeFiles/systhemer.dir/unitheme.c.o.requires:
+
+.PHONY : CMakeFiles/systhemer.dir/unitheme.c.o.requires
+
+CMakeFiles/systhemer.dir/unitheme.c.o.provides: CMakeFiles/systhemer.dir/unitheme.c.o.requires
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/unitheme.c.o.provides.build
+.PHONY : CMakeFiles/systhemer.dir/unitheme.c.o.provides
+
+CMakeFiles/systhemer.dir/unitheme.c.o.provides.build: CMakeFiles/systhemer.dir/unitheme.c.o
+
+
 CMakeFiles/systhemer.dir/tests.c.o: CMakeFiles/systhemer.dir/flags.make
 CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/tests.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/systhemer.dir/tests.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/systhemer.dir/tests.c.o"
 	/usr/bin/cc_args.py  gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/tests.c.o   -c /home/javier/Code/cpp/systhemer/src/tests.c
 
 CMakeFiles/systhemer.dir/tests.c.i: cmake_force
@@ -83,7 +107,7 @@ CMakeFiles/systhemer.dir/tests.c.o.provides.build: CMakeFiles/systhemer.dir/test
 
 CMakeFiles/systhemer.dir/utils.c.o: CMakeFiles/systhemer.dir/flags.make
 CMakeFiles/systhemer.dir/utils.c.o: /home/javier/Code/cpp/systhemer/src/utils.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/systhemer.dir/utils.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/systhemer.dir/utils.c.o"
 	/usr/bin/cc_args.py  gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/utils.c.o   -c /home/javier/Code/cpp/systhemer/src/utils.c
 
 CMakeFiles/systhemer.dir/utils.c.i: cmake_force
@@ -107,7 +131,7 @@ CMakeFiles/systhemer.dir/utils.c.o.provides.build: CMakeFiles/systhemer.dir/util
 
 CMakeFiles/systhemer.dir/main.c.o: CMakeFiles/systhemer.dir/flags.make
 CMakeFiles/systhemer.dir/main.c.o: /home/javier/Code/cpp/systhemer/src/main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/systhemer.dir/main.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/systhemer.dir/main.c.o"
 	/usr/bin/cc_args.py  gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/main.c.o   -c /home/javier/Code/cpp/systhemer/src/main.c
 
 CMakeFiles/systhemer.dir/main.c.i: cmake_force
@@ -131,6 +155,7 @@ CMakeFiles/systhemer.dir/main.c.o.provides.build: CMakeFiles/systhemer.dir/main.
 
 # Object files for target systhemer
 systhemer_OBJECTS = \
+"CMakeFiles/systhemer.dir/unitheme.c.o" \
 "CMakeFiles/systhemer.dir/tests.c.o" \
 "CMakeFiles/systhemer.dir/utils.c.o" \
 "CMakeFiles/systhemer.dir/main.c.o"
@@ -138,12 +163,13 @@ systhemer_OBJECTS = \
 # External object files for target systhemer
 systhemer_EXTERNAL_OBJECTS =
 
+systhemer: CMakeFiles/systhemer.dir/unitheme.c.o
 systhemer: CMakeFiles/systhemer.dir/tests.c.o
 systhemer: CMakeFiles/systhemer.dir/utils.c.o
 systhemer: CMakeFiles/systhemer.dir/main.c.o
 systhemer: CMakeFiles/systhemer.dir/build.make
 systhemer: CMakeFiles/systhemer.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable systhemer"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable systhemer"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/systhemer.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -151,6 +177,7 @@ CMakeFiles/systhemer.dir/build: systhemer
 
 .PHONY : CMakeFiles/systhemer.dir/build
 
+CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/unitheme.c.o.requires
 CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/tests.c.o.requires
 CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/utils.c.o.requires
 CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/main.c.o.requires

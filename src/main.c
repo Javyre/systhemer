@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[]) {
   parseArgs(argc, argv);
-  loadUniTheme("");
+  loadUniTheme("../files/default.uth");
 
   if (testsMode) {
     testTestsMode();

@@ -19,6 +19,8 @@ tests.h
 /home/javier/Code/cpp/systhemer/src/tests.h
 utils.h
 /home/javier/Code/cpp/systhemer/src/utils.h
+unitheme.h
+/home/javier/Code/cpp/systhemer/src/unitheme.h
 
 /home/javier/Code/cpp/systhemer/src/main.h
 
@@ -35,6 +37,22 @@ utils.h
 /home/javier/Code/cpp/systhemer/src/utils.h
 
 /home/javier/Code/cpp/systhemer/src/tests.h
+
+/home/javier/Code/cpp/systhemer/src/unitheme.c
+utils.h
+/home/javier/Code/cpp/systhemer/src/utils.h
+unitheme.h
+/home/javier/Code/cpp/systhemer/src/unitheme.h
+stdlib.h
+-
+string.h
+-
+
+/home/javier/Code/cpp/systhemer/src/unitheme.h
+stdbool.h
+-
+stdio.h
+-
 
 /home/javier/Code/cpp/systhemer/src/utils.c
 stdio.h

@@ -13,7 +13,7 @@ void loadUniTheme(const char *filename) {
     return;
   }
 
-  while (fgets(buff, sizeof(buff), UniThemeFile) != NULL) {
+  while (fgets(buff, 256, UniThemeFile) != NULL) {
     if (buff[0] == '\n' || buff[0] == '#') {
       continue;
     } else {
@@ -23,32 +23,60 @@ void loadUniTheme(const char *filename) {
   }
 }
 
-bool hasLineExtension(char *currentBuffer) {
-  char *s = currentBuffer;
-  while (*s != '\0') {
-    if (*s == '\\') {
-      s++;
-      while (*s == ' ' || *s == '\t' || *s == '\0' || *s == '\n') {
-        if (*s == '\0' || *s == '\n') {
-          return true;
-        }
-        s++;
-      }
-      continue;
-    }
+void strTrim(char *in) {
+  char *firstin = in; // Hold position of first char in char* in
+  char *source = in;  // Used to rewrite char* in
 
-    s++;
+  while (*in != '\0' && *in != '\n') { // While it hasnt reached the last char 
+    if (*in != ' ' && *in != '\t') {
+      *source = *in;
+      if (*(in + 1) == ' ' || *(in + 1) == '\t') {
+        source++;
+        in++;
+        *source = ' ';
+      }
+      source++;
+      in++;
+    } else {
+      in++;
+    }
   }
+  if (*(source - 1) == ' ')
+    *(source - 1) = '\0';
+  else
+    *source = '\0';
+
+  VERBOSE_PRINT_VALUE(%s, firstin);
+  in = firstin;
+}
+
+bool hasLineExtension(char *currentBuffer) {
+  strTrim(currentBuffer);
+  char *lastChar = currentBuffer;
+  while (*lastChar != '\0' && *lastChar != '\n')
+    lastChar++;
+  if (*(lastChar-1) == '\\' && *lastChar == '\0') { // lastchar-1 should point to the \ and lastchar: \0
+    *(lastChar-1) = *lastChar;
+    return true;
+  } else if (*(lastChar-1) == '\\' && *lastChar == '\n') {
+    fprintf(stderr, "Error in hasLineExtension: last char of string is '\\n' in");
+    exit(1);
+  }
+
   return false;
 }
 
 void getFullLine(char* currentBuffer, FILE *UniThemeFile) {
-  while (hasLineExtension(currentBuffer)) {
+  char *holder = malloc(strlen(currentBuffer) + 256);
+  strcpy(holder, currentBuffer);
+  while (hasLineExtension(holder)) {
     //line+=new;
-    strcat(currentBuffer, fgets(currentBuffer, sizeof(currentBuffer), UniThemeFile));
+
+    strcat(holder, fgets(currentBuffer, 256, UniThemeFile));
   }
+  strcpy(currentBuffer, holder);
 }
 
 void evalLine(char* currentBuffer) {
-  return;
+  VERBOSE_PRINT_VALUE(%s, currentBuffer);
 }

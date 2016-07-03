@@ -50,6 +50,15 @@ void strTrim(char *in) {
   in = firstin;
 }
 
+void rmComment(char *in) {
+  char *src = in;
+  while (*src != '\0' && *src != '\n') {
+    if (*src == '#')
+      *src = '\0';
+    src++;
+  }
+}
+
 bool hasLineExtension(char *currentBuffer) {
   strTrim(currentBuffer);
   char *lastChar = currentBuffer;
@@ -67,16 +76,25 @@ bool hasLineExtension(char *currentBuffer) {
 }
 
 void getFullLine(char* currentBuffer, FILE *UniThemeFile) {
-  char *holder = malloc(strlen(currentBuffer) + 256);
+  char *holder = malloc(strlen(currentBuffer) + 256 + 1);
   strcpy(holder, currentBuffer);
   while (hasLineExtension(holder)) {
     //line+=new;
-
+    rmComment(holder);
+    strcat(holder, " ");
     strcat(holder, fgets(currentBuffer, 256, UniThemeFile));
+    rmComment(holder);
   }
+  rmComment(holder);
   strcpy(currentBuffer, holder);
 }
 
 void evalLine(char* currentBuffer) {
+  char *src = currentBuffer;
+  while (*src == ' ' || *src == '\t')
+    src++;
+
+
+
   VERBOSE_PRINT_VALUE(%s, currentBuffer);
 }

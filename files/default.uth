@@ -3,8 +3,8 @@
 # Defaults.uth
 # This file contains the default program definitions and unitheme for SysThemer
    # Test comment
-~i3-tokens-"client.focused                %s %s %s %s %s"\
-           "client.focused_inactive       %s %s %s %s %s"   # This is a comment\
+~i3-tokens-"client.focused                %s %s %s %s %s"\\
+           "client.focused_inactive       %s %s %s %s %s"   \# This is a comment\
            "client.unfocused              %s %s %s\
            %s %s" \                                         # This is another comment
            "client.urgent                 %s %s %s %s %s" \

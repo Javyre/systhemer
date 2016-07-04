@@ -18,6 +18,7 @@ void loadUniTheme(const char *filename) {
       continue;
     } else {
       getFullLine(buff, UniThemeFile);
+      rmEscape(buff);
       evalLine(buff);
     }
   }
@@ -50,13 +51,61 @@ void strTrim(char *in) {
   in = firstin;
 }
 
+void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {
+  if (to2 == NULL) {
+    to2 = from2;
+    while (*to2 != '\0')
+      to2++;
+  }
+
+  char *holder = malloc((to-from)+(to2-from2)+1);
+  char *holder2 = malloc((to2-from2)+1);
+
+  strncpy(holder, from, to-from);
+  strncpy(holder2, from2, to2-from2);
+  strcat(holder, holder2);
+  strcpy(dest, holder);
+
+
+  free(holder);
+  free(holder2);
+}
+
 void rmComment(char *in) {
   char *src = in;
   while (*src != '\0' && *src != '\n') {
-    if (*src == '#')
+    if (*src == '#' && *(src-1) != '\\')
       *src = '\0';
     src++;
   }
+}
+
+void rmEscape(char *currentBuffer) {
+  char *src = currentBuffer;
+  while (*src != '\0' && *src != '\n')
+    src++;
+  if (*src == '\n')
+    fprintf(stderr, "Warning: found a '\n' (newline) character in current buffer string! This is dangerous!!!");
+  src = currentBuffer;
+  while (*src != '\0') {
+    if (*src == '\\' && (src[1] == '\\' || src[1] == '#')) {
+      strOverlap(currentBuffer, currentBuffer, (src-1), (src+1), NULL);
+    }
+    src++;
+  }
+}
+
+//check if last char is for a line extension or just part of '//'
+bool isLastExtension(char *last, char* first) {
+  char* src = last;
+  int numOfBSlashes = 0;
+  while (*src == '\\' && src != first) {
+    numOfBSlashes ++;
+    src--;
+  }
+  if (numOfBSlashes % 2 != 0)
+    return true;
+  return false;
 }
 
 bool hasLineExtension(char *currentBuffer) {
@@ -64,7 +113,9 @@ bool hasLineExtension(char *currentBuffer) {
   char *lastChar = currentBuffer;
   while (*lastChar != '\0' && *lastChar != '\n')
     lastChar++;
-  if (*(lastChar-1) == '\\' && *lastChar == '\0') { // lastchar-1 should point to the \ and lastchar: \0
+
+  //if (*(lastChar-1) == '\\' && *lastChar == '\0' && *(lastChar-2) != '\\') { // lastchar-1 should point to the \ and lastchar: \0
+  if (isLastExtension((lastChar-1), currentBuffer)) {
     *(lastChar-1) = *lastChar;
     return true;
   } else if (*(lastChar-1) == '\\' && *lastChar == '\n') {
@@ -78,9 +129,9 @@ bool hasLineExtension(char *currentBuffer) {
 void getFullLine(char* currentBuffer, FILE *UniThemeFile) {
   char *holder = malloc(strlen(currentBuffer) + 256 + 1);
   strcpy(holder, currentBuffer);
+  rmComment(holder);
   while (hasLineExtension(holder)) {
     //line+=new;
-    rmComment(holder);
     strcat(holder, " ");
     strcat(holder, fgets(currentBuffer, 256, UniThemeFile));
     rmComment(holder);
@@ -93,8 +144,7 @@ void evalLine(char* currentBuffer) {
   char *src = currentBuffer;
   while (*src == ' ' || *src == '\t')
     src++;
-
-
+  
 
   VERBOSE_PRINT_VALUE(%s, currentBuffer);
 }

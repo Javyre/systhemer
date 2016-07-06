@@ -17,7 +17,7 @@ void loadUniTheme(const char *filename) {
     if (buff[0] == '\n' || buff[0] == '#') {
       continue;
     } else {
-      getFullLine(buff, UniThemeFile);
+      getFullLine(&buff, UniThemeFile);
       rmEscape(buff);
       evalLine(buff);
     }
@@ -58,17 +58,39 @@ void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {
       to2++;
   }
 
-  char *holder = malloc((to-from)+(to2-from2)+1);
-  char *holder2 = malloc((to2-from2)+1);
+  char *holder = malloc((to-from) + 1 + (to2-from2) + 2);
+  char *holder2 = malloc((to2-from2) + 2);
+  memset(holder, '\0', (to-from)+1+(to2-from2)+2);
+  memset(holder2, '\0', (to2-from2)+2);
+  // memset(dest, '\0', strlen(dest)+1);
 
-  strncpy(holder, from, to-from);
-  strncpy(holder2, from2, to2-from2);
+
+  strncpy(holder, from, (to-from)+1);
+  strncpy(holder2, from2, (to2-from2)+1);
   strcat(holder, holder2);
+
+  //free(dest);
+  //dest = calloc(strlen(holder)+1, sizeof(char));
   strcpy(dest, holder);
 
 
   free(holder);
   free(holder2);
+}
+
+char *genWrongUnderline(char *line, char *from, char *to) {
+  char *underline = calloc(strlen(line)+1, sizeof(char));
+  char *srcUnderline = underline;
+  char *srcLine = line;
+  while (*srcLine != '\0') {
+    if (srcLine >= from && srcLine <= to)
+      *srcUnderline = '^';
+    else
+      *srcUnderline = ' ';
+    srcLine++;
+    srcUnderline++;
+  }
+  return underline;
 }
 
 void rmComment(char *in) {
@@ -90,6 +112,10 @@ void rmEscape(char *currentBuffer) {
   while (*src != '\0') {
     if (*src == '\\' && (src[1] == '\\' || src[1] == '#')) {
       strOverlap(currentBuffer, currentBuffer, (src-1), (src+1), NULL);
+      src++;
+    } else if (*src == '\\' && (src[1] != '\\' && src[1] != '#')) {
+      fprintf(stderr, BKRED "Error: Found escape character with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], currentBuffer, genWrongUnderline(currentBuffer, src, src+1));
+      exit(1);
     }
     src++;
   }
@@ -126,25 +152,38 @@ bool hasLineExtension(char *currentBuffer) {
   return false;
 }
 
-void getFullLine(char* currentBuffer, FILE *UniThemeFile) {
-  char *holder = malloc(strlen(currentBuffer) + 256 + 1);
-  strcpy(holder, currentBuffer);
+void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
+  //char *holder = malloc(strlen(currentBuffer) + 1);
+  char *holder = calloc(256, sizeof(char));
+  //char *nextLine = malloc(256);
+  strcpy(holder, *currentBuffer);
   rmComment(holder);
   while (hasLineExtension(holder)) {
     //line+=new;
+    fgets(*currentBuffer, 256, UniThemeFile);
+    holder = realloc(holder, strlen(holder) + 1 + strlen(*currentBuffer) + 1);
     strcat(holder, " ");
-    strcat(holder, fgets(currentBuffer, 256, UniThemeFile));
+    strcat(holder, *currentBuffer);
     rmComment(holder);
   }
   rmComment(holder);
-  strcpy(currentBuffer, holder);
+
+  // free(*currentBuffer);
+  // *currentBuffer = malloc(strlen(holder)+1);
+  strcpy(*currentBuffer, holder);
+
+  //free(nextLine);
+  free(holder);
 }
 
 void evalLine(char* currentBuffer) {
   char *src = currentBuffer;
   while (*src == ' ' || *src == '\t')
     src++;
+  VERBOSE_PRINT("Evaluating line bufer...");
+  VERBOSE_PRINT_VALUE(%s, src);
+
   
 
-  VERBOSE_PRINT_VALUE(%s, currentBuffer);
+
 }

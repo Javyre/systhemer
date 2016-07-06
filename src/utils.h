@@ -27,10 +27,10 @@
 #define KWHT  "\x1B[37m"
 #define BKWHT  "\e[1;37m"
 
-#define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\n", token);
-#define VERBOSE_PRINT(message) if(verboseMode) printf(BKBLU PACKAGE ": %s\n", message);
+#define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\x1b[0m" "\n", token);
+#define VERBOSE_PRINT(message) if(verboseMode) printf(PACKAGE ": " BKBLU "%s" "\x1b[0m" "\n", message);
 #define VERBOSE_PRINT_VALUE(type, token) if (verboseMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKBLU);}
-#define TEST_PRINT(message) if (testsMode) {printf(BKYEL PACKAGE ": %s\n", message);}
+#define TEST_PRINT(message) if (testsMode) {printf(PACKAGE ": " BKYEL "%s" "\x1b[0m" "\n", message);}
 #define TEST_PRINT_VALUE(type, token) if (testsMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKYEL);}
 
 bool testsMode;

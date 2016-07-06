@@ -27,7 +27,7 @@ bool isLastExtension(char *last, char* first);
 
 bool hasLineExtension(char *currentBuffer);
 
-void getFullLine(char *currentBuffer, FILE *UniThemeFile);
+void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 
 void evalLine(char *currentBuffer);
 

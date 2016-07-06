@@ -22,6 +22,8 @@ void loadUniTheme(const char *filename) {
       evalLine(buff);
     }
   }
+  free(buff);
+  fclose(UniThemeFile);
 }
 
 void strTrim(char *in) {

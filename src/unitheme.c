@@ -18,9 +18,10 @@ void loadUniTheme(const char *filename) {
       continue;
     } else {
       getFullLine(&buff, UniThemeFile);
-      rmEscape(buff);
+      rmEscape(&buff);
       evalLine(buff);
     }
+    buff = realloc(buff, 256);
   }
   free(buff);
   fclose(UniThemeFile);
@@ -64,15 +65,12 @@ void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {
   char *holder2 = malloc((to2-from2) + 2);
   memset(holder, '\0', (to-from)+1+(to2-from2)+2);
   memset(holder2, '\0', (to2-from2)+2);
-  // memset(dest, '\0', strlen(dest)+1);
 
 
   strncpy(holder, from, (to-from)+1);
   strncpy(holder2, from2, (to2-from2)+1);
   strcat(holder, holder2);
 
-  //free(dest);
-  //dest = calloc(strlen(holder)+1, sizeof(char));
   strcpy(dest, holder);
 
 
@@ -104,23 +102,29 @@ void rmComment(char *in) {
   }
 }
 
-void rmEscape(char *currentBuffer) {
-  char *src = currentBuffer;
+void rmEscape(char **currentBuffer) {
+  char *original = malloc(strlen(*currentBuffer)+1);
+  strcpy(original, *currentBuffer);
+  char *src = original;
   while (*src != '\0' && *src != '\n')
     src++;
   if (*src == '\n')
     fprintf(stderr, "Warning: found a '\n' (newline) character in current buffer string! This is dangerous!!!");
-  src = currentBuffer;
+  src = original;
   while (*src != '\0') {
     if (*src == '\\' && (src[1] == '\\' || src[1] == '#')) {
-      strOverlap(currentBuffer, currentBuffer, (src-1), (src+1), NULL);
+      strOverlap(original, original, (src-1), (src+1), NULL);
       src++;
     } else if (*src == '\\' && (src[1] != '\\' && src[1] != '#')) {
-      fprintf(stderr, BKRED "Error: Found escape character with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], currentBuffer, genWrongUnderline(currentBuffer, src, src+1));
+      fprintf(stderr, BKRED "Error: Found escape character with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], original, genWrongUnderline(original, src, src+1));
       exit(1);
     }
     src++;
   }
+
+  *currentBuffer = realloc(*currentBuffer, strlen(original)+1);
+  strcpy(*currentBuffer, original);
+  free(original);
 }
 
 //check if last char is for a line extension or just part of '//'
@@ -168,10 +172,7 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
     strcat(holder, *currentBuffer);
     rmComment(holder);
   }
-  rmComment(holder);
-
-  // free(*currentBuffer);
-  // *currentBuffer = malloc(strlen(holder)+1);
+  *currentBuffer = realloc(*currentBuffer, strlen(holder)+1);
   strcpy(*currentBuffer, holder);
 
   //free(nextLine);
@@ -184,8 +185,6 @@ void evalLine(char* currentBuffer) {
     src++;
   VERBOSE_PRINT("Evaluating line bufer...");
   VERBOSE_PRINT_VALUE(%s, src);
-
-  
 
 
 }

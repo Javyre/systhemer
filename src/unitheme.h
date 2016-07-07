@@ -21,7 +21,7 @@ void strTrim(char *in);
 
 void rmComment(char *in);
 
-void rmEscape(char *currentBuffer);
+void rmEscape(char **currentBuffer);
 
 bool isLastExtension(char *last, char* first); 
 

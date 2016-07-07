@@ -25,7 +25,7 @@ void rmEscape(char **currentBuffer);
 
 bool isLastExtension(char *last, char* first); 
 
-bool hasLineExtension(char *currentBuffer);
+bool hasLineExtension(char **currentBuffer);
 
 void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 

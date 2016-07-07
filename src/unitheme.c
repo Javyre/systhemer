@@ -106,11 +106,13 @@ void rmEscape(char **currentBuffer) {
   char *original = malloc(strlen(*currentBuffer)+1);
   strcpy(original, *currentBuffer);
   char *src = original;
+  /*
   while (*src != '\0' && *src != '\n')
     src++;
   if (*src == '\n')
-    fprintf(stderr, "Warning: found a '\n' (newline) character in current buffer string! This is dangerous!!!");
+    fprintf(stderr, "Warning: found a '\\n' (newline) character in current buffer string! This is dangerous!!!\n");
   src = original;
+  */
   while (*src != '\0') {
     if (*src == '\\' && (src[1] == '\\' || src[1] == '#')) {
       strOverlap(original, original, (src-1), (src+1), NULL);
@@ -140,7 +142,7 @@ bool isLastExtension(char *last, char* first) {
   return false;
 }
 
-bool hasLineExtension(char *currentBuffer) {
+bool hasLineExtensionold(char *currentBuffer) {
   strTrim(currentBuffer);
   char *lastChar = currentBuffer;
   while (*lastChar != '\0' && *lastChar != '\n')
@@ -158,13 +160,30 @@ bool hasLineExtension(char *currentBuffer) {
   return false;
 }
 
+bool hasLineExtension(char **currentBuffer) {
+  char *src = *currentBuffer;
+  while (*src != '\0')
+    src++;
+
+  if (*(src-1) == ';' || (*(src-2) == ';' && *(src-1) == '\n')){
+    src = *currentBuffer;
+    while (*src != ';')
+      src++;
+    *(src+1) = '\0';
+    *currentBuffer = realloc(*currentBuffer, strlen(*currentBuffer)+1);
+    return false;
+  }
+
+  return true;
+}
+
 void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
   //char *holder = malloc(strlen(currentBuffer) + 1);
   char *holder = calloc(256, sizeof(char));
   //char *nextLine = malloc(256);
   strcpy(holder, *currentBuffer);
   rmComment(holder);
-  while (hasLineExtension(holder)) {
+  while (hasLineExtension(&holder)) {
     //line+=new;
     fgets(*currentBuffer, 256, UniThemeFile);
     holder = realloc(holder, strlen(holder) + 1 + strlen(*currentBuffer) + 1);

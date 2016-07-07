@@ -19,63 +19,13 @@ void loadUniTheme(const char *filename) {
     } else {
       getFullLine(&buff, UniThemeFile);
       rmEscape(&buff);
+      strTrimStrAware(buff);
       evalLine(buff);
     }
     buff = realloc(buff, 256);
   }
   free(buff);
   fclose(UniThemeFile);
-}
-
-void strTrim(char *in) {
-  char *firstin = in; // Hold position of first char in char* in
-  char *source = in;  // Used to rewrite char* in
-
-  while (*in != '\0' && *in != '\n') { // While it hasnt reached the last char 
-    if (*in != ' ' && *in != '\t') {
-      *source = *in;
-      if (*(in + 1) == ' ' || *(in + 1) == '\t') {
-        source++;
-        in++;
-        *source = ' ';
-      }
-      source++;
-      in++;
-    } else {
-      in++;
-    }
-  }
-  if (*(source - 1) == ' ')
-    *(source - 1) = '\0';
-  else
-    *source = '\0';
-
-  VERBOSE_PRINT_VALUE(%s, firstin);
-  in = firstin;
-}
-
-void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {
-  if (to2 == NULL) {
-    to2 = from2;
-    while (*to2 != '\0')
-      to2++;
-  }
-
-  char *holder = malloc((to-from) + 1 + (to2-from2) + 2);
-  char *holder2 = malloc((to2-from2) + 2);
-  memset(holder, '\0', (to-from)+1+(to2-from2)+2);
-  memset(holder2, '\0', (to2-from2)+2);
-
-
-  strncpy(holder, from, (to-from)+1);
-  strncpy(holder2, from2, (to2-from2)+1);
-  strcat(holder, holder2);
-
-  strcpy(dest, holder);
-
-
-  free(holder);
-  free(holder2);
 }
 
 char *genWrongUnderline(char *line, char *from, char *to) {
@@ -127,37 +77,6 @@ void rmEscape(char **currentBuffer) {
   *currentBuffer = realloc(*currentBuffer, strlen(original)+1);
   strcpy(*currentBuffer, original);
   free(original);
-}
-
-//check if last char is for a line extension or just part of '//'
-bool isLastExtension(char *last, char* first) {
-  char* src = last;
-  int numOfBSlashes = 0;
-  while (*src == '\\' && src != first) {
-    numOfBSlashes ++;
-    src--;
-  }
-  if (numOfBSlashes % 2 != 0)
-    return true;
-  return false;
-}
-
-bool hasLineExtensionold(char *currentBuffer) {
-  strTrim(currentBuffer);
-  char *lastChar = currentBuffer;
-  while (*lastChar != '\0' && *lastChar != '\n')
-    lastChar++;
-
-  //if (*(lastChar-1) == '\\' && *lastChar == '\0' && *(lastChar-2) != '\\') { // lastchar-1 should point to the \ and lastchar: \0
-  if (isLastExtension((lastChar-1), currentBuffer)) {
-    *(lastChar-1) = *lastChar;
-    return true;
-  } else if (*(lastChar-1) == '\\' && *lastChar == '\n') {
-    fprintf(stderr, "Error in hasLineExtension: last char of string is '\\n' in");
-    exit(1);
-  }
-
-  return false;
 }
 
 bool hasLineExtension(char **currentBuffer) {

@@ -17,13 +17,9 @@ struct programDef
 
 void loadUniTheme(const char *filename);
 
-void strTrim(char *in);
-
 void rmComment(char *in);
 
 void rmEscape(char **currentBuffer);
-
-bool isLastExtension(char *last, char* first); 
 
 bool hasLineExtension(char **currentBuffer);
 

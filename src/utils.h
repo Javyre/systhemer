@@ -37,8 +37,15 @@ bool testsMode;
 bool verboseMode;
 
 //Function declarations
+bool isInsideOfStr(char *str, char *pos);
+
 void printHelp(const int);
 void verboseMessage(const char*);
 void parseArgs(int, char* []);
+void strTrim(char *in);
+void strTrimInRange(char *from, char *to);
+void strTrimStrAware(char *in);
+void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
+
 
 #endif

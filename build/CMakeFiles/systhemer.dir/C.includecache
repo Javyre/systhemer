@@ -59,9 +59,13 @@ stdio.h
 -
 stdlib.h
 -
+stdbool.h
+-
 unistd.h
 -
 getopt.h
+-
+string.h
 -
 utils.h
 /home/javier/Code/cpp/systhemer/src/utils.h

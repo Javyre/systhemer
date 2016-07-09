@@ -117,12 +117,46 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
   free(holder);
 }
 
-void evalLine(char* currentBuffer) {
+bool isList (char *in) {
+  bool isList = false;
+  bool open = false;
+  char *whereOpened;
+  char *tok = strtok(in, " ");
+  while (tok != NULL) {
+    if (*tok == '{') {
+      if (open) {
+        fprintf(stderr, BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", in, genWrongUnderline(in, tok, tok));
+        exit(1);
+      }
+      whereOpened = tok;
+      open = true;
+      isList = true;
+    } else if (*tok == '}') {
+      if (!open) {
+        fprintf(stderr, BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", in, genWrongUnderline(in, tok, tok));
+        exit(1);
+      }
+      open = false;
+    }
+    tok = strtok(NULL, " ");
+  }
+  if (isList && open) {
+    fprintf(stderr, BKRED "Error: Found unclosed list: \n\t%s\n\t%s\n", in, genWrongUnderline(in, whereOpened, tok));
+    exit(1);
+  }
+  return isList;
+}
+
+void evalLine (char* currentBuffer) {
   char *src = currentBuffer;
   while (*src == ' ' || *src == '\t')
     src++;
   VERBOSE_PRINT("Evaluating line bufer...");
   VERBOSE_PRINT_VALUE(%s, src);
 
+  if (isList(currentBuffer)) {
+    printf("ITS A LIST!!!\n");
+    /*evalList*/;
+  }
 
 }

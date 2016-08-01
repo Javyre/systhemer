@@ -129,16 +129,29 @@ void strTrimInRange (char *from, char *to) {
       src++;
     }
   }
-  if (*src != '\t' && *src != ' ') {
+  /*if (*src != '\t' && *src != ' ') {
     *source = *src;
     source++;
+    }*/
+  while (*(src-1) != '\0') {
+    *source = *src;
+    source++;
+    src++;
   }
+  /*
   if (*(source - 1) == ' ')
     *(source - 1) = '\0';
   else
     *source = '\0';
+    */
 
-  VERBOSE_PRINT_VALUE(%s, src);
+  /*if (*to != '\0') {
+
+    strcpy(src, to);
+    *(src + strlen(to)) = '\0';
+    strOverlap(src, from, to, to, NULL);
+    }*/
+  //VERBOSE_PRINT_VALUE(%s, src);
 
 
 }
@@ -148,11 +161,13 @@ bool isInsideOfStr (char *str, char *pos) {
   bool isInString = false;
   while (*src != '\0') {
     if (*src == '\"' && *(src-1) != '\\') {
-      isInString = (isInString) ? true : false;
+      isInString = (isInString) ? false : true;
     }
 
-    if (src == pos)
+    if (src == pos) {
       return isInString;
+      break;
+    }
     src++;
   }
   fprintf(stderr, "Error: something went wrong in function isInsideOfStr()... src never matched pos\n");
@@ -171,15 +186,21 @@ void strTrimStrAware (char *in) {
   }
 
   while (*src != '\0') {
-    if (isInsideOfStr(in, src) == true) {
-      if (isInString == false) {
+    if (*(src+1) == '\0') {
+      strTrimInRange(begin, NULL);
+      break;
+    }
+    if (isInsideOfStr(in, src) == true) { // If the current char is inside of a string
+      if (isInString == false) {          // If the previous char wasnt inside of a string
         end = (src-1);
         strTrimInRange(begin, end);
       }
+
       isInString = true;
-    } else {
-      if (isInString == true)
+    } else {                              // If the current char isnt inside of a string
+      if (isInString == true)             // If the previous char was inside of a string
         begin = (src-1);
+
       isInString = false;
     }
 

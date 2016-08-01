@@ -7,7 +7,7 @@ begindef "i3";
 
 begindef tokens {
          "client.fo\\cused              %s %s %s %s %s", 
-         "client.focused_inactive       %s %s %s %s %s", 
+         "client.focused_inactive       %s %s %s %s %s"      , 
          "client.unfocused              %s %s %s %s %s", 
          "client.urgent                 %s %s %s %s %s", 
          "client.placeholder            %s %s %s %s %s", 

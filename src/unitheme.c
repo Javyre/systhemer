@@ -147,6 +147,33 @@ bool isList (char *in) {
   return isList;
 }
 
+bool isAssignation (char *in) {
+  bool isAssignation = false;
+  bool noValue = true;
+  int distance = 0;
+  int flag = 0;
+  char *tok = strtok(in, "=");
+  while (tok != NULL) {
+    distance += strlen(tok) + 1;
+    if (isInsideOfStr(in, (in+distance))) {
+      tok = strtok(NULL, "=");
+      continue;
+    } else {
+      isAssignation = true;
+      flag++;
+    }
+    
+
+    tok =  strtok(NULL, "=");
+  }
+  if (isAssignation && flag != 2) {
+    printf("Warning: The is supposed to be only one token on each side of an '=' sign in an assignation! Weird things might happen!\n");
+  }
+  if (flag == 1)
+    return false;
+  return isAssignation;
+}
+
 void evalLine (char* currentBuffer) {
   char *src = currentBuffer;
   while (*src == ' ' || *src == '\t')
@@ -157,6 +184,11 @@ void evalLine (char* currentBuffer) {
   if (isList(currentBuffer)) {
     printf("ITS A LIST!!!\n");
     /*evalList*/;
+  }
+
+  if (isAssignation(currentBuffer)){
+    printf("ITS AN ASSIGNATION!!!\n")
+    /*evalAssignation*/;
   }
 
 }

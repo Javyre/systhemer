@@ -25,6 +25,14 @@ bool hasLineExtension(char **currentBuffer);
 
 void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 
+void getFullLine(char **currentBuffer, FILE *UniThemeFile);
+
+bool isList (char *in);
+
+bool isAssignation (char *in);
+
 void evalLine(char *currentBuffer);
+
+void evalAssig(char* currentBuffer);
 
 #endif

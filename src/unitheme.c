@@ -18,8 +18,9 @@ void loadUniTheme(const char *filename) {
       continue;
     } else {
       getFullLine(&buff, UniThemeFile);
-      rmEscape(&buff);
+      //rmEscape(&buff);
       strTrimStrAware(buff);
+      rmEscape(&buff);
       evalLine(buff);
     }
     buff = realloc(buff, 256);
@@ -28,20 +29,6 @@ void loadUniTheme(const char *filename) {
   fclose(UniThemeFile);
 }
 
-char *genWrongUnderline(char *line, char *from, char *to) {
-  char *underline = calloc(strlen(line)+1, sizeof(char));
-  char *srcUnderline = underline;
-  char *srcLine = line;
-  while (*srcLine != '\0') {
-    if (srcLine >= from && srcLine <= to)
-      *srcUnderline = '^';
-    else
-      *srcUnderline = ' ';
-    srcLine++;
-    srcUnderline++;
-  }
-  return underline;
-}
 
 void rmComment(char *in) {
   char *src = in;
@@ -64,12 +51,23 @@ void rmEscape(char **currentBuffer) {
   src = original;
   */
   while (*src != '\0') {
-    if (*src == '\\' && (src[1] == '\\' || src[1] == '#')) {
-      strOverlap(original, original, (src-1), (src+1), NULL);
-      src++;
-    } else if (*src == '\\' && (src[1] != '\\' && src[1] != '#')) {
-      fprintf(stderr, BKRED "Error: Found escape character with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], original, genWrongUnderline(original, src, src+1));
-      exit(1);
+    if (!isInsideOfStr(original, src)) {
+      if (*src == '\\' && (src[1] == '\\' || src[1] == '#')) {
+        strOverlap(original, original, (src-1), (src+1), NULL);
+        src++;
+      } else if (*src == '\\' && (src[1] != '\\' && src[1] != '#')) {
+        fprintf(stderr, BKRED "Error: Found escape character outside of string with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], original, genWrongUnderline(original, src, src+1));
+        exit(1);
+      }
+    } else {
+      if (*src == '\\' && (src[1] == '\"')) {
+        strOverlap(original, original, (src-1), (src+1), NULL);
+        src++;
+      } /*else if (*src == '\\' && (src[1] != '\"')) {
+        fprintf(stderr, BKRED "Error: Found escape character inside of string with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], original, genWrongUnderline(original, src, src+1));
+        exit(1);
+        }*/
+
     }
     src++;
   }
@@ -118,14 +116,19 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
 }
 
 bool isList (char *in) {
+  int lengthOfIn = strlen(in)+1;
+  char *copy = malloc(lengthOfIn);
+  memset(copy, '\0', lengthOfIn);
+
   bool isList = false;
   bool open = false;
   char *whereOpened;
-  char *tok = strtok(in, " ");
+  char *tok = strtok(copy, " ");
+
   while (tok != NULL) {
     if (*tok == '{') {
       if (open) {
-        fprintf(stderr, BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", in, genWrongUnderline(in, tok, tok));
+        fprintf(stderr, BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", copy, genWrongUnderline(copy, tok, tok));
         exit(1);
       }
       whereOpened = tok;
@@ -133,7 +136,7 @@ bool isList (char *in) {
       isList = true;
     } else if (*tok == '}') {
       if (!open) {
-        fprintf(stderr, BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", in, genWrongUnderline(in, tok, tok));
+        fprintf(stderr, BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", copy, genWrongUnderline(copy, tok, tok));
         exit(1);
       }
       open = false;
@@ -141,37 +144,41 @@ bool isList (char *in) {
     tok = strtok(NULL, " ");
   }
   if (isList && open) {
-    fprintf(stderr, BKRED "Error: Found unclosed list: \n\t%s\n\t%s\n", in, genWrongUnderline(in, whereOpened, tok));
+    fprintf(stderr, BKRED "Error: Found unclosed list: \n\t%s\n\t%s\n", copy, genWrongUnderline(copy, whereOpened, tok));
     exit(1);
   }
+  free(copy);
+  copy=NULL;
+
   return isList;
 }
 
 bool isAssignation (char *in) {
-  bool isAssignation = false;
-  bool noValue = true;
-  int distance = 0;
-  int flag = 0;
-  char *tok = strtok(in, "=");
-  while (tok != NULL) {
-    distance += strlen(tok) + 1;
-    if (isInsideOfStr(in, (in+distance))) {
-      tok = strtok(NULL, "=");
-      continue;
-    } else {
-      isAssignation = true;
-      flag++;
-    }
-    
+  char *src = in;
+  char *end = in;
+  while (*end != '\0') end++;
+  char *subStr;
 
-    tok =  strtok(NULL, "=");
+
+  while (*src != '\0') {
+    if (*src == '=' && !isEmptyStrInRange(in, src-1) && !isInsideOfStr(in, src)) {
+      if (isEmptyStrInRange(src+1, end-2)) {
+
+        subStr = malloc(((src-1)-in)+2);
+        memset(subStr, '\0', ((src-1)-in)+2);
+        strncpy(subStr, in, (src-1)-in);
+
+        fprintf(stderr, BKRED "Error: empty value assigned to %s : \n\t%s\n\t%s\n" KDEFAULT, subStr, in, genWrongUnderline(in, src+1, end-2));
+
+        free(subStr);
+        subStr=NULL;
+        exit(1);
+      }
+      return true;
+    }
+    src++;
   }
-  if (isAssignation && flag != 2) {
-    printf("Warning: The is supposed to be only one token on each side of an '=' sign in an assignation! Weird things might happen!\n");
-  }
-  if (flag == 1)
-    return false;
-  return isAssignation;
+  return false;
 }
 
 void evalLine (char* currentBuffer) {
@@ -187,8 +194,13 @@ void evalLine (char* currentBuffer) {
   }
 
   if (isAssignation(currentBuffer)){
-    printf("ITS AN ASSIGNATION!!!\n")
-    /*evalAssignation*/;
+   printf("ITS AN ASSIGNATION!!!\n");
+    /* evalAssignation; */
+   evalAssig(currentBuffer);
   }
+
+}
+
+void evalAssig(char* currentBuffer) {
 
 }

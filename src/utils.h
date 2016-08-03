@@ -25,6 +25,7 @@
 #define KCYN  "\x1B[36m"
 #define BKCYN  "\e[1;36m"
 #define KWHT  "\x1B[37m"
+#define KDEFAULT "\x1b[0m"
 #define BKWHT  "\e[1;37m"
 
 #define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\x1b[0m" "\n", token);
@@ -42,10 +43,12 @@ bool isInsideOfStr(char *str, char *pos);
 void printHelp(const int);
 void verboseMessage(const char*);
 void parseArgs(int, char* []);
+char *genWrongUnderline(char *line, char *from, char *to);
 void strTrim(char *in);
 void strTrimInRange(char *from, char *to);
+bool isEmptyStr (char *str);
+bool isEmptyStrInRange (char *from, char *to);
 void strTrimStrAware(char *in);
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
-
 
 #endif

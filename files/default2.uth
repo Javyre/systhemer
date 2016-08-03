@@ -3,7 +3,7 @@
 # Defaults.uth
 # This file contains the default program definitions and unitheme for SysThemer
 # Test comment
-begindef "i3";
+begindef\\ "i3";
 
 begindef tokens {
          "client.fo\\cused              %s %s %s %s %s", 
@@ -15,7 +15,8 @@ begindef tokens {
 };
 tes              t;
 path="~/.config/i3/config";
-exec-before="";
+exec-before="\"";
+poop="";
 
          # class                  border  backgr. text    indicator child_border
 begindef snippets {

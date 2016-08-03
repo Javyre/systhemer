@@ -76,6 +76,22 @@ void parseArgs(int argc, char *argv[]) {
   }
 }
 
+
+char *genWrongUnderline(char *line, char *from, char *to) {
+  char *underline = calloc(strlen(line)+1, sizeof(char));
+  char *srcUnderline = underline;
+  char *srcLine = line;
+  while (*srcLine != '\0') {
+    if (srcLine >= from && srcLine <= to)
+      *srcUnderline = '^';
+    else
+      *srcUnderline = ' ';
+    srcLine++;
+    srcUnderline++;
+  }
+  return underline;
+}
+
 void strTrim(char *in) {
   char *firstin = in; // Hold position of first char in char* in
   char *source = in;  // Used to rewrite char* in
@@ -156,6 +172,47 @@ void strTrimInRange (char *from, char *to) {
 
 }
 
+bool isEmptyStrInRange (char *from, char *to) {
+  bool isEmpty = true;
+  char *copy;
+  char *copySrc;
+  if (to == NULL) {
+    to = from;
+    while (*to != '\0')
+      to++;
+    to--;
+  }
+  if (from > to) {
+    fprintf(stderr, BKRED "Error: isEmptyStrInRange received invalid parameters: from address is greater than to address!\nfrom :\t%p :\t%s\nto   :\t%p :\t%s\n" KDEFAULT, from, from, to, to);
+    exit(1);
+  }
+
+
+  copy = malloc((to-from)+4);
+  memset(copy, '\0', (to-from)+4);
+  strncpy(copy, from, to-from);
+  copySrc = copy;
+
+
+
+  while (*copySrc != '\0') {
+    if (*copySrc != ' ' && *copySrc != '\n' && *copySrc != '\t') {
+      isEmpty = false;
+      break;
+    }
+    copySrc++;
+  }
+
+  free(copy);
+  copy = NULL;
+  return isEmpty;
+}
+
+
+bool isEmptyStr (char *str) {
+  return isEmptyStrInRange (str, NULL);
+}
+
 bool isInsideOfStr (char *str, char *pos) {
   char *src = str;
   bool isInString = false;
@@ -170,7 +227,16 @@ bool isInsideOfStr (char *str, char *pos) {
     }
     src++;
   }
-  fprintf(stderr, "Error: something went wrong in function isInsideOfStr()... src never matched pos\n");
+  if (pos < str || pos > src) {
+    fprintf(stderr, BKRED "Error: Passed an out of bounds pos to function isInsideOfStr() : %s\n"
+            "pos\t\t\t: %p :\t%s\n"
+            "str (first char of str)\t: %p :\t%s\n"
+            "src (last char of src)\t: %p :\t%s\n" KDEFAULT, (pos < str) ?
+            "pos pointer is smaller than pointer to first char of str" : (pos > src) ?
+            "pos pointer is greater than pointer to last char of str" :
+            "If you are reading this something is very very wrong", pos, pos, str, str, src, src);
+  }
+  fprintf(stderr, BKRED "Error: something went wrong in function isInsideOfStr()... src never matched pos\n" KDEFAULT);
   return false;
 }
 
@@ -186,9 +252,14 @@ void strTrimStrAware (char *in) {
   }
 
   while (*src != '\0') {
-    if (*(src+1) == '\0') {
+    if (*(src+1) == '\0' && !isInsideOfStr(in, src)) {
       strTrimInRange(begin, NULL);
+      return;
       break;
+    } else if (*(src+1) == '\0') {
+      fprintf(stderr, BKRED "Error: an unclosed string has been passed to function strTrimStrAware in utils.c!: \n\t%s\n\t%s\n" KDEFAULT, in, genWrongUnderline(in , src, src+1));
+
+      exit(1);
     }
     if (isInsideOfStr(in, src) == true) { // If the current char is inside of a string
       if (isInString == false) {          // If the previous char wasnt inside of a string
@@ -206,15 +277,15 @@ void strTrimStrAware (char *in) {
 
     src++;
   }
+  /*
   if (isInsideOfStr(in, src-1) == false) {
     end = (src-1);
     strTrimInRange(begin, end);
     return;
-  }
+    }*/
+  return;
 
 
-  fprintf(stderr, "Error: an unclosed string has been passed to function strTrimStrAware in utils.c!");
-  exit(1);
 }
 
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {

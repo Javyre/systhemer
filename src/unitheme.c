@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
 void loadUniTheme(const char *filename) {
   char *buff = malloc(256);
   FILE *UniThemeFile = fopen(filename, "r");
@@ -153,11 +155,12 @@ bool isList (char *in) {
   return isList;
 }
 
-bool isAssignation (char *in) {
+bool isAssignation (char *in, char **outTok, char **outValue) {
   char *src = in;
   char *end = in;
   while (*end != '\0') end++;
   char *subStr;
+  int temp;
 
 
   while (*src != '\0') {
@@ -174,6 +177,16 @@ bool isAssignation (char *in) {
         subStr=NULL;
         exit(1);
       }
+      temp = ((src-1)-in)+1;
+      *outTok = malloc(temp +1);
+      memset(*outTok, '\0', temp+1);
+      strncpy(*outTok, in, temp);
+
+      temp = ((end-2)-(src+1))+1;
+      *outValue = malloc(temp +1);
+      memset(*outValue, '\0', temp+1);
+      strncpy(*outValue, src+1, temp);
+
       return true;
     }
     src++;
@@ -182,7 +195,9 @@ bool isAssignation (char *in) {
 }
 
 void evalLine (char* currentBuffer) {
-  char *src = currentBuffer;
+  char *src        = currentBuffer;
+  char *assigTok   = NULL;
+  char *assigValue = NULL;
   while (*src == ' ' || *src == '\t')
     src++;
   VERBOSE_PRINT("Evaluating line bufer...");
@@ -193,14 +208,16 @@ void evalLine (char* currentBuffer) {
     /*evalList*/;
   }
 
-  if (isAssignation(currentBuffer)){
+  if (isAssignation(currentBuffer, &assigTok, &assigValue)){
    printf("ITS AN ASSIGNATION!!!\n");
     /* evalAssignation; */
-   evalAssig(currentBuffer);
+   evalAssig(currentBuffer, assigTok, assigValue);
   }
 
 }
 
-void evalAssig(char* currentBuffer) {
-
+void evalAssig(char* currentBuffer, char* tok, char* value) {
+      if (strcmp(tok, "path") == 0) {
+        printf("FOUND PATH ASSIGNATION!!!\n");
+      }
 }

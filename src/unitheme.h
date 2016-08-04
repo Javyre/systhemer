@@ -14,6 +14,7 @@ struct programDef
   int end;
   char *execAfter;
 };
+struct programDef currentProg;
 
 void loadUniTheme(const char *filename);
 
@@ -29,10 +30,10 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 
 bool isList (char *in);
 
-bool isAssignation (char *in);
+bool isAssignation (char *in, char **outTok, char **outValue);
 
 void evalLine(char *currentBuffer);
 
-void evalAssig(char* currentBuffer);
+void evalAssig(char* currentBuffer, char* tok, char* value);
 
 #endif

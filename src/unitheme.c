@@ -118,42 +118,36 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
 }
 
 bool isList (char *in) {
-  int lengthOfIn = strlen(in)+1;
-  char *copy = malloc(lengthOfIn);
-  memset(copy, '\0', lengthOfIn);
-
+  char *src = in;
   bool isList = false;
   bool open = false;
   char *whereOpened;
-  char *tok = strtok(copy, " ");
-
-  while (tok != NULL) {
-    if (*tok == '{') {
+  while (*src != '\0') {
+    if (*src == '{') {
       if (open) {
-        fprintf(stderr, BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", copy, genWrongUnderline(copy, tok, tok));
+        fprintf(stderr, BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", in, genWrongUnderline(in, src, src));
         exit(1);
       }
-      whereOpened = tok;
+      whereOpened = src;
       open = true;
       isList = true;
-    } else if (*tok == '}') {
+    } else if (*src == '}') {
       if (!open) {
-        fprintf(stderr, BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", copy, genWrongUnderline(copy, tok, tok));
+        fprintf(stderr, BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", in, genWrongUnderline(in, src, src));
         exit(1);
       }
       open = false;
     }
-    tok = strtok(NULL, " ");
+    src++;
   }
   if (isList && open) {
-    fprintf(stderr, BKRED "Error: Found unclosed list: \n\t%s\n\t%s\n", copy, genWrongUnderline(copy, whereOpened, tok));
+    fprintf(stderr, BKRED "Error: Found unclosed list: \n\t%s\n\t%s\n", in, genWrongUnderline(in, whereOpened, src));
     exit(1);
   }
-  free(copy);
-  copy=NULL;
 
   return isList;
 }
+
 
 bool isAssignation (char *in, char **outTok, char **outValue) {
   char *src = in;
@@ -191,6 +185,11 @@ bool isAssignation (char *in, char **outTok, char **outValue) {
     }
     src++;
   }
+  return false;
+}
+
+bool isStatement (char* in, char** outCall, char** outArg) {
+
   return false;
 }
 

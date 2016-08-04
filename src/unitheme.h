@@ -10,8 +10,8 @@ struct programDef
   char *tokens;
   char *path;
   char *execBefore;
-  int start;
-  int end;
+  int beginDef;
+  int endDef;
   char *execAfter;
 };
 struct programDef currentProg;
@@ -31,6 +31,8 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 bool isList (char *in);
 
 bool isAssignation (char *in, char **outTok, char **outValue);
+
+bool isStatement (char* in, char** outCall, char** outArg);
 
 void evalLine(char *currentBuffer);
 

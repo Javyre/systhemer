@@ -63,8 +63,9 @@ void rmEscape(char **currentBuffer) {
       }
     } else {
       if (*src == '\\' && (src[1] == '\"')) {
-        strOverlap(original, original, (src-1), (src+1), NULL);
-        src++;
+        //strOverlap(original, original, (src-1), (src+1), NULL);
+        //src++;
+        ;
       } /*else if (*src == '\\' && (src[1] != '\"')) {
         fprintf(stderr, BKRED "Error: Found escape character inside of string with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], original, genWrongUnderline(original, src, src+1));
         exit(1);
@@ -117,12 +118,26 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
   free(holder);
 }
 
-bool isList (char *in) {
+bool isList (char *in, char **outListName, char ***outListItems, int *outNumItems) {
   char *src = in;
+  char **listItems;
+  char **listItemsSrc = *outListItems;
+  char **lastItem;
   bool isList = false;
   bool open = false;
   char *whereOpened;
+  char *tmpc;
+  char *tok;
+  char *contents;
+
+  int numItems = 0;
+  int tmp;
+
   while (*src != '\0') {
+    if (*src == '\n') {
+      src++;
+      continue;
+    }
     if (*src == '{') {
       if (open) {
         fprintf(stderr, BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", in, genWrongUnderline(in, src, src));
@@ -137,6 +152,32 @@ bool isList (char *in) {
         exit(1);
       }
       open = false;
+
+      tmp = ((src-1)-(whereOpened+1))+1;
+      contents = malloc(tmp+1);
+      memset(contents, '\0', tmp+1);
+      strncpy(contents, whereOpened+1, tmp);
+      VERBOSE_PRINT_VALUE(%s, contents);
+      tmpc = contents;
+      while(*tmpc != '\0') {
+        *tmpc = (*tmpc == '\n') ? ' ' : *tmpc;
+        tmpc++;
+      }
+      strTrimStrAware(contents);
+      VERBOSE_PRINT_VALUE(%s, contents);
+
+      tmpc = src;
+      tmpc--;
+      while (*tmpc == ' '|| *tmpc == '\n') tmpc--;
+      if (*tmpc == '\"') {
+        numItems++;
+      } else if (*tmpc != '\n' && *tmpc != ',') {
+        fprintf(stderr, BKRED "Error: Invalid character \"%c\" after end of last item: \n\t%s\n\t%s\n", *tmpc, in, genWrongUnderline(in, tmpc, tmpc));
+        exit(1);
+      }
+
+    } else if (*src == ',' && open && !isInsideOfStr(in, src)) {
+      numItems++;
     }
     src++;
   }
@@ -144,7 +185,34 @@ bool isList (char *in) {
     fprintf(stderr, BKRED "Error: Found unclosed list: \n\t%s\n\t%s\n", in, genWrongUnderline(in, whereOpened, src));
     exit(1);
   }
+  if (isList) {
+    *outNumItems = numItems;
 
+    strTrimStrAware(in);
+    src = in;
+    while (*src != ' ') src++;
+    tmp = ((whereOpened-1)-src) + ((*(whereOpened-1) == ' ') ? 0 : 1);
+    *outListName = malloc(tmp);
+    memset(*outListName, '\0', tmp);
+    strncpy(*outListName, src+1, tmp-1);
+
+
+    listItems = malloc(sizeof(char *) * numItems);
+    lastItem = (listItemsSrc+(numItems-1));
+
+    tok = strtok(contents, ",");
+    tmp = 0;
+    for (int i=0; i<numItems; i++) {
+      listItems[i] = malloc(sizeof(char) * (strlen(tok) +1));
+      strcpy(listItems[i], tok);
+      VERBOSE_PRINT_VALUE(%s, listItems[i]);
+      tok = strtok(NULL, ",");
+    }
+
+    *outListItems = listItems;
+    free(contents);
+
+  }
   return isList;
 }
 
@@ -197,13 +265,16 @@ void evalLine (char* currentBuffer) {
   char *src        = currentBuffer;
   char *assigTok   = NULL;
   char *assigValue = NULL;
+  char *listName   = NULL;
+  char **listItems = NULL;
+  int  numItems;
   while (*src == ' ' || *src == '\t')
     src++;
   VERBOSE_PRINT("Evaluating line bufer...");
   VERBOSE_PRINT_VALUE(%s, src);
 
-  if (isList(currentBuffer)) {
-    printf("ITS A LIST!!!\n");
+  if (isList(currentBuffer, &listName, &listItems, &numItems)) {
+    printf("ITS A LIST!!! ###%s###%d###\n", listName, numItems);
     /*evalList*/;
   }
 
@@ -215,8 +286,17 @@ void evalLine (char* currentBuffer) {
 
 }
 
+void evalList(char* currentBuffer, char* listName, char** listItems, int numItems) {
+  for(int i = 0; i < numItems; i++)
+		free(listItems[i]);
+	free(listItems);
+  free(listName);
+}
+
 void evalAssig(char* currentBuffer, char* tok, char* value) {
       if (strcmp(tok, "path") == 0) {
         printf("FOUND PATH ASSIGNATION!!!\n");
       }
+      free(tok);
+      free(value);
 }

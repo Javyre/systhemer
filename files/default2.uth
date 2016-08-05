@@ -5,14 +5,14 @@
 # Test comment
 begindef "i3";
 
-def tokens {
+def tokens{
          "client.fo\\cused              %s %s %s %s %s", 
-         "client.focused_inactive       %s %s %s %s %s"      , 
+         "client.fo\"cused_inactive       %s %s %s %s %s"      , 
          "client.unfocused              %s %s %s %s %s", 
          "client.urgent                 %s %s %s %s %s", 
          "client.placeholder            %s %s %s %s %s", 
-         "client.background             %s"
-};
+         "client.background             %s",
+          };
 tes              t;
 path="~/.config/i3/config";
 exec-before="\"";

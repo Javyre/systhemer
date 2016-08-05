@@ -235,6 +235,7 @@ bool isInsideOfStr (char *str, char *pos) {
             "pos pointer is smaller than pointer to first char of str" : (pos > src) ?
             "pos pointer is greater than pointer to last char of str" :
             "If you are reading this something is very very wrong", pos, pos, str, str, src, src);
+    exit(1);
   }
   fprintf(stderr, BKRED "Error: something went wrong in function isInsideOfStr()... src never matched pos\n" KDEFAULT);
   return false;

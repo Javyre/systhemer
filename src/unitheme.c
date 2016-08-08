@@ -11,7 +11,7 @@ void loadUniTheme(const char *filename) {
   FILE *UniThemeFile = fopen(filename, "r");
   currentLine = 0;
   defsInitArr(&progDefs, 5);
- currentProg = calloc(1, sizeof(programDef));
+  currentProg = calloc(1, sizeof(programDef));
 
   if (UniThemeFile == NULL) {
     fprintf(stderr, "Error: file %s not found!", filename);
@@ -34,6 +34,7 @@ void loadUniTheme(const char *filename) {
   free(buff);
   fclose(UniThemeFile);
   defsFree(&progDefs);
+  free(currentProg);
 }
 
 //--------------------------------------------------------------------
@@ -87,8 +88,12 @@ void defsFree(programDefs *a) {
         a->progs[i]->execBefore=NULL;
         a->progs[i]->execAfter=NULL;
 
-        a->progs[1]->beginDef=0;
-        a->progs[1]->endDef=0;
+        free(a->progs[i]->beginDef);
+        free(a->progs[i]->endDef);
+        a->progs[i]->beginDef=NULL;
+        a->progs[i]->endDef=NULL;
+        /* a->progs[1]->beginDef=0; */
+        /* a->progs[1]->endDef=0; */
     }
 
     // Now free the array 
@@ -335,6 +340,8 @@ bool isStatement (char* in, char** outCall, char** outArg) {
       *outArg = strMkCpy(tok);
     words++;
   }
+  free(copyIn);
+  copyIn = NULL;
   if (words != 2)
     return false;
   return true;
@@ -359,16 +366,23 @@ void evalLine (char* currentBuffer) {
     printf("ITS A STATEMENT!!!\n");
     /*evalStatement*/;
     evalStatement(currentBuffer, statCall, statArg);
+    statCall = NULL;
+    statArg = NULL;
   } else if (isAssignation(currentBuffer, &assigTok, &assigValue)){
     printf("ITS AN ASSIGNATION!!!\n");
     /* evalAssignation; */
     evalAssig(currentBuffer, assigTok, assigValue);
+    assigTok = NULL;
+    assigValue = NULL;
   } else if (isList(currentBuffer, &listName, &listItems, &numItems)) {
     printf("ITS A LIST!!! ###%s###%d###\n", listName, numItems);
     /*evalList*/;
     evalList(currentBuffer, listName, listItems, numItems);
+    listName = NULL;
+    listItems = NULL;
+    numItems = 0;
   } else {
-    fprintf(stderr, BKRED "Error: Could not recognize: %s", currentBuffer);
+    fprintf(stderr, BKRED "Error: Could not recognize (line #%d): %s", currentLine, currentBuffer);
     exit(1);
   }
 
@@ -376,25 +390,32 @@ void evalLine (char* currentBuffer) {
 }
 
 void evalStatement(char *currentBuffer, char *statCall, char *statArg) {
-  strUnstring(statArg);
+  strUnstring(&statArg);
   if (strcmp(statCall, "begindef") == 0) {
     if (currentProg->name == NULL) {
-      currentProg->beginDef = currentLine;
+      currentProg->beginDef = malloc(sizeof(unsigned int) * 1);
+      *currentProg->beginDef = currentLine;
       currentProg->name = statArg;
     } else {
       fprintf(stderr, BKRED "Error: Called begindef twice! : check line #%d\n" KDEFAULT, currentLine);
       exit(1);
     }
-  } else if (strcmp(statCall, "endDef") == 0) {
+  } else if (strcmp(statCall, "enddef") == 0) {
+    VERBOSE_PRINT("ENDING DEF SECTION");
     /* store program detail of struct somehow */
-    currentProg->endDef = currentLine;
+    currentProg->endDef = malloc(sizeof(unsigned int) * 1);
+    *currentProg->endDef = currentLine;
     defsInsert(&progDefs, currentProg);
-   
+
+    currentProg = calloc(1, sizeof(programDef));
+    currentProg->name = NULL;
+
   }
   printf("%s\n", statCall);
   printf("%s\n", statArg);
   free(statCall);
-  free(statArg);
+  statCall = NULL;
+  //free(statArg);
 }
 
 void evalAssig(char* currentBuffer, char* tok, char* value) {

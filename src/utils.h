@@ -51,9 +51,9 @@ void strTrimInRange(char *from, char *to);
 bool isEmptyStr (char *str);
 bool isEmptyStrInRange (char *from, char *to);
 void strTrimStrAware(char *in);
-char *strRealloc(char *str);
+void strRealloc(char **str);
 void strRmEscape(char *str);
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
-void strUnstring(char *str);
+void strUnstring(char **str);
 
 #endif

@@ -228,7 +228,9 @@ bool isInsideOfStr (char *str, char *pos) {
   char *src = str;
   bool isInString = false;
   while (*src != '\0') {
-    if (*src == '\"' && *(src-1) != '\\') {
+    if (*src == '\"' && src == str) {
+      isInString = (isInString) ? false : true;
+    } else if (*src == '\"' && *(src-1) != '\\' && src != str) {
       isInString = (isInString) ? false : true;
     }
 
@@ -324,13 +326,12 @@ void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {
   free(holder2);
 }
 
-char *strRealloc(char *str) {
-  char *out = realloc(str, strlen(str)+1);
-  if (out == NULL) {
+void strRealloc(char **str) {
+  *str = realloc(*str, strlen(*str)+1);
+  if (*str == NULL) {
     fprintf(stderr, "Error: failed to reallocate variable in heap");
     exit(1);
   }
-  return out;
 }
 
 void strRmEscape(char *str) {
@@ -358,22 +359,22 @@ void strRmEscape(char *str) {
 
 }
 
-void strUnstring(char *str) {
-  VERBOSE_PRINT_VALUE(%s, str);
-  strRmEscape(str);
-  VERBOSE_PRINT_VALUE(%s, str);
-  for (int i = 0; i < (int)strlen(str); i++) {
-    str[i] = (str[i] == '\"') ? ' ' : str[i];
+void strUnstring(char **str) {
+  VERBOSE_PRINT_VALUE(%s, *str);
+  strRmEscape(*str);
+  VERBOSE_PRINT_VALUE(%s, *str);
+  for (size_t i = 0; i < strlen(*str); i++) {
+    (*str)[i] = ((*str)[i] == '\"') ? ' ' : (*str)[i];
  }
-  VERBOSE_PRINT_VALUE(%s, str);
-  if (str[0] == ' ') {
-    for (int i=0; i < (int)strlen(str); i++) {
-      str[i] =  str[i+1];
+  VERBOSE_PRINT_VALUE(%s, *str);
+  if ((*str)[0] == ' ') {
+    for (size_t i=0; i < strlen(*str); i++) {
+      (*str)[i] =  (*str)[i+1];
     }
   }
-  VERBOSE_PRINT_VALUE(%s, str);
-  str[strlen(str)-1] = (str[strlen(str)-1] == ' ') ? '\0' : str[strlen(str)-1];
-  str = strRealloc(str);
-  VERBOSE_PRINT_VALUE(%s, str);
+  VERBOSE_PRINT_VALUE(%s, *str);
+  (*str)[strlen(*str)-1] = ((*str)[strlen(*str)-1] == ' ') ? '\0' : (*str)[strlen(*str)-1];
+  strRealloc(str);
+  VERBOSE_PRINT_VALUE(%s, *str);
 }
 

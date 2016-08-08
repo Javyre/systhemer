@@ -10,8 +10,8 @@ typedef struct
   char *tokens;
   char *path;
   char *execBefore;
-  int beginDef;
-  int endDef;
+  unsigned int *beginDef;
+  unsigned int *endDef;
   char *execAfter;
 } programDef;
 programDef *currentProg;
@@ -24,7 +24,7 @@ typedef struct
 } programDefs;
 programDefs progDefs;
 
-int currentLine;
+unsigned int currentLine;
 
 void loadUniTheme(const char *filename);
 

@@ -31,4 +31,5 @@ def snippets {
 exec-after="";
 
 enddef "i3";
-begindef "bspwm";
+# begindef "bspwm";
+# enddef "bspwm";

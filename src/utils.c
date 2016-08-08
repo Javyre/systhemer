@@ -91,6 +91,17 @@ char *genWrongUnderline(char *line, char *from, char *to) {
   }
   return underline;
 }
+char *strMkCpyInRange(char *from, int numchars) {
+  if (numchars == 0) {
+    numchars = strlen(from);
+  }
+  char *out = calloc(sizeof(char), numchars+1);
+  strncpy(out, from, numchars);
+  return out;
+}
+char *strMkCpy(char *in) {
+  return strMkCpyInRange(in, 0);
+}
 
 void strTrim(char *in) {
   char *firstin = in; // Hold position of first char in char* in
@@ -313,4 +324,56 @@ void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {
   free(holder2);
 }
 
+char *strRealloc(char *str) {
+  char *out = realloc(str, strlen(str)+1);
+  if (out == NULL) {
+    fprintf(stderr, "Error: failed to reallocate variable in heap");
+    exit(1);
+  }
+  return out;
+}
+
+void strRmEscape(char *str) {
+  char *src = str;
+  /*
+  while (*src != '\0' && *src != '\n')
+    src++;
+  if (*src == '\n')
+    fprintf(stderr, "Warning: found a '\\n' (newline) character in current buffer string! This is dangerous!!!\n");
+  src = str;
+  */
+  while (*src != '\0') {
+    if (isInsideOfStr(str, src)) {
+      if (*src == '\\' && (src[1] == '\"')) {
+        strOverlap(str, str, (src-1), (src+1), NULL);
+        src++;
+      } else if (*src == '\\' && (src[1] != '\"')) {
+        fprintf(stderr, BKRED "Error: Found escape character inside of string with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], str, genWrongUnderline(str, src, src+1));
+        exit(1);
+        }
+
+    }
+    src++;
+  }
+
+}
+
+void strUnstring(char *str) {
+  VERBOSE_PRINT_VALUE(%s, str);
+  strRmEscape(str);
+  VERBOSE_PRINT_VALUE(%s, str);
+  for (int i = 0; i < (int)strlen(str); i++) {
+    str[i] = (str[i] == '\"') ? ' ' : str[i];
+ }
+  VERBOSE_PRINT_VALUE(%s, str);
+  if (str[0] == ' ') {
+    for (int i=0; i < (int)strlen(str); i++) {
+      str[i] =  str[i+1];
+    }
+  }
+  VERBOSE_PRINT_VALUE(%s, str);
+  str[strlen(str)-1] = (str[strlen(str)-1] == ' ') ? '\0' : str[strlen(str)-1];
+  str = strRealloc(str);
+  VERBOSE_PRINT_VALUE(%s, str);
+}
 

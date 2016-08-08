@@ -44,11 +44,16 @@ void printHelp(const int);
 void verboseMessage(const char*);
 void parseArgs(int, char* []);
 char *genWrongUnderline(char *line, char *from, char *to);
+char *strMkCpyInRange(char *from, int numchars);
+char *strMkCpy(char *in);
 void strTrim(char *in);
 void strTrimInRange(char *from, char *to);
 bool isEmptyStr (char *str);
 bool isEmptyStrInRange (char *from, char *to);
 void strTrimStrAware(char *in);
+char *strRealloc(char *str);
+void strRmEscape(char *str);
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
+void strUnstring(char *str);
 
 #endif

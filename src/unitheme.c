@@ -9,6 +9,9 @@
 void loadUniTheme(const char *filename) {
   char *buff = malloc(256);
   FILE *UniThemeFile = fopen(filename, "r");
+  currentLine = 0;
+  defsInitArr(&progDefs, 5);
+ currentProg = calloc(1, sizeof(programDef));
 
   if (UniThemeFile == NULL) {
     fprintf(stderr, "Error: file %s not found!", filename);
@@ -16,6 +19,7 @@ void loadUniTheme(const char *filename) {
   }
 
   while (fgets(buff, 256, UniThemeFile) != NULL) {
+    currentLine++;
     if (buff[0] == '\n' || buff[0] == '#') {
       continue;
     } else {
@@ -29,8 +33,72 @@ void loadUniTheme(const char *filename) {
   }
   free(buff);
   fclose(UniThemeFile);
+  defsFree(&progDefs);
 }
 
+//--------------------------------------------------------------------
+
+void defsInitArr(programDefs *a, size_t initialSize) {
+    // Allocate initial space
+    a->progs= (programDef **)malloc(initialSize * sizeof(programDef *));
+
+    a->used = 0;           // no elements used
+    a->size = initialSize; // available nr of elements
+
+    // Initialize all values of the array to 0
+    for(size_t i = 0; i<initialSize; i++)
+    {
+        memset(&a->progs[i],0,sizeof(programDef *));
+    }
+}
+
+// Add element to array
+void defsInsert(programDefs *a, programDef *element) {
+    if (a->used == a->size)
+    {
+        a->size *= 2;
+        a->progs = (programDef **)realloc(a->progs, a->size * sizeof(programDef *));
+        // Initialize the last/new elements of the reallocated progs
+        for(size_t i = a->used; i < a->size; i++)
+          {
+            memset(&a->progs[i],0,sizeof(programDef *));
+          }
+    }
+
+    a->progs[a->used] = element;
+
+
+
+    a->used++;
+}
+
+void defsFree(programDefs *a) {
+    // Free all name variables of each array element first
+    for(size_t i=0; i < a->used; i++)
+    {
+        free(a->progs[i]->name);
+        free(a->progs[i]->tokens);
+        free(a->progs[i]->path);
+        free(a->progs[i]->execBefore);
+        free(a->progs[i]->execAfter);
+        a->progs[i]->name=NULL;
+        a->progs[i]->tokens=NULL;
+        a->progs[i]->path=NULL;
+        a->progs[i]->execBefore=NULL;
+        a->progs[i]->execAfter=NULL;
+
+        a->progs[1]->beginDef=0;
+        a->progs[1]->endDef=0;
+    }
+
+    // Now free the array 
+    free(a->progs);
+    a->progs= NULL;
+
+    a->used = 0;
+    a->size = 0;
+}
+//--------------------------------------------------------------------
 
 void rmComment(char *in) {
   char *src = in;
@@ -104,6 +172,7 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
   strcpy(holder, *currentBuffer);
   rmComment(holder);
   while (hasLineExtension(&holder)) {
+    currentLine++;
     //line+=new;
     fgets(*currentBuffer, 256, UniThemeFile);
     holder = realloc(holder, strlen(holder) + 1 + strlen(*currentBuffer) + 1);
@@ -257,12 +326,24 @@ bool isAssignation (char *in, char **outTok, char **outValue) {
 }
 
 bool isStatement (char* in, char** outCall, char** outArg) {
-
-  return false;
+  char *copyIn = strMkCpyInRange(in, strlen(in)-1);
+  int words = 0;
+  for (char *tok = strtok(copyIn, " "); tok != NULL; tok = strtok(NULL, " ")) {
+    if (words == 0)
+      *outCall = strMkCpy(tok);
+    else if (words == 1)
+      *outArg = strMkCpy(tok);
+    words++;
+  }
+  if (words != 2)
+    return false;
+  return true;
 }
 
 void evalLine (char* currentBuffer) {
   char *src        = currentBuffer;
+  char *statCall   = NULL;
+  char *statArg    = NULL;
   char *assigTok   = NULL;
   char *assigValue = NULL;
   char *listName   = NULL;
@@ -270,33 +351,67 @@ void evalLine (char* currentBuffer) {
   int  numItems;
   while (*src == ' ' || *src == '\t')
     src++;
+  if (verboseMode) printf("=====================================\n");
   VERBOSE_PRINT("Evaluating line bufer...");
   VERBOSE_PRINT_VALUE(%s, src);
 
-  if (isList(currentBuffer, &listName, &listItems, &numItems)) {
+  if (isStatement(currentBuffer, &statCall, &statArg)) {
+    printf("ITS A STATEMENT!!!\n");
+    /*evalStatement*/;
+    evalStatement(currentBuffer, statCall, statArg);
+  } else if (isAssignation(currentBuffer, &assigTok, &assigValue)){
+    printf("ITS AN ASSIGNATION!!!\n");
+    /* evalAssignation; */
+    evalAssig(currentBuffer, assigTok, assigValue);
+  } else if (isList(currentBuffer, &listName, &listItems, &numItems)) {
     printf("ITS A LIST!!! ###%s###%d###\n", listName, numItems);
     /*evalList*/;
+    evalList(currentBuffer, listName, listItems, numItems);
+  } else {
+    fprintf(stderr, BKRED "Error: Could not recognize: %s", currentBuffer);
+    exit(1);
   }
 
-  if (isAssignation(currentBuffer, &assigTok, &assigValue)){
-   printf("ITS AN ASSIGNATION!!!\n");
-    /* evalAssignation; */
-   evalAssig(currentBuffer, assigTok, assigValue);
-  }
 
 }
 
+void evalStatement(char *currentBuffer, char *statCall, char *statArg) {
+  strUnstring(statArg);
+  if (strcmp(statCall, "begindef") == 0) {
+    if (currentProg->name == NULL) {
+      currentProg->beginDef = currentLine;
+      currentProg->name = statArg;
+    } else {
+      fprintf(stderr, BKRED "Error: Called begindef twice! : check line #%d\n" KDEFAULT, currentLine);
+      exit(1);
+    }
+  } else if (strcmp(statCall, "endDef") == 0) {
+    /* store program detail of struct somehow */
+    currentProg->endDef = currentLine;
+    defsInsert(&progDefs, currentProg);
+   
+  }
+  printf("%s\n", statCall);
+  printf("%s\n", statArg);
+  free(statCall);
+  free(statArg);
+}
+
+void evalAssig(char* currentBuffer, char* tok, char* value) {
+  if (strcmp(tok, "path") == 0) {
+    printf("FOUND PATH ASSIGNATION!!!\n");
+  }
+  free(tok);
+  free(value);
+}
+
 void evalList(char* currentBuffer, char* listName, char** listItems, int numItems) {
+
+
+
   for(int i = 0; i < numItems; i++)
 		free(listItems[i]);
 	free(listItems);
   free(listName);
 }
 
-void evalAssig(char* currentBuffer, char* tok, char* value) {
-      if (strcmp(tok, "path") == 0) {
-        printf("FOUND PATH ASSIGNATION!!!\n");
-      }
-      free(tok);
-      free(value);
-}

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-struct programDef
+typedef struct
 {
   char *name;
   char *tokens;
@@ -13,10 +13,26 @@ struct programDef
   int beginDef;
   int endDef;
   char *execAfter;
-};
-struct programDef currentProg;
+} programDef;
+programDef *currentProg;
+
+typedef struct
+{
+  programDef **progs;
+  size_t used;
+  size_t size;
+} programDefs;
+programDefs progDefs;
+
+int currentLine;
 
 void loadUniTheme(const char *filename);
+
+void defsInitArr(programDefs *a, size_t initialSize);
+
+void defsInsert(programDefs *a, programDef *element);
+
+void defsFree(programDefs *a);
 
 void rmComment(char *in);
 
@@ -36,8 +52,11 @@ bool isStatement (char* in, char** outCall, char** outArg);
 
 void evalLine(char *currentBuffer);
 
-void evalList(char* currentBuffer, char* listName, char** listItems, int numItems);
+void evalStatement(char *currentBuffer, char *statCall, char *statArg);
 
 void evalAssig(char* currentBuffer, char* tok, char* value);
+
+void evalList(char* currentBuffer, char* listName, char** listItems, int numItems);
+
 
 #endif

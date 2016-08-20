@@ -13,9 +13,9 @@ def tokens{
          "client.placeholder            %s %s %s %s %s", 
          "client.background             %s",
           };
-tes              t;
-path="~/.config/i3/config";
-exec-before="\"";
+# tes              "t";
+path  =       "~/.config/i3/config";
+exec-before="\"hello";
 
          # class                  border  backgr. text    indicator child_border
 def snippets {
@@ -31,5 +31,5 @@ def snippets {
 exec-after="";
 
 enddef "i3";
-# begindef "bspwm";
-# enddef "bspwm";
+begindef "bspwm";
+enddef "bspwm";

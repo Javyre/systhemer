@@ -1,3 +1,4 @@
+#ifndef NDEBUG
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,6 +6,7 @@
 
 #include "tests.h"
 #include "utils.h"
+
 
 void testTestsMode() { TEST_PRINT_VALUE(% d, testsMode) }
 
@@ -70,6 +72,7 @@ void testStrTrimPointer(char *in) {
 
 void testStrTrimPointerNew(char *in) {
   char *out = malloc(strlen(in) + 1);
+  memset(out, '\0', strlen(in) + 1);
   char *token;
 
   token = strtok(in, " \t");
@@ -92,52 +95,77 @@ void testStrTrimPointerNew(char *in) {
 }
 
 
-int foundAnyOf(char *tokens[]) {
-  for (int i=0; i < (sizeof(tokens)/sizeof(tokens[0])); i++){
-    TEST_PRINT_VALUE(%s, tokens[i]);
+bool testStrExpect(const char* original, const char *exp, const char *result, const char *call_name) {
+  static size_t call_num = 0;
+  /* static int g_num_errors = 0; */
+  /* static char *prev_call_name; */
+  bool res;
+  call_num++;
+  if (strcmp(exp, result) == 0) {
+    T_PRINT("\nTest #%lu of %s" BKGRN " ran successfully\n", (unsigned long) call_num, g_current_prog);
+    res = true;
+  } else {
+    g_num_errors++;
+    T_PRINT("\nTest #%lu of %s" BKRED " ran unsuccessfully: \n\texpected: %s\n\treceived: %s\n%s%s%s%lu test fails so far...\n", (unsigned long) call_num, g_current_prog, exp, result, original == NULL ? "" : "\toriginal: ", original == NULL ? "" : original, original == NULL ? "" : "\n", (unsigned long) g_num_errors);
+    res = false;
   }
-  return 0;
+  /* free(prev_call_name); */
+  /* prev_call_name = strMkCpy(call_name); */
+
+  if (!res && exit_on_failed_test)
+    EXIT(1);
+
+  return res;
 }
-void testFileIO() {
-  /*
-     client.focused something something something
-     client.unfocused ... ... ...
-     client.focused_inactive
-     client.urgent
 
-     focused_workspace
-     inactive_workspace
-     urgent_workspace
-   */
-  char *tokens[7] = {
-    "client.focused",
-    "client.unfocused",
-    "client.focused_inactive",
-    "client.urgent",
-    "focused_workspace",
-    "incative_workspace",
-    "urgent_workspace"
-  };
-
-  FILE *fp = fopen("../files/test/testcfg", "r");
-  if (fp == NULL) {
-    fprintf(stderr, "Can't open file ../files/test/testcfg !!!\n");
-    exit(1);
-  }
-
-  char *s, *tok, buff[256];
-  while ((s = fgets(buff, sizeof(buff), fp)) != NULL) {
-    if (buff[0] == '\n' || buff[0] == '#')
-      continue;
-
-    tok = strtok(buff, " \t");
-    //if (strcmp(tok, "client.unfocused") == 0) {
-    if (foundAnyOf(tokens)) {
-      TEST_PRINT("Found token!");
-      while (tok != NULL) {
-        tok = strtok(NULL, " \t");
-        TEST_PRINT_VALUE(%s, tok);
-      }
-    }
-  }
+void testAll() {
+  testStrTrimStrAware();
+  testIsInsideOfStr();
 }
+
+void testStrTrimStrAware() {
+  g_current_prog = __func__;
+  char *str;
+  char *original;
+  str = strMkCpy("\"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"");
+  original = strMkCpy(str);
+  strTrimStrAware(str);
+  testStrExpect(original, "\"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"", str, __func__);
+  free(str);
+  free(original);
+
+  str = strMkCpy(" \"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"");
+  original = strMkCpy(str);
+  strTrimStrAware(str);
+  testStrExpect(original, "\"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"", str, __func__);
+  free(str);
+  free(original);
+
+  str = strMkCpy(" \"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\" ");
+  original = strMkCpy(str);
+  strTrimStrAware(str);
+  testStrExpect(original, "\"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"", str, __func__);
+  free(str);
+  free(original);
+
+
+  str = NULL;
+  original = NULL;
+}
+
+void testIsInsideOfStr() {
+  g_current_prog = __func__;
+  char *original;
+  char *str;
+
+  original = strMkCpy("Some text \"something...\" abcdefg");
+  str = calloc(strlen(original)+1, sizeof(char));
+  for (size_t i = 0; i < strlen(original); i++)
+    str[i] = isInsideOfStr(original, original+i) ? '1': '0';
+  testStrExpect(original, "00000000001111111111111100000000", str, __func__);
+  free(original);
+  original = NULL;
+  free(str);
+  str = NULL;
+}
+#endif

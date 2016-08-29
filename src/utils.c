@@ -204,6 +204,11 @@ void strTrimInRange(char *from, char *to) {
     *source = *src;
     source++;
     }*/
+  if (*src == ' ' && src == to) {
+    src++;
+    source--;
+  }
+
   while (*(src - 1) != '\0') {
     *source = *src;
     source++;

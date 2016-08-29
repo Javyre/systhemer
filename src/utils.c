@@ -406,11 +406,8 @@ void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {
     while (*to2 != '\0')
       to2++;
   }
-
-  char *holder = malloc((to - from) + 1 + (to2 - from2) + 2);
-  char *holder2 = malloc((to2 - from2) + 2);
-  memset(holder, '\0', (to - from) + 1 + (to2 - from2) + 2);
-  memset(holder2, '\0', (to2 - from2) + 2);
+  char *holder = calloc((to - from) + 1 + (to2 - from2) + 2, sizeof(char));
+  char *holder2 = calloc((to2 - from2) + 2, sizeof(char));
 
   strncpy(holder, from, (to - from) + 1);
   strncpy(holder2, from2, (to2 - from2) + 1);

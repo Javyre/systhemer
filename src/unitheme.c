@@ -9,6 +9,7 @@ static programDefs progDefs;
 
 void loadUniTheme(const char *filename) {
   char *buff = malloc(256);
+  char *tmp;
   FILE *UniThemeFile = fopen(filename, "r");
   currentLine = 0;
   defsInitArr(&progDefs, 5);
@@ -36,11 +37,14 @@ void loadUniTheme(const char *filename) {
       rmEscape(&buff);
       evalLine(buff);
     }
-    buff = realloc(buff, 256);
-    if (buff == NULL) {
+    tmp = realloc(buff, 256);
+    if (tmp == NULL) {
       fprintf(stderr, BKRED "Error: Failed to realocate memory for the buff variable in the unitheme reader!" KDEFAULT);
       EXIT(1);
-      free(buff);
+
+    } else {
+      buff = tmp;
+      tmp = NULL;
     }
   }
   free(buff);
@@ -298,7 +302,7 @@ bool hasLineExtension(char **currentBuffer) {
 void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
   // char *holder = malloc(strlen(currentBuffer) + 1);
   char *holder = calloc(256, sizeof(char));
-  char *tmp;
+  char *tmp = NULL;
   // char *nextLine = malloc(256);
   strcpy(holder, *currentBuffer);
   rmComment(holder);
@@ -309,6 +313,9 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
     tmp = realloc(holder, strlen(holder) + 1 + strlen(*currentBuffer) + 1);
     if (tmp == NULL) {
       fprintf(stderr, "Error: reallocation failed in %s at line %d", __FILE__, __LINE__);
+    } else {
+      holder = tmp;
+      tmp = NULL;
     }
     strcat(holder, " ");
     strcat(holder, *currentBuffer);
@@ -318,6 +325,8 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
   strcpy(*currentBuffer, holder);
 
   // free(nextLine);
+  if (tmp != NULL)
+    free(tmp);
   free(holder);
 }
 

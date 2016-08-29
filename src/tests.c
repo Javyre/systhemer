@@ -7,8 +7,9 @@
 #include "tests.h"
 #include "utils.h"
 
+#define UPDATE_CURR_PROG() do{ if (g_current_prog != NULL) free(g_current_prog); g_current_prog = NULL; g_current_prog = strMkCpy(__func__); g_num_errors = 0; g_call_num = 0; printf("\n=======================\n"); }while(0);
 
-void testTestsMode() { TEST_PRINT_VALUE(% d, testsMode) }
+void testTestsMode() { TEST_PRINT_VALUE(%d, testsMode) }
 
 char *testStrTrim(char *in) {
   TEST_PRINT_VALUE(%s, in);
@@ -96,17 +97,16 @@ void testStrTrimPointerNew(char *in) {
 
 
 bool testStrExpect(const char* original, const char *exp, const char *result, const char *call_name) {
-  static size_t call_num = 0;
   /* static int g_num_errors = 0; */
   /* static char *prev_call_name; */
   bool res;
-  call_num++;
+  g_call_num++;
   if (strcmp(exp, result) == 0) {
-    T_PRINT("\nTest #%lu of %s" BKGRN " ran successfully\n", (unsigned long) call_num, g_current_prog);
+    T_PRINT("\nTest #%lu of %s" BKGRN " ran successfully\n", (unsigned long) g_call_num, g_current_prog);
     res = true;
   } else {
     g_num_errors++;
-    T_PRINT("\nTest #%lu of %s" BKRED " ran unsuccessfully: \n\texpected: %s\n\treceived: %s\n%s%s%s%lu test fails so far...\n", (unsigned long) call_num, g_current_prog, exp, result, original == NULL ? "" : "\toriginal: ", original == NULL ? "" : original, original == NULL ? "" : "\n", (unsigned long) g_num_errors);
+    T_PRINT("\nTest #%lu of %s" BKRED " ran unsuccessfully: \n\texpected: %s\n\treceived: %s\n%s%s%s%lu test fails so far...\n", (unsigned long) g_call_num, g_current_prog, exp, result, original == NULL ? "" : "\toriginal: ", original == NULL ? "" : original, original == NULL ? "" : "\n", (unsigned long) g_num_errors);
     res = false;
   }
   /* free(prev_call_name); */
@@ -121,51 +121,98 @@ bool testStrExpect(const char* original, const char *exp, const char *result, co
 void testAll() {
   testStrTrimStrAware();
   testIsInsideOfStr();
+  testStrTrimInRange();
+
+  free(g_current_prog);
+  g_current_prog = NULL;
 }
+
+#define TEST_STR_TRIM_STR_AWARE(rgnl, xpct)       \
+  do {                                            \
+    original = strMkCpy(rgnl);                    \
+    str = strMkCpy(original);                     \
+    strTrimStrAware(str);                         \
+    testStrExpect(original, xpct, str, __func__); \
+    free(original);                               \
+    free(str);                                    \
+  } while (0);
 
 void testStrTrimStrAware() {
-  g_current_prog = __func__;
-  char *str;
+  UPDATE_CURR_PROG();
   char *original;
-  str = strMkCpy("\"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"");
-  original = strMkCpy(str);
-  strTrimStrAware(str);
-  testStrExpect(original, "\"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"", str, __func__);
-  free(str);
-  free(original);
+  char *str;
 
-  str = strMkCpy(" \"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"");
-  original = strMkCpy(str);
-  strTrimStrAware(str);
-  testStrExpect(original, "\"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"", str, __func__);
-  free(str);
-  free(original);
+  TEST_STR_TRIM_STR_AWARE("\"foo   bar\"", "\"foo   bar\"");
+  TEST_STR_TRIM_STR_AWARE(" \"foo   bar\"", "\"foo   bar\"");
+  TEST_STR_TRIM_STR_AWARE(" \"foo   bar\" ", "\"foo   bar\"");
 
-  str = strMkCpy(" \"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\" ");
-  original = strMkCpy(str);
-  strTrimStrAware(str);
-  testStrExpect(original, "\"client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577\"", str, __func__);
-  free(str);
-  free(original);
-
-
-  str = NULL;
   original = NULL;
+  str = NULL;
 }
+
+#define TEST_IS_INSIDE_OF_STR(rgnl, xpct)                       \
+  do {                                                          \
+    original = strMkCpy(rgnl);                                  \
+    str = calloc(strlen(original)+1, sizeof(char));             \
+    for (size_t i = 0; i < strlen(original); i++)               \
+      str[i] = isInsideOfStr(original, original+i) ? '=': '_';  \
+    testStrExpect(original, xpct, str, __func__);               \
+    free(str);                                                  \
+    free(original);                                             \
+  } while (0);
 
 void testIsInsideOfStr() {
-  g_current_prog = __func__;
+  UPDATE_CURR_PROG();
   char *original;
   char *str;
 
-  original = strMkCpy("Some text \"something...\" abcdefg");
-  str = calloc(strlen(original)+1, sizeof(char));
-  for (size_t i = 0; i < strlen(original); i++)
-    str[i] = isInsideOfStr(original, original+i) ? '1': '0';
-  testStrExpect(original, "00000000001111111111111100000000", str, __func__);
-  free(original);
-  original = NULL;
-  free(str);
+  TEST_IS_INSIDE_OF_STR("foo bar \"foo...\" bar",
+                        "________========____");
+
+  TEST_IS_INSIDE_OF_STR("\"\"",
+                        "==");
+
+  TEST_IS_INSIDE_OF_STR(" \"\"",
+                        "_==");
+
+  TEST_IS_INSIDE_OF_STR(" \"\" ",
+                        "_==_");
+
   str = NULL;
+  original = NULL;
 }
+
+#define TEST_STR_TRIM_IN_RANGE(rgnl, xpct, frm, to) \
+  do {                                              \
+    original = strMkCpy(rgnl);                      \
+    str = strMkCpyInRange(original+frm, (to-frm)+1);  \
+    printf("%s\n", str);                               \
+    free(str);                                      \
+    str = strMkCpy(original);                       \
+    strTrimInRange(str+frm, str+to);                \
+    testStrExpect(original, xpct, str, __func__);   \
+    free(original);                                 \
+    free(str);                                      \
+  } while (0);
+
+void testStrTrimInRange() {
+  UPDATE_CURR_PROG();
+  char *original;
+  char *str;
+
+  TEST_STR_TRIM_IN_RANGE("foo   bar   \"   foo   ...\"   bar",
+                         "foo bar"  " \"   foo   ...\"   bar", 0, 12);
+  TEST_STR_TRIM_IN_RANGE("foo   bar   \"   foo   ...\"   bar",
+                         "foo   bar   \"   foo   ...\""" bar", 25, 31);
+
+  TEST_STR_TRIM_IN_RANGE("foo   bar   \"   foo   ...\"   bar",
+                         "foo bar"   "\"   foo   ...\"   bar", 0, 11);
+  TEST_STR_TRIM_IN_RANGE("foo   bar   \"   foo   ...\"   bar",
+                         "foo   bar   \"   foo   ...\"" "bar", 26, 31);
+  /* TEST_STR_TRIM_IN_RANGE("foo   bar   \"   foo   ...\"   bar", "foo bar \"   foo   ...\" bar"); */
+
+  str = NULL;
+  original = NULL;
+}
+
 #endif

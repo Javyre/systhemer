@@ -24,7 +24,6 @@ int main(int argc, char *argv[]) {
 
   warnings_on = false;
   parseArgs(argc, argv);
-  loadUniTheme("../files/default2.uth");
 
 #ifndef NDEBUG
   if (testsMode) {
@@ -32,9 +31,12 @@ int main(int argc, char *argv[]) {
     testAll();
     if (g_num_errors != 0 && exit_on_failed_test_end)
       EXIT(1);
+  } else {
+#endif
+    loadUniTheme("../files/default2.uth");
+#ifndef NDEBUG
   }
 #endif
-
 
   return 0;
 }

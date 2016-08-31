@@ -336,8 +336,9 @@ void strTrimStrAware(char *in) {
   */
 
   char *src = in;
-  char *begin = in;
+  char *begin;
   char *end;
+  char *tmp;
   bool isInString = false;
   bool flag = false;
   size_t s1, s2;
@@ -347,6 +348,22 @@ void strTrimStrAware(char *in) {
     printf("in is \"%s\"\n", in);
     return;
   }
+
+  /* Erase all spaces at the end */
+  while (in[strlen(in) -1] == ' ')
+    in[strlen(in) -1] = '\0';
+
+  /* Erase all beginning spaces */
+  tmp = malloc(strlen(in) + 1);
+  while (*src == ' ') {
+    strcpy(tmp , in+1);
+    strcpy(in, tmp);
+    /* VERBOSE_PRINT_VALUE(%s, in); */
+  }
+  free(tmp);
+  tmp = NULL;
+  begin = in;
+  src = in;
 
   /* Do not process string where the whole content is a string */
   for (size_t i=0; i<strlen(in); i++) {
@@ -371,7 +388,7 @@ void strTrimStrAware(char *in) {
         fprintf(stderr, BKRED
                 "Error: About to pass an undefined begin value to strTrimInRange\n"
                 "function : %s \nline : %d\nfile : %s\n"
-                KDEFAULT, __func__, __LINE__ + 4, "utils.c"); /* Not using __FILE__ because it is determined at compile time */
+                KDEFAULT, __func__, __LINE__ + 6, "utils.c"); /* Not using __FILE__ because it is determined at compile time */
 
         EXIT(1);
       }
@@ -392,7 +409,7 @@ void strTrimStrAware(char *in) {
       EXIT(1);
     }
 
-    /* what happens is first char is " */
+    /* What happens if first char is " */
     if (*src == '\"' && src == in) {
       isInString = true;
       begin = NULL;
@@ -400,9 +417,11 @@ void strTrimStrAware(char *in) {
       continue;
     }
 
+    /* What happens if char is escape character */
     if (*src == '\\' && *(src-1) != '\\' && src != in) {
       WARNING_PRINT("\\\\\\\\\\\\\\");
-      src++;
+      src+=2;
+      continue;
     }
 
 
@@ -443,7 +462,6 @@ void strTrimStrAware(char *in) {
   */
 
     /* Erases any left over spaces at the end */
-    strTrimInRange(begin, NULL);
     while (in[strlen(in) -1] == ' ')
       in[strlen(in) -1] = '\0';
 }

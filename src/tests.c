@@ -147,7 +147,7 @@ void testStrTrimStrAware() {
   TEST_STR_TRIM_STR_AWARE("\"foo   bar\"   ", "\"foo   bar\"");
   TEST_STR_TRIM_STR_AWARE(" \"foo   bar\"   ", "\"foo   bar\"");
 
-  TEST_STR_TRIM_STR_AWARE(" \"client.fo\\\"cused_inactive       %s %s %s %s %s\" ", "\"client.fo\\\"cused_inactive       %s %s %s %s %s\"");
+  TEST_STR_TRIM_STR_AWARE(" \"foo   ba\\\"r\" ", "\"foo   ba\\\"r\"");
 
   original = NULL;
   str = NULL;
@@ -187,6 +187,9 @@ void testIsInsideOfStr() {
 
   TEST_IS_INSIDE_OF_STR(" \"\" ",
                         "_==_");
+
+  TEST_IS_INSIDE_OF_STR(" \" foo\\\"bar \" ",
+                        "_============_");
 
   str = NULL;
   original = NULL;

@@ -144,7 +144,10 @@ void testStrTrimStrAware() {
 
   TEST_STR_TRIM_STR_AWARE("\"foo   bar\"", "\"foo   bar\"");
   TEST_STR_TRIM_STR_AWARE(" \"foo   bar\"", "\"foo   bar\"");
-  TEST_STR_TRIM_STR_AWARE(" \"foo   bar\" ", "\"foo   bar\"");
+  TEST_STR_TRIM_STR_AWARE("\"foo   bar\"   ", "\"foo   bar\"");
+  TEST_STR_TRIM_STR_AWARE(" \"foo   bar\"   ", "\"foo   bar\"");
+
+  /* TEST_STR_TRIM_STR_AWARE("\"client.fo\"cused_inactive       %s %s %s %s %s\" ", "client.fo\"cused_inactive       %s %s %s %s %s"); */
 
   original = NULL;
   str = NULL;
@@ -169,6 +172,13 @@ void testIsInsideOfStr() {
   TEST_IS_INSIDE_OF_STR("foo bar \"foo...\" bar",
                         "________========____");
 
+
+  TEST_IS_INSIDE_OF_STR("  ",
+                        "__");
+
+  TEST_IS_INSIDE_OF_STR(" ",
+                        "_");
+
   TEST_IS_INSIDE_OF_STR("\"\"",
                         "==");
 
@@ -185,15 +195,15 @@ void testIsInsideOfStr() {
 #define TEST_STR_TRIM_IN_RANGE(rgnl, xpct, frm, to) \
   do {                                              \
     original = strMkCpy(rgnl);                      \
-    str = strMkCpyInRange(original+frm, (to-frm)+1);  \
-    printf("%s\n", str);                               \
-    free(str);                                      \
     str = strMkCpy(original);                       \
     strTrimInRange(str+frm, str+to);                \
     testStrExpect(original, xpct, str, __func__);   \
     free(original);                                 \
     free(str);                                      \
   } while (0);
+/* str = strMkCpyInRange(original+frm, (to-frm)+1);   \ */
+/* printf("%s\n", str);                               \ */
+/* free(str);                                         \ */
 
 void testStrTrimInRange() {
   UPDATE_CURR_PROG();
@@ -209,6 +219,12 @@ void testStrTrimInRange() {
                          "foo bar"   "\"   foo   ...\"   bar", 0, 11);
   TEST_STR_TRIM_IN_RANGE("foo   bar   \"   foo   ...\"   bar",
                          "foo   bar   \"   foo   ...\"" "bar", 26, 31);
+
+  TEST_STR_TRIM_IN_RANGE(" \"foo\"",
+                         "\"foo\"", 0, 1);
+  TEST_STR_TRIM_IN_RANGE("\"foo\" ",
+                         "\"foo\"", 4, 5);
+
   /* TEST_STR_TRIM_IN_RANGE("foo   bar   \"   foo   ...\"   bar", "foo bar \"   foo   ...\" bar"); */
 
   str = NULL;

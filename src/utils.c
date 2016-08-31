@@ -206,7 +206,8 @@ void strTrimInRange(char *from, char *to) {
     }*/
   if (*src == ' ' && src == to) {
     src++;
-    source--;
+    if (source-1 >= from && *(source-1) == ' ')
+      source--;
   }
 
   while (*(src - 1) != '\0') {
@@ -249,8 +250,7 @@ bool isEmptyStrInRange(char *from, char *to) {
     EXIT(1);
   }
 
-  copy = malloc((to - from) + 4);
-  memset(copy, '\0', (to - from) + 4);
+  copy = calloc((to - from) + 4, sizeof(char));
   strncpy(copy, from, to - from);
   copySrc = copy;
 
@@ -329,27 +329,65 @@ void strTrimStrAware(char *in) {
     "some string"
 
      Trim from the first to the last '_'
+
+     Dependencies :
+       - strTrimInRange
+       - isInsideOfStr
   */
+
   char *src = in;
   char *begin = in;
   char *end;
   bool isInString = false;
+  bool flag = false;
   size_t s1, s2;
 
+  /* Do not process empty string */
   if (strcmp(in, " ") == 0 || strcmp(in, "") == 0) {
     printf("in is \"%s\"\n", in);
     return;
   }
 
+  /* Do not process string where the whole content is a string */
+  for (size_t i=0; i<strlen(in); i++) {
+    if (!isInsideOfStr(in, &in[i]))
+      flag = true;
+  }
+  if (!flag)
+    return;
+
+  /* Main loop */
   while (*src != '\0') {
     /* what happens if last char is " */
-    if (*(src + 1) == '\0' && ((!isInsideOfStr(in, src)) || (isInsideOfStr(in, src) && *src == '\"' && isInsideOfStr(in, src-1)))) {
+    if (*(src + 1) == '\0' &&
+        ((!isInsideOfStr(in, src) /*&& (isInsideOfStr(in, src-1) && *(src-1) == '\"' && isInsideOfStr(in, src-2))*/) ||
+         (isInsideOfStr(in, src) && *src == '\"' && isInsideOfStr(in, src-1)))) {
+
+      if (isInsideOfStr(in, src) && *src == '\"' && isInsideOfStr(in, src-1)) {
+        begin = src;
+      }
+
+      if (begin == NULL){
+        fprintf(stderr, BKRED
+                "Error: About to pass an undefined begin value to strTrimInRange\n"
+                "function : %s \nline : %d\nfile : %s\n"
+                KDEFAULT, __func__, __LINE__ + 4, "utils.c"); /* Not using __FILE__ because it is determined at compile time */
+
+        EXIT(1);
+      }
+
+      /* Erases any left over spaces at the end */
       strTrimInRange(begin, NULL);
+      while (in[strlen(in) -1] == ' ')
+        in[strlen(in) -1] = '\0';
+      printf("poop");
+
       return;
-    } else if (*(src + 1) == '\0') {
-      fprintf(stderr,
-              BKRED "Error: an unclosed string has been passed to function "
-                    "strTrimStrAware in utils.c!: \n\t%s\n\t%s\n" KDEFAULT,
+
+    } else if (*(src + 1) == '\0' && isInsideOfStr(in, src)) {
+      fprintf(stderr, BKRED
+              "Error: an unclosed string has been passed to function "
+              "strTrimStrAware in utils.c!: \n\t%s\n\t%s\n" KDEFAULT,
               in, genWrongUnderline(in, src, src + 1));
 
       EXIT(1);
@@ -358,6 +396,7 @@ void strTrimStrAware(char *in) {
     /* what happens is first char is " */
     if (*src == '\"' && src == in) {
       isInString = true;
+      begin = NULL;
       src++;
       continue;
     }
@@ -397,12 +436,18 @@ void strTrimStrAware(char *in) {
     src++;
   }
   /*
-  if (isInsideOfStr(in, src-1) == false) {
+    if (isInsideOfStr(in, src-1) == false) {
     end = (src-1);
     strTrimInRange(begin, end);
     return;
-    }*/
-  return;
+    }
+  */
+
+    /* Erases any left over spaces at the end */
+    strTrimInRange(begin, NULL);
+    while (in[strlen(in) -1] == ' ')
+      in[strlen(in) -1] = '\0';
+    printf("poop");
 }
 
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {

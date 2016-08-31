@@ -651,6 +651,7 @@ void evalList(char *currentBuffer, char *listName, list *content) {
   for (size_t i = 0; i < content->used; i++) {
     VERBOSE_PRINT_VALUE(%s, content->items[i]);
     strTrimStrAware(content->items[i]);
+    VERBOSE_PRINT_VALUE(%s, content->items[i]);
   }
   if (currentProg->name != NULL) {
     if (strcmp(listName, "tokens") == 0) {

@@ -379,7 +379,6 @@ bool isList(char *in, char **outListName, list **outListItems) {
         *tmpc = (*tmpc == '\n') ? ' ' : *tmpc;
         tmpc++;
       }
-      strTrimStrAware(contents);
       VERBOSE_PRINT_VALUE(%s, contents);
 
       tmpc = src;

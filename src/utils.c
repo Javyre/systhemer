@@ -380,7 +380,6 @@ void strTrimStrAware(char *in) {
       strTrimInRange(begin, NULL);
       while (in[strlen(in) -1] == ' ')
         in[strlen(in) -1] = '\0';
-      printf("poop");
 
       return;
 
@@ -447,7 +446,6 @@ void strTrimStrAware(char *in) {
     strTrimInRange(begin, NULL);
     while (in[strlen(in) -1] == ' ')
       in[strlen(in) -1] = '\0';
-    printf("poop");
 }
 
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {

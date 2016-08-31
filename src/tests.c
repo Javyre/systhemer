@@ -147,7 +147,7 @@ void testStrTrimStrAware() {
   TEST_STR_TRIM_STR_AWARE("\"foo   bar\"   ", "\"foo   bar\"");
   TEST_STR_TRIM_STR_AWARE(" \"foo   bar\"   ", "\"foo   bar\"");
 
-  /* TEST_STR_TRIM_STR_AWARE("\"client.fo\"cused_inactive       %s %s %s %s %s\" ", "client.fo\"cused_inactive       %s %s %s %s %s"); */
+  TEST_STR_TRIM_STR_AWARE(" \"client.fo\\\"cused_inactive       %s %s %s %s %s\" ", "\"client.fo\\\"cused_inactive       %s %s %s %s %s\"");
 
   original = NULL;
   str = NULL;

@@ -7,7 +7,6 @@
 //Package defines and dev options (constant)
 #define PACKAGE "SysThemer"
 #define VERSION "0.0.1"
-#define EXIT_ON_ERR true
 
 
 #define KNRM  "\x1B[0m"
@@ -25,20 +24,49 @@
 #define KCYN  "\x1B[36m"
 #define BKCYN  "\e[1;36m"
 #define KWHT  "\x1B[37m"
+#define KDEFAULT "\x1b[0m"
 #define BKWHT  "\e[1;37m"
 
-#define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\n", token);
-#define VERBOSE_PRINT(message) if(verboseMode) printf(BKBLU PACKAGE ": %s\n", message);
+#define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\x1b[0m" "\n", token);
+#define WARNING_PRINT(message) if(warnings_on) printf(PACKAGE ": " BKYEL"%s" "\x1b[0m" "\n", message);
+#define WARNING_PRINT_VALUE(type, token) if (warnings_on) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKYEL);}
+#define VERBOSE_PRINT(message) if(verboseMode) printf(PACKAGE ": " BKBLU "%s" "\x1b[0m" "\n", message);
 #define VERBOSE_PRINT_VALUE(type, token) if (verboseMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKBLU);}
-#define TEST_PRINT(message) if (testsMode) {printf(BKYEL PACKAGE ": %s\n", message);}
-#define TEST_PRINT_VALUE(type, token) if (testsMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKYEL);}
+#ifndef NDEBUG
+#define TEST_PRINT(message) if (testsMode) {printf(PACKAGE ": " BKNRM "%s" "\x1b[0m" "\n", message);}
+#define T_PRINT(message, ...) if (testsMode) {printf(BKNRM message KDEFAULT, __VA_ARGS__);}
+#define TEST_PRINT_VALUE(type, token) if (testsMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKNRM );}
+#endif
 
-bool testsMode;
+#define EXIT(exval) if (exit_on_err) {exit(exval);}
+
 bool verboseMode;
+bool exit_on_err;
+bool warnings_on;
+
+#ifndef NDEBUG
+bool testsMode;
+bool exit_on_failed_test_end;
+bool exit_on_failed_test;
+#endif
 
 //Function declarations
+bool isInsideOfStr(char *str, char *pos);
+
 void printHelp(const int);
 void verboseMessage(const char*);
 void parseArgs(int, char* []);
+char *genWrongUnderline(char *line, char *from, char *to);
+char *strMkCpyInRange(const char *from, int numchars);
+char *strMkCpy(const char *in);
+void strTrim(char *in);
+void strTrimInRange(char *from, char *to);
+bool isEmptyStr (char *str);
+bool isEmptyStrInRange (char *from, char *to);
+void strTrimStrAware(char *in);
+void strRealloc(char **str);
+void strRmEscape(char *str);
+void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
+int strUnstring(char **str);
 
 #endif

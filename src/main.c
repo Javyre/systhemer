@@ -5,31 +5,38 @@
 
 // Local includes
 #include "main.h"
+
+#ifndef NDEBUG
 #include "tests.h"
+#endif
+
 #include "utils.h"
 #include "unitheme.h"
 
 int main(int argc, char *argv[]) {
-  parseArgs(argc, argv);
-  loadUniTheme("");
+  verboseMode = false;
+  exit_on_err = true;
 
+#ifndef NDEBUG
+  exit_on_failed_test_end = true;
+  exit_on_failed_test = false;
+#endif
+
+  warnings_on = false;
+  parseArgs(argc, argv);
+
+#ifndef NDEBUG
   if (testsMode) {
     testTestsMode();
-
-    char *string =
-        malloc(strlen("    Hello\t\t   world\t              :D    \t") + 1);
-    strcpy(string, "    Hello\t\t   world\t              :D    \t");
-
-    // strc
-    // testStrTrimPointer(string);
-    // testStrTrimPointerNew(string);
-    // string should now be "Hello world :D"
-    // VERBOSE_PRINT_VALUE(%s, string);
-
-    testFileIO();
+    testAll();
+    if (g_num_errors != 0 && exit_on_failed_test_end)
+      EXIT(1);
+  } else {
+#endif
+    loadUniTheme("../files/default2.uth");
+#ifndef NDEBUG
   }
-
-
+#endif
 
   return 0;
 }

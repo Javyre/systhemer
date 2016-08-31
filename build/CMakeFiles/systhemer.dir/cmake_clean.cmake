@@ -1,7 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/systhemer.dir/tests.c.o"
-  "CMakeFiles/systhemer.dir/utils.c.o"
   "CMakeFiles/systhemer.dir/main.c.o"
+  "CMakeFiles/systhemer.dir/tests.c.o"
+  "CMakeFiles/systhemer.dir/unitheme.c.o"
+  "CMakeFiles/systhemer.dir/utils.c.o"
   "systhemer.pdb"
   "systhemer"
 )

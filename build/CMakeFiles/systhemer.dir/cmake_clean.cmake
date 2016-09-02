@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/systhemer.dir/execUnitheme.c.o"
   "CMakeFiles/systhemer.dir/main.c.o"
   "CMakeFiles/systhemer.dir/tests.c.o"
   "CMakeFiles/systhemer.dir/unitheme.c.o"

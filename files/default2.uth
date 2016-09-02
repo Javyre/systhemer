@@ -14,7 +14,8 @@ def tokens{
          "client.background             %s",
           };
 # tes              "t";
-path  =       "~/.config/i3/config";
+# path  =       "~/.config/i3/config";
+path  =       "../files/test/testcfg";
 exec-before="\"hello";
 
          # class                  border  backgr. text    indicator child_border

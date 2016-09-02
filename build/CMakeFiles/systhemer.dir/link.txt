@@ -1,1 +1,1 @@
-/usr/bin/cc_args.py  gcc -fsanitize=address -O1 -fno-omit-frame-pointer -g -Wall   CMakeFiles/systhemer.dir/main.c.o CMakeFiles/systhemer.dir/tests.c.o CMakeFiles/systhemer.dir/unitheme.c.o CMakeFiles/systhemer.dir/utils.c.o  -o systhemer -rdynamic 
+/usr/bin/cc_args.py  gcc -g -Wall   CMakeFiles/systhemer.dir/execUnitheme.c.o CMakeFiles/systhemer.dir/main.c.o CMakeFiles/systhemer.dir/tests.c.o CMakeFiles/systhemer.dir/unitheme.c.o CMakeFiles/systhemer.dir/utils.c.o  -o systhemer -rdynamic 

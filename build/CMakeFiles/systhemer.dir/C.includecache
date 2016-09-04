@@ -17,6 +17,8 @@ string.h
 -
 unistd.h
 -
+regex.h
+-
 
 /home/javier/Code/cpp/systhemer/src/execUnitheme.h
 stdbool.h

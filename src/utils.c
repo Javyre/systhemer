@@ -505,7 +505,7 @@ void strRmEscape(char *str) {
   */
   while (*src != '\0') {
     if (isInsideOfStr(str, src)) {
-      if (*src == '\\' && (src[1] == '\"')) {
+      if (*src == '\\' && (src[1] == '\"' || src[1] == '\\')) {
         strOverlap(str, str, (src - 1), (src + 1), NULL);
         src++;
       } else if (*src == '\\' && (src[1] != '\"')) {
@@ -523,7 +523,7 @@ int strUnstring(char **str) {
   VERBOSE_PRINT_VALUE(%s, *str);
   strRmEscape(*str);
   VERBOSE_PRINT_VALUE(%s, *str);
-  /* get rud of opening " */
+  /* get rid of opening " */
   for (size_t i = 0; i < strlen(*str); i++) {
     if ((*str)[i] == '\"') {
       (*str)[i] = ' ';

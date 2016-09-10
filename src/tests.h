@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 static size_t g_num_errors = 0;
+static size_t g_num_errors_total = 0;
 static size_t g_call_num = 0;
 static char * g_current_prog = NULL;
 
@@ -13,7 +14,7 @@ void testStrTrimPointer (char *);
 void testStrTrimPointerNew (char *);
 void testFileIO ();
 
-void testAll();
+size_t testAll();
 bool testStrExpect(const char *original, const char *exp, const char *result, const char *call_name);
 void testStrTrimStrAware();
 void testIsInsideOfStr();

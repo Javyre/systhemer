@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
   exit_on_err = true;
 
 #ifndef NDEBUG
+  /* size_t num_errs = 0; */
   exit_on_failed_test_end = true;
   exit_on_failed_test = false;
 #endif
@@ -28,9 +29,10 @@ int main(int argc, char *argv[]) {
 #ifndef NDEBUG
   if (testsMode) {
     testTestsMode();
-    testAll();
-    if (g_num_errors != 0 && exit_on_failed_test_end)
-      EXIT(1);
+    return testAll();
+    /* num_errs = testAll(); */
+    /* if (num_errs != 0 && exit_on_failed_test_end) */
+    /*   EXIT(num_errs); */
   } else {
 #endif
     loadUniTheme("../files/default2.uth");

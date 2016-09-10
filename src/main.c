@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
   } else {
 #endif
     loadUniTheme("../files/default2.uth");
+    runExecUitheme();
 #ifndef NDEBUG
   }
 #endif

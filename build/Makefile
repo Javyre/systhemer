@@ -123,6 +123,33 @@ systhemer/fast:
 	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/build
 .PHONY : systhemer/fast
 
+execUnitheme.o: execUnitheme.c.o
+
+.PHONY : execUnitheme.o
+
+# target to build an object file
+execUnitheme.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/execUnitheme.c.o
+.PHONY : execUnitheme.c.o
+
+execUnitheme.i: execUnitheme.c.i
+
+.PHONY : execUnitheme.i
+
+# target to preprocess a source file
+execUnitheme.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/execUnitheme.c.i
+.PHONY : execUnitheme.c.i
+
+execUnitheme.s: execUnitheme.c.s
+
+.PHONY : execUnitheme.s
+
+# target to generate assembly for a file
+execUnitheme.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/execUnitheme.c.s
+.PHONY : execUnitheme.c.s
+
 main.o: main.c.o
 
 .PHONY : main.o
@@ -240,6 +267,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... systhemer"
+	@echo "... execUnitheme.o"
+	@echo "... execUnitheme.i"
+	@echo "... execUnitheme.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

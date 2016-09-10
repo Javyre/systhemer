@@ -6,6 +6,28 @@
 
 #IncludeRegexTransform: 
 
+/home/javier/Code/cpp/systhemer/src/execUnitheme.c
+execUnitheme.h
+/home/javier/Code/cpp/systhemer/src/execUnitheme.h
+utils.h
+/home/javier/Code/cpp/systhemer/src/utils.h
+stdlib.h
+-
+string.h
+-
+unistd.h
+-
+pcre2.h
+-
+
+/home/javier/Code/cpp/systhemer/src/execUnitheme.h
+stdbool.h
+-
+stdio.h
+-
+unitheme.h
+/home/javier/Code/cpp/systhemer/src/unitheme.h
+
 /home/javier/Code/cpp/systhemer/src/main.c
 stdio.h
 -
@@ -24,12 +46,20 @@ unitheme.h
 
 /home/javier/Code/cpp/systhemer/src/main.h
 
+/home/javier/Code/cpp/systhemer/src/priv_unitheme.h
+stdbool.h
+-
+stdio.h
+-
+
 /home/javier/Code/cpp/systhemer/src/tests.c
 stdio.h
 -
 stdlib.h
 -
 string.h
+-
+pcre2.h
 -
 tests.h
 /home/javier/Code/cpp/systhemer/src/tests.h
@@ -43,6 +73,10 @@ stdbool.h
 /home/javier/Code/cpp/systhemer/src/unitheme.c
 unitheme.h
 /home/javier/Code/cpp/systhemer/src/unitheme.h
+priv_unitheme.h
+/home/javier/Code/cpp/systhemer/src/priv_unitheme.h
+execUnitheme.h
+/home/javier/Code/cpp/systhemer/src/execUnitheme.h
 utils.h
 /home/javier/Code/cpp/systhemer/src/utils.h
 stdlib.h

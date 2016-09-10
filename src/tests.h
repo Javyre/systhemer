@@ -19,5 +19,7 @@ void testStrTrimStrAware();
 void testIsInsideOfStr();
 void testStrTrimInRange();
 
+void testRegex();
+
 #endif
 #endif

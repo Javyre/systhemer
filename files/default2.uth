@@ -5,16 +5,19 @@
 # Test comment
 begindef "i3";
 
+# "^\\n?client\\.focused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
 def tokens{
-         "client.fo\\cused              %s %s %s %s %s", 
-         "client.fo\"cused_inactive     %s %s %s %s %s"      , 
-         "client.unfocused              %s %s %s %s %s", 
-         "client.urgent                 %s %s %s %s %s", 
-         "client.placeholder            %s %s %s %s %s", 
-         "client.background             %s",
+         "^\\n?client\\.focused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.focused_inactive\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.unfocused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.urgent\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+
+         "^\\n?client\\.placeholder\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.background\\s+\\S+\\n?$",
           };
 # tes              "t";
-path  =       "~/.config/i3/config";
+# path  =       "~/.config/i3/config";
+path  =       "../files/test/testcfg";
 exec-before="\"hello";
 
          # class                  border  backgr. text    indicator child_border

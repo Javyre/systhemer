@@ -10,7 +10,7 @@
 #include "tests.h"
 #include "utils.h"
 
-#define UPDATE_CURR_PROG() do{ if (g_current_prog != NULL) free(g_current_prog); g_current_prog = NULL; g_current_prog = strMkCpy(__func__); g_num_errors = 0; g_call_num = 0; printf("\n=======================\n"); }while(0);
+#define UPDATE_CURR_PROG() do{ if (g_current_prog != NULL) free(g_current_prog); g_current_prog = NULL; g_current_prog = strMkCpy(__func__); g_num_errors_total += g_num_errors; g_num_errors = 0; g_call_num = 0; printf("\n%s%lu total test fails so far...\n" KDEFAULT, (g_num_errors_total > 0 ? BKRED : BKGRN), (unsigned long)g_num_errors_total); printf("=======================\n"); }while(0);
 
 void testTestsMode() { TEST_PRINT_VALUE(%d, testsMode) }
 
@@ -121,15 +121,19 @@ bool testStrExpect(const char* original, const char *exp, const char *result, co
   return res;
 }
 
-void testAll() {
+size_t testAll() {
   testStrTrimStrAware();
   testIsInsideOfStr();
   testStrTrimInRange();
 
   testRegex();
 
+  UPDATE_CURR_PROG();
+
   free(g_current_prog);
   g_current_prog = NULL;
+
+  return g_num_errors_total;
 }
 
 #define TEST_STR_TRIM_STR_AWARE(rgnl, xpct)       \

@@ -17,7 +17,7 @@ string.h
 -
 unistd.h
 -
-regex.h
+pcre2.h
 -
 
 /home/javier/Code/cpp/systhemer/src/execUnitheme.h
@@ -58,6 +58,8 @@ stdio.h
 stdlib.h
 -
 string.h
+-
+pcre2.h
 -
 tests.h
 /home/javier/Code/cpp/systhemer/src/tests.h

@@ -5,13 +5,15 @@
 # Test comment
 begindef "i3";
 
+# "^\\n?client\\.focused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
 def tokens{
-         "^\\n?client\\.focused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$", 
-         "client\\.focused_inactive      %s %s %s %s %s"      , 
-         "client\\.unfocused              %s %s %s %s %s", 
-         "client\\.urgent                 %s %s %s %s %s", 
-         "client\\.placeholder            %s %s %s %s %s", 
-         "client\\.background             %s",
+         "^\\n?client\\.focused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.focused_inactive\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.unfocused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.urgent\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+
+         "^\\n?client\\.placeholder\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.background\\s+\\S+\\n?$",
           };
 # tes              "t";
 # path  =       "~/.config/i3/config";

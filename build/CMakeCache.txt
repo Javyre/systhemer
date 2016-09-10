@@ -56,7 +56,7 @@ CMAKE_C_COMPILER_ARG1:STRING=clang
 CMAKE_C_FLAGS:STRING=
 
 //Flags used by the compiler during debug builds.
-CMAKE_C_FLAGS_DEBUG:STRING=-g -Wall -lpcre2-32
+CMAKE_C_FLAGS_DEBUG:STRING=-g -Wall -lpcre2-8
 
 //Flags used by the compiler during release builds for minimum
 // size.

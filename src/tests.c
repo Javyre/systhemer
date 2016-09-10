@@ -4,6 +4,9 @@
 
 #include <string.h>
 
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+
 #include "tests.h"
 #include "utils.h"
 
@@ -123,6 +126,8 @@ void testAll() {
   testIsInsideOfStr();
   testStrTrimInRange();
 
+  testRegex();
+
   free(g_current_prog);
   g_current_prog = NULL;
 }
@@ -152,6 +157,7 @@ void testStrTrimStrAware() {
   original = NULL;
   str = NULL;
 }
+#undef TEST_STR_TRIM_STR_AWARE
 
 #define TEST_IS_INSIDE_OF_STR(rgnl, xpct)                       \
   do {                                                          \
@@ -194,6 +200,7 @@ void testIsInsideOfStr() {
   str = NULL;
   original = NULL;
 }
+#undef TEST_IS_INSIDE_OF_STR
 
 #define TEST_STR_TRIM_IN_RANGE(rgnl, xpct, frm, to) \
   do {                                              \
@@ -207,7 +214,6 @@ void testIsInsideOfStr() {
 /* str = strMkCpyInRange(original+frm, (to-frm)+1);   \ */
 /* printf("%s\n", str);                               \ */
 /* free(str);                                         \ */
-
 void testStrTrimInRange() {
   UPDATE_CURR_PROG();
   char *original;
@@ -232,6 +238,77 @@ void testStrTrimInRange() {
 
   str = NULL;
   original = NULL;
+}
+#undef TEST_STR_TRIM_IN_RANGE
+
+#define TEST_REGEX(ntr, rg_xpr, xpct)                                   \
+  do {                                                                  \
+    entry = strMkCpy(ntr);                                              \
+    reg_expr = strMkCpy(rg_xpr);                                        \
+    str = NULL;                                                         \
+    reg_comped = pcre2_compile((PCRE2_SPTR)reg_expr, PCRE2_ZERO_TERMINATED, 0, &error_code, &error_offset, NULL); \
+    if (reg_comped == NULL) {                                           \
+      fprintf(stderr, BKRED "REGEX COMPILATION FAILED!!\n" KDEFAULT);   \
+      err_msg = calloc(256, sizeof(PCRE2_UCHAR));                       \
+      pcre2_get_error_message(error_code, err_msg, &err_msg_len);       \
+      fprintf(stderr, BKRED "%s\n" KDEFAULT, err_msg);                  \
+      free(err_msg);                                                    \
+    } else {                                                            \
+      match_data = pcre2_match_data_create_from_pattern(reg_comped, NULL); \
+      error_code = pcre2_match(reg_comped, (PCRE2_SPTR)entry, strlen(entry), 0, 0, match_data, NULL); \
+      pcre2_match_data_free(match_data);                                \
+      if (error_code >= 0) {                                            \
+        str = strMkCpy("match");                                        \
+      } else {                                                          \
+        str = strMkCpy("no match");                                     \
+                                                                        \
+        VERBOSE_PRINT_VALUE(%d, error_code);                            \
+        err_msg = calloc(256, sizeof(PCRE2_UCHAR));                     \
+        pcre2_get_error_message(error_code, err_msg, &err_msg_len);     \
+        fprintf(stderr, BKRED "%s\n" KDEFAULT, err_msg);                \
+        free(err_msg);                                                  \
+      }                                                                 \
+    }                                                                   \
+                                                                        \
+    original = malloc(256);                                             \
+    sprintf(original, "%s and %s", entry, reg_expr);                    \
+    strRealloc(&original);                                              \
+    testStrExpect(original, xpct, str == NULL ? "ERROR" : str, __func__); \
+                                                                        \
+    pcre2_code_free(reg_comped);                                        \
+    free(entry);                                                        \
+    free(original);                                                     \
+    free(str);                                                          \
+    free(reg_expr);                                                     \
+    str = original = entry = reg_expr = err_msg = match_data = reg_comped = NULL; \
+    error_code = error_offset = err_msg_len = 0;                        \
+  } while (0);
+void testRegex() {
+  UPDATE_CURR_PROG();
+  char *str;
+  char *original;
+  char *entry;
+  char *reg_expr;
+  int error_code = 0;
+  size_t error_offset = 0;
+  pcre2_match_data *match_data;
+  PCRE2_UCHAR *err_msg = NULL;
+  PCRE2_SIZE err_msg_len = 0;
+
+  pcre2_code *reg_comped;
+
+  TEST_REGEX("foo bar",
+             "^\\S+\\s\\S+\\n?$",
+             "match");
+  TEST_REGEX("client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577",
+             "^\\n?client\\.focused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+             "match");
+  TEST_REGEX("client.unfocused        $inactive-bg-color  $inactive-bg-color $inactive-text-color #B2FFA9",
+             "^\\n?client\\.unfocused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+             "match");
+
+
+
 }
 
 #endif

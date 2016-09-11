@@ -8,14 +8,11 @@
 
 void execUnitheme(programDefs *prgs) {
   FILE *cfg_file;
-  FILE *cmd_output;
   char *buff;
-  char *cmd_output_buff;
 
   int err_code = 0;
   size_t err_offset = 0;
   PCRE2_UCHAR *err_msg = NULL;
-  size_t err_msg_len = 0;
 
   pcre2_code **tok_reg_comped;
   pcre2_match_data *match_data = NULL;
@@ -41,7 +38,7 @@ void execUnitheme(programDefs *prgs) {
         if (tok_reg_comped[ii] == NULL) {
           fprintf(stderr, BKRED "REGEX COMPILATION FAILED!!\n" KDEFAULT);
           err_msg = calloc(256, sizeof(PCRE2_UCHAR));
-          pcre2_get_error_message(err_code, err_msg, (size_t)&err_msg_len);
+          pcre2_get_error_message(err_code, err_msg, 256);
           fprintf(stderr, BKRED "%s\n" KDEFAULT, err_msg);
           free(err_msg);
         }
@@ -72,7 +69,7 @@ void execUnitheme(programDefs *prgs) {
             } else if (err_code != -1){                                                 /* Error code -1 means just no match */
               VERBOSE_PRINT_VALUE(%d, err_code);
               err_msg = malloc(256);
-              pcre2_get_error_message(err_code, err_msg, (size_t)&err_msg_len);
+              pcre2_get_error_message(err_code, err_msg, 256);
               fprintf(stderr, BKRED "%s\n" KDEFAULT, err_msg);
               free(err_msg);
             }

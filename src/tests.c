@@ -12,6 +12,15 @@
 
 #define UPDATE_CURR_PROG() do{ if (g_current_prog != NULL) free(g_current_prog); g_current_prog = NULL; g_current_prog = strMkCpy(__func__); g_num_errors_total += g_num_errors; g_num_errors = 0; g_call_num = 0; printf("\n%s%lu total test fails so far...\n" KDEFAULT, (g_num_errors_total > 0 ? BKRED : BKGRN), (unsigned long)g_num_errors_total); printf("=======================\n"); }while(0);
 
+
+
+static size_t g_num_errors = 0;
+static size_t g_num_errors_total = 0;
+static size_t g_call_num = 0;
+static char * g_current_prog = NULL;
+
+
+
 void testTestsMode() { TEST_PRINT_VALUE(%d, testsMode) }
 
 char *testStrTrim(char *in) {
@@ -272,12 +281,19 @@ void testRegexRmEscape() {
   char *original;
   char *str;
 
-  TEST_REGEX_RM_ESCAPE("/\//", "///");
+  /* === Should Change === */
+  /* /\// -> /// */
+  TEST_REGEX_RM_ESCAPE("/\\//", "///");
+  /* \n/\// -> \n/// */
+  TEST_REGEX_RM_ESCAPE("\\n/\\//", "\\n///");
+
+  /* === Shouldnt Change === */
+  /* /\n/ -> /\n/ */
   TEST_REGEX_RM_ESCAPE("/\\n/", "/\\n/");
-  TEST_REGEX_RM_ESCAPE("\\n/\//", "\\n///");
+  /* \n/\n/ -> \n/\n/ */
   TEST_REGEX_RM_ESCAPE("\\n/\\n/", "\\n/\\n/");
-  TEST_REGEX_RM_ESCAPE("\//\//", "\////");
-  TEST_REGEX_RM_ESCAPE("/\\n/\/", "/\\n/\/");
+  /* /\n/\/ -> /\n/\/ */
+  TEST_REGEX_RM_ESCAPE("/\\n/\\/", "/\\n/\\/");
 
   str = NULL;
   original = NULL;
@@ -354,7 +370,7 @@ void testStrTrimInRange() {
     if (reg_comped == NULL) {                                           \
       fprintf(stderr, BKRED "REGEX COMPILATION FAILED!!\n" KDEFAULT);   \
       err_msg = calloc(256, sizeof(PCRE2_UCHAR));                       \
-      pcre2_get_error_message(error_code, err_msg, &err_msg_len);       \
+      pcre2_get_error_message(error_code, err_msg, 256);                \
       fprintf(stderr, BKRED "%s\n" KDEFAULT, err_msg);                  \
       free(err_msg);                                                    \
     } else {                                                            \
@@ -368,7 +384,7 @@ void testStrTrimInRange() {
                                                                         \
         VERBOSE_PRINT_VALUE(%d, error_code);                            \
         err_msg = calloc(256, sizeof(PCRE2_UCHAR));                     \
-        pcre2_get_error_message(error_code, err_msg, &err_msg_len);     \
+        pcre2_get_error_message(error_code, err_msg, 256);     \
         fprintf(stderr, BKRED "%s\n" KDEFAULT, err_msg);                \
         free(err_msg);                                                  \
       }                                                                 \
@@ -384,8 +400,10 @@ void testStrTrimInRange() {
     free(original);                                                     \
     free(str);                                                          \
     free(reg_expr);                                                     \
-    str = original = entry = reg_expr = err_msg = match_data = reg_comped = NULL; \
-    error_code = error_offset = err_msg_len = 0;                        \
+    str = original = entry = reg_expr = NULL;                           \
+    err_msg = NULL; match_data = NULL; reg_comped = NULL; \
+    error_code = 0;                                           \
+    error_offset = 0;\
   } while (0);
 void testRegex() {
   UPDATE_CURR_PROG();
@@ -397,7 +415,6 @@ void testRegex() {
   size_t error_offset = 0;
   pcre2_match_data *match_data;
   PCRE2_UCHAR *err_msg = NULL;
-  PCRE2_SIZE err_msg_len = 0;
 
   pcre2_code *reg_comped;
 

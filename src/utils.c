@@ -510,7 +510,7 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
 
   char *src = str;
   while (*src != '\0') {
-    if (isInsideOfStr(str, src)) {
+    if (utilIsInsideOf(str, src, delim, escape)) {
       if (*src == escape_char && (src[1] == delim_char || src[1] == escape_char)) {
         strOverlap(str, str, (src - 1), (src + 1), NULL);
         src++;

@@ -23,7 +23,7 @@ typedef unsigned char ESCAPE_TYPE;
 /* The following SET_DELIM_CHAR is modified to suppress compile warnings */
 /* Refer to the second definition for changes etc. */
 /* TODO: find a better way of suppressing this warning */
-#define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = scp_tp == 9999 ? '\0' : '\\';
+#define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = scp_tp == 8 ? '\0' : '\\';
 /* #define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = scp_tp == 0 ? STR_ESCAPE_CHAR : REGEX_ESCAPE_CHAR; */
 
 #define KNRM  "\x1B[0m"

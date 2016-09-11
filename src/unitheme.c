@@ -253,20 +253,12 @@ void rmComment(char *in) {
   }
 }
 
-void rmEscape(char **currentBuffer) {
+void rmEscape(char **currentBuffer) { /* Apply's only to everything outside of strings and regex's */
   char *original = malloc(strlen(*currentBuffer) + 1);
   strcpy(original, *currentBuffer);
   char *src = original;
-  /*
-  while (*src != '\0' && *src != '\n')
-    src++;
-  if (*src == '\n')
-    fprintf(stderr, "Warning: found a '\\n' (newline) character in current
-  buffer string! This is dangerous!!!\n");
-  src = original;
-  */
   while (*src != '\0') {
-    if (!isInsideOfStr(original, src)) {
+    if (!isInsideOfStr(original, src) && !isInsideOfRegEx(original, src)) {
       if (*src == '\\' && (src[1] == '\\' || src[1] == '#')) {
         strOverlap(original, original, (src - 1), (src + 1), NULL);
         src++;
@@ -276,17 +268,6 @@ void rmEscape(char **currentBuffer) {
                 src[1], original, genWrongUnderline(original, src, src + 1));
         EXIT(1);
       }
-    } else {
-      if (*src == '\\' && (src[1] == '\"')) {
-        // strOverlap(original, original, (src-1), (src+1), NULL);
-        // src++;
-        ;
-      } /*else if (*src == '\\' && (src[1] != '\"')) {
-        fprintf(stderr, BKRED "Error: Found escape character inside of string
-        with invalid successor \"%c\": \n\t%s\n\t%s\n", src[1], original,
-        genWrongUnderline(original, src, src+1));
-        exit(1);
-        }*/
     }
     src++;
   }
@@ -364,7 +345,7 @@ bool isList(char *in, char **outListName, list **outListItems) {
       src++;
       continue;
     }
-    if (*src == '{' && !isInsideOfStr(in, src)) {
+    if (*src == '{' && !isInsideOfStr(in, src) && !isInsideOfRegEx(in, src)) {
       if (open) {
         fprintf(stderr,
                 BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", in,
@@ -374,7 +355,7 @@ bool isList(char *in, char **outListName, list **outListItems) {
       whereOpened = src;
       open = true;
       isList = true;
-    } else if (*src == '}' && !isInsideOfStr(in, src)) {
+    } else if (*src == '}' && !isInsideOfStr(in, src) && !isInsideOfRegEx(in, src)) {
       if (!open) {
         fprintf(stderr,
                 BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", in,
@@ -408,7 +389,7 @@ bool isList(char *in, char **outListName, list **outListItems) {
         exit(1);
       }
 
-    } else if (*src == ',' && open && !isInsideOfStr(in, src)) {
+    } else if (*src == ',' && open && !isInsideOfStr(in, src) && !isInsideOfRegEx(in, src)) {
       numItems++;
     }
     src++;

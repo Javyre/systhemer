@@ -22,6 +22,8 @@ void testIsInsideOfRegEx();
 void testStrTrimInRange();
 
 void testRegex();
+void testRegexRmEscape();
+void testRegexUnregex();
 
 #endif
 #endif

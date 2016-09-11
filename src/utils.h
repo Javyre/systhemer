@@ -67,7 +67,9 @@ bool isEmptyStrInRange (char *from, char *to);
 void strTrimStrAware(char *in);
 void strRealloc(char **str);
 void strRmEscape(char *str);
+void regexRmEscape(char *str);
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
 int strUnstring(char **str);
+int regexUnregex(char **str);
 
 #endif

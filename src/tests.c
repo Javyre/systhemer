@@ -128,6 +128,8 @@ size_t testAll() {
 
   testRegex();
   testIsInsideOfRegEx();
+  testRegexRmEscape();
+  testRegexUnregex();
 
   UPDATE_CURR_PROG();
 
@@ -208,14 +210,14 @@ void testIsInsideOfStr() {
 #undef TEST_IS_INSIDE_OF_STR
 
 #define TEST_IS_INSIDE_OF_REGEX(rgnl, xpct)                       \
-  do {                                                          \
-    original = strMkCpy(rgnl);                                  \
-    str = calloc(strlen(original)+1, sizeof(char));             \
-    for (size_t i = 0; i < strlen(original); i++)               \
+  do {                                                            \
+    original = strMkCpy(rgnl);                                    \
+    str = calloc(strlen(original)+1, sizeof(char));               \
+    for (size_t i = 0; i < strlen(original); i++)                 \
       str[i] = isInsideOfRegEx(original, original+i) ? '=': '_';  \
-    testStrExpect(original, xpct, str, __func__);               \
-    free(str);                                                  \
-    free(original);                                             \
+    testStrExpect(original, xpct, str, __func__);                 \
+    free(str);                                                    \
+    free(original);                                               \
   } while (0);
 
 void testIsInsideOfRegEx() {
@@ -228,27 +230,81 @@ void testIsInsideOfRegEx() {
 
 
   TEST_IS_INSIDE_OF_REGEX("  ",
-                        "__");
+                          "__");
 
   TEST_IS_INSIDE_OF_REGEX(" ",
-                        "_");
+                          "_");
 
   TEST_IS_INSIDE_OF_REGEX("//",
-                        "==");
+                          "==");
+
+  TEST_IS_INSIDE_OF_REGEX("\\///",
+                          "__==");
 
   TEST_IS_INSIDE_OF_REGEX(" //",
-                        "_==");
+                          "_==");
+
+  TEST_IS_INSIDE_OF_REGEX(" //\\/",
+                          "_==__");
 
   TEST_IS_INSIDE_OF_REGEX(" // ",
-                        "_==_");
+                          "_==_");
 
   TEST_IS_INSIDE_OF_REGEX(" / foo\\/bar / ",
-                        "_============_");
+                          "_============_");
 
   str = NULL;
   original = NULL;
 }
 #undef TEST_IS_INSIDE_OF_REGEX
+
+#define TEST_REGEX_RM_ESCAPE(rgnl, xpct)   \
+  do {                                              \
+    original = strMkCpy(rgnl);                      \
+    str = strMkCpy(original);                       \
+    regexRmEscape(str);                             \
+    testStrExpect(original, xpct, str, __func__);   \
+    free(original);                                 \
+    free(str);                                      \
+  } while (0);
+void testRegexRmEscape() {
+  UPDATE_CURR_PROG();
+  char *original;
+  char *str;
+
+  TEST_REGEX_RM_ESCAPE("/\//", "///");
+  TEST_REGEX_RM_ESCAPE("/\\n/", "/\\n/");
+  TEST_REGEX_RM_ESCAPE("\\n/\//", "\\n///");
+  TEST_REGEX_RM_ESCAPE("\\n/\\n/", "\\n/\\n/");
+  TEST_REGEX_RM_ESCAPE("\//\//", "\////");
+  TEST_REGEX_RM_ESCAPE("/\\n/\/", "/\\n/\/");
+
+  str = NULL;
+  original = NULL;
+}
+#undef TEST_REGEX_RM_ESCAPE
+
+#define TEST_REGEX_UNREGEX(rgnl, xpct)            \
+  do {                                            \
+    original = strMkCpy(rgnl);                    \
+    str = strMkCpy(original);                     \
+    regexUnregex(&str);                           \
+    testStrExpect(original, xpct, str, __func__); \
+    free(original);                               \
+    free(str);                                    \
+  } while (0);
+
+void testRegexUnregex() {
+  UPDATE_CURR_PROG();
+  char *original;
+  char *str;
+
+  TEST_REGEX_UNREGEX("  /foo/  ", "  foo  ");
+
+  original = NULL;
+  str = NULL;
+}
+#undef TEST_REGEX_UNREGEX
 
 #define TEST_STR_TRIM_IN_RANGE(rgnl, xpct, frm, to) \
   do {                                              \

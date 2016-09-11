@@ -566,6 +566,27 @@ void strRmEscape(char *str) {
   }
 }
 
+void regexRmEscape(char *str) {
+  char *src = str;
+  /*
+    while (*src != '\0' && *src != '\n')
+    src++;
+    if (*src == '\n')
+    fprintf(stderr, "Warning: found a '\\n' (newline) character in current
+    buffer string! This is dangerous!!!\n");
+    src = str;
+  */
+  while (*src != '\0') {
+    if (isInsideOfRegEx(str, src)) {
+      if (*src == '\\' && (src[1] == '/' || src[1] == '\\')) {
+        strOverlap(str, str, (src - 1), (src + 1), NULL);
+        src++;
+      }
+    }
+    src++;
+  }
+}
+
 int strUnstring(char **str) {
   VERBOSE_PRINT_VALUE(%s, *str);
   strRmEscape(*str);
@@ -586,6 +607,48 @@ int strUnstring(char **str) {
   /* get rid of closing " */
   for (size_t i = strlen(*str);; i--) {
     if ((*str)[i] == '\"') {
+      (*str)[i] = ' ';
+      break;
+    }
+  }
+
+  /* for (size_t i = 0; i < strlen(*str); i++) { */
+    /* (*str)[i] = ((*str)[i] == '\"') ? ' ' : (*str)[i]; */
+  /* } */
+  VERBOSE_PRINT_VALUE(%s, *str);
+  if ((*str)[0] == ' ') {
+    for (size_t i = 0; i < strlen(*str); i++) {
+      (*str)[i] = (*str)[i + 1];
+    }
+  }
+  VERBOSE_PRINT_VALUE(%s, *str);
+  (*str)[strlen(*str) - 1] =
+      ((*str)[strlen(*str) - 1] == ' ') ? '\0' : (*str)[strlen(*str) - 1];
+  strRealloc(str);
+  VERBOSE_PRINT_VALUE(%s, *str);
+  return 0;
+}
+
+int regexUnregex(char **str) {
+  VERBOSE_PRINT_VALUE(%s, *str);
+  strRmEscape(*str);
+  VERBOSE_PRINT_VALUE(%s, *str);
+  /* get rid of opening / */
+  for (size_t i = 0; i < strlen(*str); i++) {
+    if ((*str)[i] == '/') {
+      (*str)[i] = ' ';
+      break;
+    }
+    if (i == strlen(*str)-1) {
+      fprintf(stderr,
+              BKRED "Error: Invalid string %s! Missing quotes (\")\n" KDEFAULT,
+              *str);
+      return 1;
+    }
+  }
+  /* get rid of closing / */
+  for (size_t i = strlen(*str);; i--) {
+    if ((*str)[i] == '/') {
       (*str)[i] = ' ';
       break;
     }

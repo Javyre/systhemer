@@ -17,7 +17,7 @@ work for you!
 | Extract GTK theme into a universal theme                    | Low      |                                      |
 | Support for the i3wm configs                                | Medium   | Started (for testing other features) |
 | Support for other programs... (list to be continued)        | Medium         |                                      |
-| Make the universal theme file a scripting/programming language of its own | Medium | Started (but only still much less of a priority as other features) |
+| Make the universal theme file a scripting/programming language of its own | Medium | Started (but still much less of a priority as other features) |
 | Make a Cpp GUI frontend for this C commandline backend (kind of a universal control panel) | Low | |
     
 ## Usage ##

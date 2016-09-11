@@ -127,6 +127,7 @@ size_t testAll() {
   testStrTrimInRange();
 
   testRegex();
+  testIsInsideOfRegEx();
 
   UPDATE_CURR_PROG();
 
@@ -205,6 +206,49 @@ void testIsInsideOfStr() {
   original = NULL;
 }
 #undef TEST_IS_INSIDE_OF_STR
+
+#define TEST_IS_INSIDE_OF_REGEX(rgnl, xpct)                       \
+  do {                                                          \
+    original = strMkCpy(rgnl);                                  \
+    str = calloc(strlen(original)+1, sizeof(char));             \
+    for (size_t i = 0; i < strlen(original); i++)               \
+      str[i] = isInsideOfRegEx(original, original+i) ? '=': '_';  \
+    testStrExpect(original, xpct, str, __func__);               \
+    free(str);                                                  \
+    free(original);                                             \
+  } while (0);
+
+void testIsInsideOfRegEx() {
+  UPDATE_CURR_PROG();
+  char *original;
+  char *str;
+
+  TEST_IS_INSIDE_OF_REGEX("foo bar /foo.../ bar",
+                        "________========____");
+
+
+  TEST_IS_INSIDE_OF_REGEX("  ",
+                        "__");
+
+  TEST_IS_INSIDE_OF_REGEX(" ",
+                        "_");
+
+  TEST_IS_INSIDE_OF_REGEX("//",
+                        "==");
+
+  TEST_IS_INSIDE_OF_REGEX(" //",
+                        "_==");
+
+  TEST_IS_INSIDE_OF_REGEX(" // ",
+                        "_==_");
+
+  TEST_IS_INSIDE_OF_REGEX(" / foo\\/bar / ",
+                        "_============_");
+
+  str = NULL;
+  original = NULL;
+}
+#undef TEST_IS_INSIDE_OF_REGEX
 
 #define TEST_STR_TRIM_IN_RANGE(rgnl, xpct, frm, to) \
   do {                                              \

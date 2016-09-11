@@ -52,6 +52,7 @@ bool exit_on_failed_test;
 
 //Function declarations
 bool isInsideOfStr(char *str, char *pos);
+bool isInsideOfRegEx(char *str, char *pos);
 
 void printHelp(const int);
 void verboseMessage(const char*);

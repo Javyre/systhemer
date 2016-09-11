@@ -364,7 +364,7 @@ bool isList(char *in, char **outListName, list **outListItems) {
       src++;
       continue;
     }
-    if (*src == '{') {
+    if (*src == '{' && !isInsideOfStr(in, src)) {
       if (open) {
         fprintf(stderr,
                 BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", in,
@@ -374,7 +374,7 @@ bool isList(char *in, char **outListName, list **outListItems) {
       whereOpened = src;
       open = true;
       isList = true;
-    } else if (*src == '}') {
+    } else if (*src == '}' && !isInsideOfStr(in, src)) {
       if (!open) {
         fprintf(stderr,
                 BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", in,
@@ -661,17 +661,24 @@ void evalAssig(char *currentBuffer, char *tok, char *value) {
 }
 
 void evalList(char *currentBuffer, char *listName, list *content) {
-  for (size_t i = 0; i < content->used; i++) {
-    VERBOSE_PRINT_VALUE(%s, content->items[i]);
-    strTrimStrAware(content->items[i]);
-    strUnstring(&content->items[i]);
-    strRealloc(&content->items[i]);
-    VERBOSE_PRINT_VALUE(%s, content->items[i]);
-  }
   if (currentProg->name != NULL) {
-    if (strcmp(listName, "tokens") == 0) {
+    if (strcmp(listName, "tokens") == 0) { /* Automaticaly treat as regular expressions and not strings (delimiters: // and different escape chars) */
+      for (size_t i = 0; i < content->used; i++) {
+        VERBOSE_PRINT_VALUE(%s, content->items[i]);
+        strTrimStrAware(content->items[i]); //TODO: Replace this line with appropriate regex equivalent
+        strUnstring(&content->items[i]); //TODO: Replace this line with appropriate regex equivalent
+        strRealloc(&content->items[i]);
+        VERBOSE_PRINT_VALUE(%s, content->items[i]);
+      }
       currentProg->tokens = content;
-    } else if (strcmp(listName, "snippets") == 0) {
+    } else if (strcmp(listName, "snippets") == 0) { /* Automatically treat as strings (delimiters: "" and different escape chars) */
+      for (size_t i = 0; i < content->used; i++) {
+        VERBOSE_PRINT_VALUE(%s, content->items[i]);
+        strTrimStrAware(content->items[i]);
+        strUnstring(&content->items[i]);
+        strRealloc(&content->items[i]);
+        VERBOSE_PRINT_VALUE(%s, content->items[i]);
+      }
       currentProg->snippets = content;
     } else {
       fprintf(stderr,

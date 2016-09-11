@@ -271,26 +271,26 @@ bool isEmptyStr(char *str) { return isEmptyStrInRange(str, NULL); }
 
 bool isInsideOfStr(char *str, char *pos) {
   char *src = str;
-  bool isInString = false;
+  bool is_in_str = false;
   bool set_on_next = false;
   while (*src != '\0') {
     if (set_on_next) {
-      isInString = false;
+      is_in_str = false;
       set_on_next = false;
     }
 
     if (*src == '\"' && src == str) {
-      isInString = (isInString) ? false : true;
+      is_in_str = (is_in_str) ? false : true;
     } else if (*src == '\"' && *(src - 1) != '\\' && src != str) {
-      if (isInString) {
+      if (is_in_str) {
         set_on_next = true;
       } else {
-        isInString = true;
+        is_in_str = true;
       }
     }
 
     if (src == pos) {
-      return isInString;
+      return is_in_str;
     }
     src++;
   }
@@ -313,6 +313,53 @@ bool isInsideOfStr(char *str, char *pos) {
   }
   fprintf(stderr, BKRED "Error: something went wrong in function "
                         "isInsideOfStr()... src never matched pos\n" KDEFAULT);
+  return false;
+}
+
+bool isInsideOfRegEx(char *str, char *pos) {
+  char *src = str;
+  bool is_in_regex = false;
+  bool set_on_next = false;
+  while (*src != '\0') {
+    if (set_on_next) {
+      is_in_regex = false;
+      set_on_next = false;
+    }
+
+    if (*src == '/' && src == str) {
+      is_in_regex = (is_in_regex) ? false : true;
+    } else if (*src == '/' && *(src - 1) != '\\' && src != str) {
+      if (is_in_regex) {
+        set_on_next = true;
+      } else {
+        is_in_regex = true;
+      }
+    }
+
+    if (src == pos) {
+      return is_in_regex;
+    }
+    src++;
+  }
+  if (pos < str || pos > src) {
+    fprintf(
+        stderr, BKRED
+        "Error: Passed an out of bounds pos to function isInsideOfRegEx() : %s\n"
+        "pos\t\t\t: %p :\t%s\n"
+        "str (first char of str)\t: %p :\t%s\n"
+        "src (last char of str)\t: %p :\t%s\n" KDEFAULT,
+        (pos < str)
+            ? "pos pointer is smaller than pointer to first char of str"
+            : (pos > src)
+                  ? "pos pointer is greater than pointer to last char of str"
+                  : "If you are reading this something is very very wrong",
+        pos, pos, str, str, src, src);
+    EXIT(1);
+  } else if (*pos == '\\' && *(pos-1) != '\\') {
+    WARNING_PRINT("Warning: Passed a '\' (backslash char) character to isInsideOfRegEx() this isn't supposed to happen!\n")
+  }
+  fprintf(stderr, BKRED "Error: something went wrong in function "
+                        "isInsideOfRegEx()... src never matched pos\n" KDEFAULT);
   return false;
 }
 

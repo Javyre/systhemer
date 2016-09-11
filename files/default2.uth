@@ -7,12 +7,12 @@ begindef "i3";
 
 # "^\\n?client\\.focused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
 def tokens{
-         "^\\n?client\\.focused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
-         "^\\n?client\\.focused_inactive\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
-         "^\\n?client\\.unfocused\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
-         "^\\n?client\\.urgent\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.focused(\\s+\\S+){4}\\n?$", 
+         "^\\n?client\\.focused_inactive(\\s+\\S+){4}\\n?$",
+         "^\\n?client\\.unfocused(\\s+\\S+){4}\\n?$",
+         "^\\n?client\\.urgent(\\s+\\S+){4}\\n?$",
 
-         "^\\n?client\\.placeholder\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\n?$",
+         "^\\n?client\\.placeholder(\\s+\\S+){4}\\n?$",
          "^\\n?client\\.background\\s+\\S+\\n?$",
           };
 # tes              "t";

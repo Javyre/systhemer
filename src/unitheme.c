@@ -557,10 +557,7 @@ void evalLine(char *currentBuffer) {
 
 void evalStatement(char *currentBuffer, char *statCall, char *statArg) {
   bool freeArg = false;
-  if (strUnstring(&statArg)) {
-    fprintf(stderr, BKRED "Check line #%d\n" KDEFAULT, (int)currentLine);
-    exit(1);
-  }
+  strUnstring(&statArg);
   if (strcmp(statCall, "begindef") == 0) {
     if (currentProg->name == NULL) {
       currentProg->beginDef = calloc(1, sizeof(size_t));
@@ -608,10 +605,7 @@ void evalAssig(char *currentBuffer, char *tok, char *value) {
   bool freeVal = false;
   strTrim(tok);
   strTrimStrAware(value);
-  if (strUnstring(&value)) {
-    fprintf(stderr, BKRED "Check line #%d\n" KDEFAULT, (int)currentLine);
-    exit(1);
-  }
+  strUnstring(&value);
   if (currentProg->name != NULL) {
     if (strcmp(tok, "path") == 0) {
       printf("FOUND PATH ASSIGNATION!!!\n");

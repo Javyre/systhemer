@@ -8,6 +8,23 @@
 #define PACKAGE "SysThemer"
 #define VERSION "0.0.1"
 
+typedef unsigned char DELIM_TYPE;
+#define STR_DELIM 0
+#define REGEX_DELIM 1
+#define STR_DELIM_CHAR '\"'
+#define REGEX_DELIM_CHAR '/'
+#define SET_DELIM_CHAR(dlm_tp, dlm_chr) const char dlm_chr = dlm_tp == 0 ? STR_DELIM_CHAR : REGEX_DELIM_CHAR;
+
+typedef unsigned char ESCAPE_TYPE;
+#define STR_ESCAPE 0
+#define REGEX_ESCAPE 1
+#define STR_ESCAPE_CHAR '\\'
+#define REGEX_ESCAPE_CHAR '\\'
+/* The following SET_DELIM_CHAR is modified to suppress compile warnings */
+/* Refer to the second definition for changes etc. */
+/* TODO: find a better way of suppressing this warning */
+#define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = scp_tp == 9999 ? '\0' : '\\';
+/* #define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = scp_tp == 0 ? STR_ESCAPE_CHAR : REGEX_ESCAPE_CHAR; */
 
 #define KNRM  "\x1B[0m"
 #define BKNRM  "\e[1;0m"
@@ -51,6 +68,7 @@ bool exit_on_failed_test;
 #endif
 
 //Function declarations
+bool utilIsInsideOf(char *str, char *pos, const DELIM_TYPE delim, const ESCAPE_TYPE escape);
 bool isInsideOfStr(char *str, char *pos);
 bool isInsideOfRegEx(char *str, char *pos);
 
@@ -66,10 +84,15 @@ bool isEmptyStr (char *str);
 bool isEmptyStrInRange (char *from, char *to);
 void strTrimStrAware(char *in);
 void strRealloc(char **str);
+
+void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape);
 void strRmEscape(char *str);
 void regexRmEscape(char *str);
+
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
-int strUnstring(char **str);
-int regexUnregex(char **str);
+
+void utilUnstring(char **str, DELIM_TYPE delim);
+void strUnstring(char **str);
+void regexUnregex(char **str);
 
 #endif

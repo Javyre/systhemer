@@ -269,7 +269,10 @@ bool isEmptyStrInRange(char *from, char *to) {
 
 bool isEmptyStr(char *str) { return isEmptyStrInRange(str, NULL); }
 
-bool isInsideOfStr(char *str, char *pos) {
+bool utilIsInsideOf(char *str, char *pos, const DELIM_TYPE delim, const ESCAPE_TYPE escape) {
+  SET_DELIM_CHAR(delim, delim_char);
+  SET_ESCAPE_CHAR(escape, escape_char)
+
   char *src = str;
   bool is_in_str = false;
   bool set_on_next = false;
@@ -279,9 +282,9 @@ bool isInsideOfStr(char *str, char *pos) {
       set_on_next = false;
     }
 
-    if (*src == '\"' && src == str) {
+    if (*src == delim_char && src == str) {
       is_in_str = (is_in_str) ? false : true;
-    } else if (*src == '\"' && *(src - 1) != '\\' && src != str) {
+    } else if (*src == delim_char && *(src - 1) != escape_char && src != str) {
       if (is_in_str) {
         set_on_next = true;
       } else {
@@ -308,59 +311,20 @@ bool isInsideOfStr(char *str, char *pos) {
                   : "If you are reading this something is very very wrong",
         pos, pos, str, str, src, src);
     EXIT(1);
-  } else if (*pos == '\\' && *(pos-1) != '\\') {
-    WARNING_PRINT("Warning: Passed a '\' (backslash char) character to isInsideOfStr() this isn't supposed to happen!\n")
+  } else if (*pos == escape_char && *(pos-1) != escape_char) {
+    WARNING_PRINT("Warning: Passed an escape character to isInsideOfStr() this isn't supposed to happen!\n")
   }
   fprintf(stderr, BKRED "Error: something went wrong in function "
                         "isInsideOfStr()... src never matched pos\n" KDEFAULT);
   return false;
 }
 
+bool isInsideOfStr(char *str, char *pos) {
+  return utilIsInsideOf(str, pos, STR_DELIM, STR_ESCAPE);
+}
+
 bool isInsideOfRegEx(char *str, char *pos) {
-  char *src = str;
-  bool is_in_regex = false;
-  bool set_on_next = false;
-  while (*src != '\0') {
-    if (set_on_next) {
-      is_in_regex = false;
-      set_on_next = false;
-    }
-
-    if (*src == '/' && src == str) {
-      is_in_regex = (is_in_regex) ? false : true;
-    } else if (*src == '/' && *(src - 1) != '\\' && src != str) {
-      if (is_in_regex) {
-        set_on_next = true;
-      } else {
-        is_in_regex = true;
-      }
-    }
-
-    if (src == pos) {
-      return is_in_regex;
-    }
-    src++;
-  }
-  if (pos < str || pos > src) {
-    fprintf(
-        stderr, BKRED
-        "Error: Passed an out of bounds pos to function isInsideOfRegEx() : %s\n"
-        "pos\t\t\t: %p :\t%s\n"
-        "str (first char of str)\t: %p :\t%s\n"
-        "src (last char of str)\t: %p :\t%s\n" KDEFAULT,
-        (pos < str)
-            ? "pos pointer is smaller than pointer to first char of str"
-            : (pos > src)
-                  ? "pos pointer is greater than pointer to last char of str"
-                  : "If you are reading this something is very very wrong",
-        pos, pos, str, str, src, src);
-    EXIT(1);
-  } else if (*pos == '\\' && *(pos-1) != '\\') {
-    WARNING_PRINT("Warning: Passed a '\' (backslash char) character to isInsideOfRegEx() this isn't supposed to happen!\n")
-  }
-  fprintf(stderr, BKRED "Error: something went wrong in function "
-                        "isInsideOfRegEx()... src never matched pos\n" KDEFAULT);
-  return false;
+  return utilIsInsideOf(str, pos, REGEX_DELIM, REGEX_ESCAPE);
 }
 
 void strTrimStrAware(char *in) {
@@ -540,133 +504,88 @@ void strRealloc(char **str) {
   }
 }
 
-void strRmEscape(char *str) {
+void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
+  SET_DELIM_CHAR(delim, delim_char);
+  SET_ESCAPE_CHAR(escape , escape_char);
+
   char *src = str;
-  /*
-  while (*src != '\0' && *src != '\n')
-    src++;
-  if (*src == '\n')
-    fprintf(stderr, "Warning: found a '\\n' (newline) character in current
-  buffer string! This is dangerous!!!\n");
-  src = str;
-  */
   while (*src != '\0') {
     if (isInsideOfStr(str, src)) {
-      if (*src == '\\' && (src[1] == '\"' || src[1] == '\\')) {
+      if (*src == escape_char && (src[1] == delim_char || src[1] == escape_char)) {
         strOverlap(str, str, (src - 1), (src + 1), NULL);
         src++;
-      } else if (*src == '\\' && (src[1] != '\"')) {
-        fprintf(stderr, BKRED "Error: Found escape character inside of string "
-                              "with invalid successor \"%c\": \n\t%s\n\t%s\n",
-                src[1], str, genWrongUnderline(str, src, src + 1));
-        EXIT(1);
+      } else if (delim == STR_DELIM) {
+        if(*src == '\\' && (src[1] != '\"')) {
+          fprintf(stderr, BKRED "Error: Found escape character inside of string "
+                  "with invalid successor \"%c\": \n\t%s\n\t%s\n",
+                  src[1], str, genWrongUnderline(str, src, src + 1));
+          EXIT(1);
+        }
       }
     }
     src++;
   }
+}
+
+void strRmEscape(char *str) {
+  utilRmEscape(str, STR_DELIM, STR_ESCAPE);
 }
 
 void regexRmEscape(char *str) {
-  char *src = str;
-  /*
-    while (*src != '\0' && *src != '\n')
-    src++;
-    if (*src == '\n')
-    fprintf(stderr, "Warning: found a '\\n' (newline) character in current
-    buffer string! This is dangerous!!!\n");
-    src = str;
-  */
-  while (*src != '\0') {
-    if (isInsideOfRegEx(str, src)) {
-      if (*src == '\\' && (src[1] == '/' || src[1] == '\\')) {
-        strOverlap(str, str, (src - 1), (src + 1), NULL);
-        src++;
-      }
-    }
-    src++;
-  }
+  utilRmEscape(str, REGEX_DELIM, REGEX_ESCAPE);
 }
 
-int strUnstring(char **str) {
+void utilUnstring(char **str, DELIM_TYPE delim) {
+  SET_DELIM_CHAR(delim, delim_char);
+
   VERBOSE_PRINT_VALUE(%s, *str);
   strRmEscape(*str);
   VERBOSE_PRINT_VALUE(%s, *str);
-  /* get rid of opening " */
+  /* get rid of opening delim char */
   for (size_t i = 0; i < strlen(*str); i++) {
-    if ((*str)[i] == '\"') {
+    if ((*str)[i] == delim_char) {
       (*str)[i] = ' ';
       break;
     }
     if (i == strlen(*str)-1) {
       fprintf(stderr,
-              BKRED "Error: Invalid string %s! Missing quotes (\")\n" KDEFAULT,
-              *str);
-      return 1;
+              BKRED "Error: Invalid string %s! Missing delimiter character (%c)\n" KDEFAULT,
+              *str, delim_char);
+      EXIT(1);
+      return;
     }
   }
-  /* get rid of closing " */
+  /* get rid of closing delim char */
   for (size_t i = strlen(*str);; i--) {
-    if ((*str)[i] == '\"') {
+    if ((*str)[i] == delim_char) {
       (*str)[i] = ' ';
       break;
     }
   }
 
-  /* for (size_t i = 0; i < strlen(*str); i++) { */
-    /* (*str)[i] = ((*str)[i] == '\"') ? ' ' : (*str)[i]; */
-  /* } */
+  /* get rid of the space character added at the beginning */
   VERBOSE_PRINT_VALUE(%s, *str);
   if ((*str)[0] == ' ') {
     for (size_t i = 0; i < strlen(*str); i++) {
       (*str)[i] = (*str)[i + 1];
     }
   }
+
+  /* get rid of the space character added at the end */
   VERBOSE_PRINT_VALUE(%s, *str);
   (*str)[strlen(*str) - 1] =
       ((*str)[strlen(*str) - 1] == ' ') ? '\0' : (*str)[strlen(*str) - 1];
+
+  /* reallocate and return */
   strRealloc(str);
   VERBOSE_PRINT_VALUE(%s, *str);
-  return 0;
+  return;
 }
 
-int regexUnregex(char **str) {
-  VERBOSE_PRINT_VALUE(%s, *str);
-  strRmEscape(*str);
-  VERBOSE_PRINT_VALUE(%s, *str);
-  /* get rid of opening / */
-  for (size_t i = 0; i < strlen(*str); i++) {
-    if ((*str)[i] == '/') {
-      (*str)[i] = ' ';
-      break;
-    }
-    if (i == strlen(*str)-1) {
-      fprintf(stderr,
-              BKRED "Error: Invalid string %s! Missing quotes (\")\n" KDEFAULT,
-              *str);
-      return 1;
-    }
-  }
-  /* get rid of closing / */
-  for (size_t i = strlen(*str);; i--) {
-    if ((*str)[i] == '/') {
-      (*str)[i] = ' ';
-      break;
-    }
-  }
+void strUnstring(char **str) {
+  utilUnstring(str, STR_DELIM);
+}
 
-  /* for (size_t i = 0; i < strlen(*str); i++) { */
-    /* (*str)[i] = ((*str)[i] == '\"') ? ' ' : (*str)[i]; */
-  /* } */
-  VERBOSE_PRINT_VALUE(%s, *str);
-  if ((*str)[0] == ' ') {
-    for (size_t i = 0; i < strlen(*str); i++) {
-      (*str)[i] = (*str)[i + 1];
-    }
-  }
-  VERBOSE_PRINT_VALUE(%s, *str);
-  (*str)[strlen(*str) - 1] =
-      ((*str)[strlen(*str) - 1] == ' ') ? '\0' : (*str)[strlen(*str) - 1];
-  strRealloc(str);
-  VERBOSE_PRINT_VALUE(%s, *str);
-  return 0;
+void regexUnregex(char **str) {
+  utilUnstring(str, REGEX_DELIM);
 }

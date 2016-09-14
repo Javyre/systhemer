@@ -51,6 +51,10 @@ stdbool.h
 -
 stdio.h
 -
+utils.h
+/home/javier/Code/cpp/systhemer/src/utils.h
+unitheme.h
+/home/javier/Code/cpp/systhemer/src/unitheme.h
 
 /home/javier/Code/cpp/systhemer/src/tests.c
 stdio.h
@@ -83,6 +87,8 @@ stdlib.h
 -
 string.h
 -
+pcre2.h
+-
 
 /home/javier/Code/cpp/systhemer/src/unitheme.h
 stdbool.h
@@ -108,5 +114,7 @@ utils.h
 
 /home/javier/Code/cpp/systhemer/src/utils.h
 stdbool.h
+-
+stdlib.h
 -
 

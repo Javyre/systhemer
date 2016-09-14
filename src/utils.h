@@ -3,28 +3,44 @@
 
 //C includes (that we use in this header)
 #include <stdbool.h>
+#include <stdlib.h>
 
 //Package defines and dev options (constant)
 #define PACKAGE "SysThemer"
 #define VERSION "0.0.1"
 
+#define DEF_STRING_KEYWORD "string"
+#define DEF_REGEX_KEYWORD "regex"
+
+/* typedef unsigned char STRING_TYPE; */
+typedef enum {
+  T_NULL = 0,
+  T_STRING,
+  T_REGEX
+} STRING_TYPE;
+#define SET_STRING_TYPE(str_tp, dlm_chr, scp_chr)                       \
+  SET_DELIM_CHAR(((str_tp) == T_NULL ? NULL_DELIM : (str_tp) == 1 ? STR_DELIM : REGEX_DELIM), dlm_chr); \
+  SET_ESCAPE_CHAR(((str_tp) == T_NULL ? NULL_ESCAPE : (str_tp) == 1 ? STR_ESCAPE : REGEX_ESCAPE), scp_chr);
+
 typedef unsigned char DELIM_TYPE;
-#define STR_DELIM 0
-#define REGEX_DELIM 1
+#define NULL_DELIM 0
+#define STR_DELIM 1
+#define REGEX_DELIM 2
 #define STR_DELIM_CHAR '\"'
 #define REGEX_DELIM_CHAR '/'
-#define SET_DELIM_CHAR(dlm_tp, dlm_chr) const char dlm_chr = dlm_tp == 0 ? STR_DELIM_CHAR : REGEX_DELIM_CHAR;
+#define SET_DELIM_CHAR(dlm_tp, dlm_chr) const char dlm_chr = (dlm_tp == NULL_DELIM) ? '\0' : (dlm_tp == 1 ? STR_DELIM_CHAR : REGEX_DELIM_CHAR);
 
 typedef unsigned char ESCAPE_TYPE;
-#define STR_ESCAPE 0
-#define REGEX_ESCAPE 1
+#define NULL_ESCAPE 0
+#define STR_ESCAPE 1
+#define REGEX_ESCAPE 2
 #define STR_ESCAPE_CHAR '\\'
 #define REGEX_ESCAPE_CHAR '\\'
 /* The following SET_DELIM_CHAR is modified to suppress compile warnings */
 /* Refer to the second definition for changes etc. */
 /* TODO: find a better way of suppressing this warning */
-#define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = scp_tp == 8 ? '\0' : '\\';
-/* #define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = scp_tp == 0 ? STR_ESCAPE_CHAR : REGEX_ESCAPE_CHAR; */
+#define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = (scp_tp == NULL_ESCAPE) ? '\0' : '\\';
+/* #define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = (scp_tp == NULL_ESCAPE) ? '\0' : (scp_tp == 1 ? STR_ESCAPE_CHAR : REGEX_ESCAPE_CHAR); */
 
 #define KNRM  "\x1B[0m"
 #define BKNRM  "\e[1;0m"
@@ -76,7 +92,7 @@ void printHelp(const int);
 void verboseMessage(const char*);
 void parseArgs(int, char* []);
 char *genWrongUnderline(char *line, char *from, char *to);
-char *strMkCpyInRange(const char *from, int numchars);
+char *strMkCpyInRange(const char *from, size_t numchars);
 char *strMkCpy(const char *in);
 void strTrim(char *in);
 void strTrimInRange(char *from, char *to);
@@ -94,5 +110,8 @@ void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
 void utilUnstring(char **str, DELIM_TYPE delim);
 void strUnstring(char **str);
 void regexUnregex(char **str);
+
+int getNextStr(char *in, char **out_begin, char** out_end);
+int getNextRegEx(char *in, char **out_begin, char** out_end);
 
 #endif

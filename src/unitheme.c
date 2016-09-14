@@ -5,6 +5,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 
 static programDef *currentProg;
 static programDefs progDefs;
@@ -325,115 +327,321 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
   free(holder);
 }
 
-bool isList(char *in, char **outListName, list **outListItems) {
+void getListAttr(char *in, char **outListName, list **outListItems, STRING_TYPE str_type) {
+  char *begin_item = NULL;
+  char *end_item = NULL;
+  char *src = NULL;
+  char *tmpc = NULL;
+  char *tok = NULL;
+  char *k_word;
+
+  /* ==== Set type keyword ==== */
+  switch (str_type) {
+  case T_STRING:
+    k_word = strMkCpy(DEF_STRING_KEYWORD);
+    break;
+  case T_REGEX:
+    k_word = strMkCpy(DEF_REGEX_KEYWORD);
+    break;
+  default:
+    k_word = NULL;
+    fprintf(stderr, BKRED "Error: Unknown STRING_TYPE: %d passed to getListAttr!", str_type);
+    EXIT(1);
+    break;
+  }
+
+  /* ==== Get list name ==== */
+  tmpc = strMkCpy(in);
+  tok = strtok(tmpc, " \t\n");
+  while (tok) {
+    if (strcmp(tok, "def") && strcmp(tok, k_word)) {
+      *outListName = strMkCpyInRange(tok, ((tok[strlen(tok)-1] == '{') ? strlen(tok)-1 : 0));
+      VERBOSE_PRINT_VALUE(%s, *outListName);
+      break;
+    }
+    tok = strtok(NULL, " \t\n");
+  }
+  free(tmpc);
+  tmpc = NULL;
+  tok = NULL;
+
+  /* ==== Get list items ==== */
+  /* Init list */
+  *outListItems = (list *)calloc(1, sizeof(list));
+  defsInitList(*outListItems, 20);
+
+  /* Skip to char after opening { char */
+  src = in;
+  for (;*src!='{';src++);
+  src++;
+
+  /* Find and insert items one by one */
+  VERBOSE_PRINT_VALUE(%s, src);
+  if (str_type == T_STRING) {
+    while (getNextStr(src, &begin_item, &end_item)) {
+      defsInsertList(*outListItems, strMkCpyInRange(begin_item, end_item-begin_item+1));
+      src = end_item+1;
+
+      VERBOSE_PRINT_VALUE(%s, (*outListItems)->items[(*outListItems)->used-1]);
+  }
+  } else if (str_type == T_REGEX) {
+    while (getNextRegEx(src, &begin_item, &end_item)) {
+      defsInsertList(*outListItems, strMkCpyInRange(begin_item, end_item-begin_item+1));
+      src = end_item+1;
+
+      VERBOSE_PRINT_VALUE(%s, (*outListItems)->items[(*outListItems)->used-1]);
+    }
+
+  }
+
+  free(k_word);
+  k_word = NULL;
+}
+
+bool isList(char *in, char **outListName, list **outListItems, STRING_TYPE *str_type) {
   char *src = in;
   /* char **listItems; */
   /* char **listItemsSrc = *outListItems; */
   /* char **lastItem; */
-  bool isList = false;
+  bool isList = true;
   bool open = false;
   char *whereOpened = NULL;
   char *tmpc;
   char *tok;
   char *contents;
 
+  char *begin_item = NULL;
+  char *end_item = NULL;
+
+  /*
+    Mega expression for detecting valid def list:
+    https://regex101.com/r/kY5iB8/2
+    https://regex101.com/r/kY5iB8/3
+    https://regex101.com/r/kY5iB8/4
+    https://regex101.com/r/kY5iB8/5
+
+    def\s+(string)\s+\S+(?<s>\s*\n*\s*)\{\g<s>((?<str>("((\\")|[^"(\\")])+"|""))\g<s>,\g<s>)*(\g<str>\g<s>)?\};?
+    def\s+(regex)\s+\S+(?<s>\s*\n*\s*)\{\g<s>((?<str>(\/((\\\/)|[^\/(\\\/)])+\/|\/\/))\g<s>,\g<s>)*(\g<str>\g<s>)?\};?
+
+    Universal (detects valid )
+    (def\s+(regex)\s+\S+(?<s>\s*\n*\s*)\{\g<s>((?<reg>(\/((\\\/)|[^\/(\\\/)])+\/|\/\/))\g<s>,\g<s>)*(\g<reg>\g<s>)?\};?)|(def\s+(string)\s+\S+\g<s>\{\g<s>((?<str>("((\\")|[^"(\\")])+"|""))\g<s>,\g<s>)*(\g<str>\g<s>)?\};?)
+  */
+
+  int re_err_code = 0;
+  size_t re_err_offset = 0;
+  PCRE2_UCHAR *re_err_msg = NULL;
+
+  pcre2_code *re_code_is_def_string;
+  char *re_exp_is_def_string = strMkCpy("def\\s+string\\s+(\\S+)(?<s>[\\s\\n]*)\\{\\g<s>((?<str>(\"((\\\\\")|(\\\\\\\\)|[^\\\\\"])+\"|\"\"))\\g<s>,\\g<s>)*(\\g<str>\\g<s>)?\\};?");
+  pcre2_code *re_code_is_def_regex;
+  char *re_exp_is_def_regex = strMkCpy("def\\s+regex\\s+(\\S+)(?<s>[\\s\\n]*)\\{\\g<s>((?<reg>(\\/((\\\\\\/)|[^\\/])+\\/|\\/\\/))\\g<s>,\\g<s>)*(\\g<reg>\\g<s>)?\\};?");
+  pcre2_match_data *re_match_data = NULL;
+
+  /* Compile the expressions */
+  /*
+    TODO: Make some sort of init function to only compile these expressions once
+    and not every time this function is called
+  */
+  re_code_is_def_string = pcre2_compile((PCRE2_SPTR)re_exp_is_def_string, PCRE2_ZERO_TERMINATED, 0, &re_err_code, &re_err_offset, NULL);
+  free(re_exp_is_def_string);
+  re_exp_is_def_string = NULL;
+  if (re_code_is_def_string == NULL) {
+    fprintf(stderr, BKRED "REGEX COMPILATION FAILED!!\n" KDEFAULT);
+    re_err_msg = calloc(256, sizeof(PCRE2_UCHAR));
+    pcre2_get_error_message(re_err_code, re_err_msg, 256);
+    fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
+    free(re_err_msg);
+  }
+  re_code_is_def_regex = pcre2_compile((PCRE2_SPTR)re_exp_is_def_regex, PCRE2_ZERO_TERMINATED, 0, &re_err_code, &re_err_offset, NULL);
+  /* free(re_exp_is_def_regex); */
+  /* re_exp_is_def_regex = NULL; */
+  if (re_code_is_def_regex == NULL) {
+    fprintf(stderr, BKRED "REGEX COMPILATION FAILED!!\n" KDEFAULT);
+    re_err_msg = calloc(256, sizeof(PCRE2_UCHAR));
+    pcre2_get_error_message(re_err_code, re_err_msg, 256);
+    fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
+    free(re_err_msg);
+  }
+
   size_t numItems = 0;
   int tmp;
 
-  while (*src != '\0') {
-    if (*src == '\n') {
+
+  re_match_data = pcre2_match_data_create_from_pattern(re_code_is_def_string, NULL); /* Create match data */
+  re_err_code = pcre2_match(re_code_is_def_string,                                   /* Test for match */
+                            (PCRE2_SPTR)in,
+                            strlen(in),
+                            0,
+                            0,
+                            re_match_data,
+                            NULL);
+  pcre2_match_data_free(re_match_data);                                          /* Dispose of the match data right away */
+  if (re_err_code <= 0 && re_err_code != -1){                                    /* Error code -1 means just no match */
+    VERBOSE_PRINT_VALUE(%d, re_err_code);
+    re_err_msg = malloc(256);
+    pcre2_get_error_message(re_err_code, re_err_msg, 256);
+    fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
+    free(re_err_msg);
+  } else if (re_err_code > 0) {
+    WARNING_PRINT("VALID STRING DEF");
+    *str_type = T_STRING;
+    /* Handle a def string {} */
+
+    getListAttr(in, outListName, outListItems, *str_type);
+
+  } else if (re_err_code == -1) {
+    re_match_data = pcre2_match_data_create_from_pattern(re_code_is_def_string, NULL); /* Create match data */
+    re_err_code = pcre2_match(re_code_is_def_regex,                                   /* Test for match */
+                              (PCRE2_SPTR)in,
+                              strlen(in),
+                              0,
+                              0,
+                              re_match_data,
+                              NULL);
+    pcre2_match_data_free(re_match_data);                                          /* Dispose of the match data right away */
+    if (re_err_code <= 0 && re_err_code != -1){                                    /* Error code -1 means just no match */
+      VERBOSE_PRINT_VALUE(%d, re_err_code);
+      re_err_msg = malloc(256);
+      pcre2_get_error_message(re_err_code, re_err_msg, 256);
+      fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
+      free(re_err_msg);
+    } else if (re_err_code > 0) {
+      WARNING_PRINT("VALID REGEX DEF");
+      /* Handle a def regex {} */
+
+      /* ==== Set str type ==== */
+      /* Set str_type now that we know its valid */
+      *str_type = T_REGEX;
+
+      /* ==== Get list name ==== */
+      tmpc = strMkCpy(in);
+      tok = strtok(tmpc, " \t\n");
+      while (tok) {
+        if (strcmp(tok, "def") && strcmp(tok, "regex")) {
+          *outListName = strMkCpyInRange(tok, ((tok[strlen(tok)-1] == '{') ? strlen(tok)-1 : 0));
+          VERBOSE_PRINT_VALUE(%s, *outListName);
+          break;
+        }
+        tok = strtok(NULL, " \t\n");
+      }
+      free(tmpc);
+      tmpc = NULL;
+      tok = NULL;
+
+      /* ==== Get list items ==== */
+      /* Init list */
+      *outListItems = (list *)calloc(1, sizeof(list));
+      defsInitList(*outListItems, 20);
+
+      /* Skip to char after opening { char */
+      src = in;
+      for (;*src!='{';src++);
       src++;
-      continue;
+
+      /* Find and insert items one by one */
+      VERBOSE_PRINT_VALUE(%s, src);
+      while (getNextRegEx(src, &begin_item, &end_item)) {
+        defsInsertList(*outListItems, strMkCpyInRange(begin_item, end_item-begin_item+1));
+        src = end_item+1;
+
+        VERBOSE_PRINT_VALUE(%s, (*outListItems)->items[(*outListItems)->used-1]);
+      }
+    } else if (re_err_code == -1) {
+      WARNING_PRINT("INVALID DEF");
+      VERBOSE_PRINT_VALUE(%s, re_exp_is_def_regex);
+      isList = false;
     }
-    if (*src == '{' && !isInsideOfStr(in, src) && !isInsideOfRegEx(in, src)) {
-      if (open) {
-        fprintf(stderr,
-                BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", in,
-                genWrongUnderline(in, src, src));
-        exit(1);
-      }
-      whereOpened = src;
-      open = true;
-      isList = true;
-    } else if (*src == '}' && !isInsideOfStr(in, src) && !isInsideOfRegEx(in, src)) {
-      if (!open) {
-        fprintf(stderr,
-                BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", in,
-                genWrongUnderline(in, src, src));
-        exit(1);
-      }
-      open = false;
-
-      tmp = ((src - 1) - (whereOpened + 1)) + 1;
-      contents = malloc(tmp + 1);
-      memset(contents, '\0', tmp + 1);
-      strncpy(contents, whereOpened + 1, tmp);
-      VERBOSE_PRINT_VALUE(%s, contents);
-      tmpc = contents;
-      while (*tmpc != '\0') {
-        *tmpc = (*tmpc == '\n') ? ' ' : *tmpc;
-        tmpc++;
-      }
-      VERBOSE_PRINT_VALUE(%s, contents);
-
-      tmpc = src;
-      tmpc--;
-      while (*tmpc == ' ' || *tmpc == '\n')
-        tmpc--;
-      if (*tmpc == '\"') {
-        numItems++;
-      } else if (*tmpc != '\n' && *tmpc != ',') {
-        fprintf(stderr, BKRED "Error: Invalid character \"%c\" after end of "
-                              "last item: \n\t%s\n\t%s\n",
-                *tmpc, in, genWrongUnderline(in, tmpc, tmpc));
-        exit(1);
-      }
-
-    } else if (*src == ',' && open && !isInsideOfStr(in, src) && !isInsideOfRegEx(in, src)) {
-      numItems++;
-    }
-    src++;
   }
-  if (isList && open) {
-    fprintf(stderr, BKRED "Error: Found unclosed list: \n\t%s\n\t%s\n", in,
-            genWrongUnderline(in, whereOpened, src));
-    exit(1);
-  }
-  if (isList) {
 
-    strTrimStrAware(in);
-    src = in;
-    while (*src != ' ')
-      src++;
-    tmp = ((whereOpened - 1) - src) + ((*(whereOpened - 1) == ' ') ? 0 : 1);
-    *outListName = malloc(tmp);
-    memset(*outListName, '\0', tmp);
-    strncpy(*outListName, src + 1, tmp - 1);
 
-    /* listItems = malloc(sizeof(char *) * numItems); */
-    /* lastItem = (listItemsSrc + (numItems - 1)); */
+  /* while (*src != '\0') { */
+  /*   if (*src == '\n') { */
+  /*     src++; */
+  /*     continue; */
+  /*   } */
+  /*   if (*src == '{' && !isInsideOfStr(in, src) && !isInsideOfRegEx(in, src)) { */
+  /*     if (open) { */
+  /*       fprintf(stderr, */
+  /*               BKRED "Error: List opened more than once: \n\t%s\n\t%s\n", in, */
+  /*               genWrongUnderline(in, src, src)); */
+  /*       exit(1); */
+  /*     } */
+  /*     whereOpened = src; */
+  /*     open = true; */
+  /*     isList = true; */
+  /*   } else if (*src == '}' && !isInsideOfStr(in, src) && !isInsideOfRegEx(in, src)) { */
+  /*     if (!open) { */
+  /*       fprintf(stderr, */
+  /*               BKRED "Error: List closed more than once: \n\t%s\n\t%s\n", in, */
+  /*               genWrongUnderline(in, src, src)); */
+  /*       exit(1); */
+  /*     } */
+  /*     open = false; */
 
-    /* tok = strtok(contents, ","); */
-    /* tmp = 0; */
-    /* for (int i = 0; i < numItems; i++) { */
-    /*   listItems[i] = malloc(sizeof(char) * (strlen(tok) + 1)); */
-    /*   strcpy(listItems[i], tok); */
-    /*   VERBOSE_PRINT_VALUE(%s, listItems[i]); */
-    /*   tok = strtok(NULL, ","); */
-    /* } */
+  /*     tmp = ((src - 1) - (whereOpened + 1)) + 1; */
+  /*     contents = calloc(tmp + 1, sizeof(char)); */
+  /*     strncpy(contents, whereOpened + 1, tmp); */
+  /*     VERBOSE_PRINT_VALUE(%s, contents); */
+  /*     tmpc = contents; */
+  /*     while (*tmpc != '\0') { */
+  /*       *tmpc = (*tmpc == '\n') ? ' ' : *tmpc; */
+  /*       tmpc++; */
+  /*     } */
+  /*     VERBOSE_PRINT_VALUE(%s, contents); */
 
-    /* *outListItems = listItems; */
+  /*     tmpc = src; */
+  /*     tmpc--; */
+  /*     while (*tmpc == ' ' || *tmpc == '\n') */
+  /*       tmpc--; */
+  /*     if (*tmpc == '\"') { */
+  /*       numItems++; */
+  /*     } else if (*tmpc != '\n' && *tmpc != ',') { */
+  /*       fprintf(stderr, BKRED "Error: Invalid character \"%c\" after end of " */
+  /*                             "last item: \n\t%s\n\t%s\n", */
+  /*               *tmpc, in, genWrongUnderline(in, tmpc, tmpc)); */
+  /*       exit(1); */
+  /*     } */
 
-    *outListItems = (list *)calloc(1, sizeof(list));
-    defsInitList(*outListItems, 20);
-    tok = strtok(contents, ",");
-    for (size_t i = 0; i < numItems; i++) {
-      defsInsertList(*outListItems, strMkCpy(tok));
-      VERBOSE_PRINT_VALUE(%s, (*outListItems)->items[(*outListItems)->used-1]);
-      tok = strtok(NULL, ",");
-    }
-    free(contents);
-  }
+  /*   } else if (*src == ',' && open && (!isInsideOfStr(in, src))) { */
+  /*     numItems++; */
+  /*   } */
+  /*   src++; */
+  /* } */
+  /* if (isList && open) { */
+  /*   fprintf(stderr, BKRED "Error: Found unclosed list: \n\t%s\n\t%s\n", in, */
+  /*           genWrongUnderline(in, whereOpened, src)); */
+  /*   exit(1); */
+  /* } */
+  /* if (isList) { */
+  /*   /\* Skip space chars *\/ */
+  /*   strTrimStrAware(in); */
+  /*   src = in; */
+  /*   while (*src != ' ') */
+  /*     src++; */
+
+  /*   /\* Get list name *\/ */
+  /*   tmp = ((whereOpened - 1) - src) + ((*(whereOpened - 1) == ' ') ? 0 : 1); */
+  /*   *outListName = malloc(tmp); */
+  /*   memset(*outListName, '\0', tmp); */
+  /*   strncpy(*outListName, src + 1, tmp - 1); */
+
+  /*   /\* Get list items *\/ */
+  /*   *outListItems = (list *)calloc(1, sizeof(list)); */
+  /*   defsInitList(*outListItems, 20); */
+  /*   tok = strtok(contents, ","); */
+  /*   for (size_t i = 0; i < numItems; i++) { */
+  /*     defsInsertList(*outListItems, strMkCpy(tok)); */
+  /*     VERBOSE_PRINT_VALUE(%s, (*outListItems)->items[(*outListItems)->used-1]); */
+  /*     tok = strtok(NULL, ","); */
+  /*   } */
+  /*   free(contents); */
+  /* } */
+
+  pcre2_code_free(re_code_is_def_string);
+  re_code_is_def_string = NULL;
+  pcre2_code_free(re_code_is_def_regex);
+  re_code_is_def_regex = NULL;
+
   return isList;
 }
 
@@ -522,6 +730,7 @@ void evalLine(char *currentBuffer) {
   char *assigValue = NULL;
   char *listName = NULL;
   list *listItems = NULL;
+  STRING_TYPE list_item_type = T_NULL;
   while (*src == ' ' || *src == '\t')
     src++;
   VERBOSE_PRINT("Evaluating line bufer...");
@@ -539,10 +748,10 @@ void evalLine(char *currentBuffer) {
     evalAssig(currentBuffer, assigTok, assigValue);
     assigTok = NULL;
     assigValue = NULL;
-  } else if (isList(currentBuffer, &listName, &listItems)) {
+  } else if (isList(currentBuffer, &listName, &listItems, &list_item_type)) {
     printf("ITS A LIST!!! ###%s###%d###\n", listName, (int)listItems->used);
     /*evalList*/;
-    evalList(currentBuffer, listName, listItems);
+    evalList(currentBuffer, listName, listItems, list_item_type);
     listName = NULL;
     listItems = NULL;
   } else {
@@ -635,18 +844,18 @@ void evalAssig(char *currentBuffer, char *tok, char *value) {
     free(value);
 }
 
-void evalList(char *currentBuffer, char *listName, list *content) {
+void evalList(char *currentBuffer, char *listName, list *content, STRING_TYPE str_type) {
   if (currentProg->name != NULL) {
-    if (strcmp(listName, "tokens") == 0) { /* Automaticaly treat as regular expressions and not strings (delimiters: // and different escape chars) */
+    if (str_type == T_REGEX) { /* Automaticaly treat as regular expressions and not strings (delimiters: // and different escape chars) */
       for (size_t i = 0; i < content->used; i++) {
         VERBOSE_PRINT_VALUE(%s, content->items[i]);
         strTrimStrAware(content->items[i]); //TODO: Replace this line with appropriate regex equivalent
-        strUnstring(&content->items[i]); //TODO: Replace this line with appropriate regex equivalent
+        regexUnregex(&content->items[i]); //TODO: Replace this line with appropriate regex equivalent
         strRealloc(&content->items[i]);
         VERBOSE_PRINT_VALUE(%s, content->items[i]);
       }
       currentProg->tokens = content;
-    } else if (strcmp(listName, "snippets") == 0) { /* Automatically treat as strings (delimiters: "" and different escape chars) */
+    } else if (str_type == T_STRING) { /* Automatically treat as strings (delimiters: "" and different escape chars) */
       for (size_t i = 0; i < content->used; i++) {
         VERBOSE_PRINT_VALUE(%s, content->items[i]);
         strTrimStrAware(content->items[i]);

@@ -109,7 +109,7 @@ char *genWrongUnderline(char *line, char *from, char *to) {
   }
   return underline;
 }
-char *strMkCpyInRange(const char *from, int numchars) {
+char *strMkCpyInRange(const char *from, size_t numchars) {
   if (numchars == 0) {
     numchars = strlen(from);
   }
@@ -315,7 +315,7 @@ bool utilIsInsideOf(char *str, char *pos, const DELIM_TYPE delim, const ESCAPE_T
     WARNING_PRINT("Warning: Passed an escape character to isInsideOfStr() this isn't supposed to happen!\n")
   }
   fprintf(stderr, BKRED "Error: something went wrong in function "
-                        "isInsideOfStr()... src never matched pos\n" KDEFAULT);
+                        "utilIsInsideOf()... src never matched pos\n" KDEFAULT);
   return false;
 }
 
@@ -511,9 +511,12 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
   char *src = str;
   while (*src != '\0') {
     if (utilIsInsideOf(str, src, delim, escape)) {
-      if (*src == escape_char && (src[1] == delim_char || src[1] == escape_char)) {
+      if ( delim == STR_DELIM && *src == escape_char && (src[1] == delim_char || src[1] == escape_char)) {
         strOverlap(str, str, (src - 1), (src + 1), NULL);
         src++;
+      } else if ( delim == REGEX_DELIM && *src == escape_char && (src[1] == delim_char)) {
+          strOverlap(str, str, (src - 1), (src + 1), NULL);
+          src++;
       } else if (delim == STR_DELIM) {
         if(*src == '\\' && (src[1] != '\"')) {
           fprintf(stderr, BKRED "Error: Found escape character inside of string "
@@ -588,4 +591,36 @@ void strUnstring(char **str) {
 
 void regexUnregex(char **str) {
   utilUnstring(str, REGEX_DELIM);
+}
+
+/* Returns the first and last char of the first Str sees */
+/* Returns 1 if found and 0 for not found */
+int getNextStr(char *in, char **out_begin, char** out_end) {
+  *out_begin = NULL;
+  *out_end = NULL;
+  for (size_t i=0;i<strlen(in);i++) {
+    if (*out_end != NULL)
+      return 1;
+    if (isInsideOfStr(in, &in[i]) && *out_begin == NULL)
+      *out_begin = &in[i];
+    else if (!isInsideOfStr(in, &in[i]) && *out_begin != NULL)
+      *out_end = &in[i-1];
+  }
+  return 0;
+}
+
+/* Returns the first and last char of the first RegeEx it sees */
+/* Returns 1 if found and 0 for not found */
+int getNextRegEx(char *in, char **out_begin, char** out_end) {
+  *out_begin = NULL;
+  *out_end = NULL;
+  for (size_t i=0;i<strlen(in);i++) {
+    if (*out_end != NULL)
+      return 1;
+    if (isInsideOfRegEx(in, &in[i]) && *out_begin == NULL)
+      *out_begin = &in[i];
+    else if (!isInsideOfRegEx(in, &in[i]) && *out_begin != NULL)
+      *out_end = &in[i-1];
+  }
+  return 0;
 }

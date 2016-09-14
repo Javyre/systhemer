@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include "utils.h"
+#include "unitheme.h"
 
 size_t currentLine;
 
@@ -16,7 +18,9 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 
 void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 
-bool isList (char *in, char **outListName, list **outListItems);
+void getListAttr(char *in, char **outListName, list **outListItems, STRING_TYPE str_type);
+
+bool isList (char *in, char **outListName, list **outListItems, STRING_TYPE *str_type);
 
 bool isAssignation (char *in, char **outTok, char **outValue);
 
@@ -28,6 +32,6 @@ void evalStatement(char *currentBuffer, char *statCall, char *statArg);
 
 void evalAssig(char* currentBuffer, char* tok, char* value);
 
-void evalList(char* currentBuffer, char* listName, list *content);
+void evalList(char* currentBuffer, char* listName, list *content, STRING_TYPE str_type);
 
 #endif

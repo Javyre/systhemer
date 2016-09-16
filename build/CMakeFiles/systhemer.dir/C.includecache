@@ -51,6 +51,8 @@ stdbool.h
 -
 stdio.h
 -
+pcre2.h
+-
 utils.h
 /home/javier/Code/cpp/systhemer/src/utils.h
 unitheme.h

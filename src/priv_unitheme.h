@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 #include "utils.h"
 #include "unitheme.h"
 
@@ -18,11 +20,17 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 
 void getFullLine(char **currentBuffer, FILE *UniThemeFile);
 
+STRING_TYPE getDefType(char *in, pcre2_code *re_code_is_def_string, pcre2_code *re_code_is_def_regex);
+
+void getListAttr(char *in, char **outListName, list **outListItems, STRING_TYPE str_type);
+
 void getListAttr(char *in, char **outListName, list **outListItems, STRING_TYPE str_type);
 
 bool isList (char *in, char **outListName, list **outListItems, STRING_TYPE *str_type);
 
-bool isAssignation (char *in, char **outTok, char **outValue);
+void getAssigAttr(char *in, char **outTok, char **outValue, STRING_TYPE str_type);
+
+bool isAssignation (char *in, char **outTok, char **outValue, STRING_TYPE *str_type);
 
 bool isStatement (char* in, char** outCall, char** outArg);
 

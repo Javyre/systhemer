@@ -327,6 +327,61 @@ void getFullLine(char **currentBuffer, FILE *UniThemeFile) {
   free(holder);
 }
 
+/* Returns the datatype of the def as well as running the compiled rexeprs and returning T_NULL if didnt match anything */
+STRING_TYPE getDefType(char *in, pcre2_code *re_code_is_def_string, pcre2_code *re_code_is_def_regex) {
+  STRING_TYPE str_type = T_NULL;
+
+  int re_err_code = 0;
+  PCRE2_UCHAR *re_err_msg = NULL;
+
+  pcre2_match_data *re_match_data = NULL;
+
+  re_match_data = pcre2_match_data_create_from_pattern(re_code_is_def_string, NULL); /* Create match data */
+  re_err_code = pcre2_match(re_code_is_def_string,                                   /* Test for match */
+                            (PCRE2_SPTR)in,
+                            strlen(in),
+                            0,
+                            0,
+                            re_match_data,
+                            NULL);
+  pcre2_match_data_free(re_match_data);                                          /* Dispose of the match data right away */
+  if (re_err_code <= 0 && re_err_code != -1){                                    /* Error code -1 means just no match */
+    VERBOSE_PRINT_VALUE(%d, re_err_code);
+    re_err_msg = malloc(256);
+    pcre2_get_error_message(re_err_code, re_err_msg, 256);
+    fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
+    free(re_err_msg);
+  } else if (re_err_code > 0) {
+    WARNING_PRINT("VALID STRING DEF");
+    str_type = T_STRING;
+  } else if (re_err_code == -1) {
+    re_match_data = pcre2_match_data_create_from_pattern(re_code_is_def_string, NULL); /* Create match data */
+    re_err_code = pcre2_match(re_code_is_def_regex,                                   /* Test for match */
+                              (PCRE2_SPTR)in,
+                              strlen(in),
+                              0,
+                              0,
+                              re_match_data,
+                              NULL);
+    pcre2_match_data_free(re_match_data);                                          /* Dispose of the match data right away */
+    if (re_err_code <= 0 && re_err_code != -1){                                    /* Error code -1 means just no match */
+      VERBOSE_PRINT_VALUE(%d, re_err_code);
+      re_err_msg = malloc(256);
+      pcre2_get_error_message(re_err_code, re_err_msg, 256);
+      fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
+      free(re_err_msg);
+    } else if (re_err_code > 0) {
+      WARNING_PRINT("VALID REGEX DEF");
+      str_type = T_REGEX;
+    } else if (re_err_code == -1) {
+      /* WARNING_PRINT("INVALID DEF"); */
+      return T_NULL;
+    }
+  }
+
+  return str_type;
+}
+
 void getListAttr(char *in, char **outListName, list **outListItems, STRING_TYPE str_type) {
   char *begin_item = NULL;
   char *end_item = NULL;
@@ -399,17 +454,7 @@ void getListAttr(char *in, char **outListName, list **outListItems, STRING_TYPE 
 }
 
 bool isList(char *in, char **outListName, list **outListItems, STRING_TYPE *str_type) {
-  char *src = in;
-  /* char **listItems; */
-  /* char **listItemsSrc = *outListItems; */
-  /* char **lastItem; */
   bool isList = true;
-  char *tmpc;
-  char *tok;
-
-  char *begin_item = NULL;
-  char *end_item = NULL;
-
   /*
     Mega expression for detecting valid def list:
     https://regex101.com/r/kY5iB8/2
@@ -450,8 +495,8 @@ bool isList(char *in, char **outListName, list **outListItems, STRING_TYPE *str_
     free(re_err_msg);
   }
   re_code_is_def_regex = pcre2_compile((PCRE2_SPTR)re_exp_is_def_regex, PCRE2_ZERO_TERMINATED, 0, &re_err_code, &re_err_offset, NULL);
-  /* free(re_exp_is_def_regex); */
-  /* re_exp_is_def_regex = NULL; */
+  free(re_exp_is_def_regex);
+  re_exp_is_def_regex = NULL;
   if (re_code_is_def_regex == NULL) {
     fprintf(stderr, BKRED "REGEX COMPILATION FAILED!!\n" KDEFAULT);
     re_err_msg = calloc(256, sizeof(PCRE2_UCHAR));
@@ -460,64 +505,70 @@ bool isList(char *in, char **outListName, list **outListItems, STRING_TYPE *str_
     free(re_err_msg);
   }
 
-
-
-  re_match_data = pcre2_match_data_create_from_pattern(re_code_is_def_string, NULL); /* Create match data */
-  re_err_code = pcre2_match(re_code_is_def_string,                                   /* Test for match */
-                            (PCRE2_SPTR)in,
-                            strlen(in),
-                            0,
-                            0,
-                            re_match_data,
-                            NULL);
-  pcre2_match_data_free(re_match_data);                                          /* Dispose of the match data right away */
-  if (re_err_code <= 0 && re_err_code != -1){                                    /* Error code -1 means just no match */
-    VERBOSE_PRINT_VALUE(%d, re_err_code);
-    re_err_msg = malloc(256);
-    pcre2_get_error_message(re_err_code, re_err_msg, 256);
-    fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
-    free(re_err_msg);
-  } else if (re_err_code > 0) {
-    WARNING_PRINT("VALID STRING DEF");
-    *str_type = T_STRING;
-  } else if (re_err_code == -1) {
-    re_match_data = pcre2_match_data_create_from_pattern(re_code_is_def_string, NULL); /* Create match data */
-    re_err_code = pcre2_match(re_code_is_def_regex,                                   /* Test for match */
-                              (PCRE2_SPTR)in,
-                              strlen(in),
-                              0,
-                              0,
-                              re_match_data,
-                              NULL);
-    pcre2_match_data_free(re_match_data);                                          /* Dispose of the match data right away */
-    if (re_err_code <= 0 && re_err_code != -1){                                    /* Error code -1 means just no match */
-      VERBOSE_PRINT_VALUE(%d, re_err_code);
-      re_err_msg = malloc(256);
-      pcre2_get_error_message(re_err_code, re_err_msg, 256);
-      fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
-      free(re_err_msg);
-    } else if (re_err_code > 0) {
-      WARNING_PRINT("VALID REGEX DEF");
-      *str_type = T_REGEX;
-    } else if (re_err_code == -1) {
-      WARNING_PRINT("INVALID DEF");
-      VERBOSE_PRINT_VALUE(%s, re_exp_is_def_regex);
-      isList = false;
-    }
-  }
-
-  if (isList)
-    getListAttr(in, outListName, outListItems, *str_type);
-
+  *str_type = getDefType(in, re_code_is_def_string, re_code_is_def_regex);
   pcre2_code_free(re_code_is_def_string);
   re_code_is_def_string = NULL;
   pcre2_code_free(re_code_is_def_regex);
   re_code_is_def_regex = NULL;
-
-  return isList;
+  if (*str_type != T_NULL) {
+    getListAttr(in, outListName, outListItems, *str_type);
+    return true;
+  } else {
+    return false;
+  }
 }
 
-bool isAssignation(char *in, char **outTok, char **outValue) {
+void getAssigAttr(char *in, char **outTok, char **outValue, STRING_TYPE str_type) {
+  char *tmpc = NULL;
+  char *tok = NULL;
+  char *k_word;
+
+  char *begin_val = NULL;
+  char *end_val = NULL;
+
+  /* ==== Set type keyword ==== */
+  switch (str_type) {
+  case T_STRING:
+    k_word = strMkCpy(DEF_STRING_KEYWORD);
+    break;
+  case T_REGEX:
+    k_word = strMkCpy(DEF_REGEX_KEYWORD);
+    break;
+  default:
+    k_word = NULL;
+    fprintf(stderr, BKRED "Error: Unknown STRING_TYPE: %d passed to getListAttr!", str_type);
+    EXIT(1);
+    break;
+  }
+
+  /* ==== Get assig name ==== */
+  tmpc = strMkCpy(in);
+  tok = strtok(tmpc, " \t\n");
+  while (tok) {
+    /* if (strcmp(tok, "def") && strcmp(tok, k_word)) { */
+    if (strcmp(tok, k_word)) {
+      *outTok = strMkCpyInRange(tok, ((tok[strlen(tok)-1] == '{') ? strlen(tok)-1 : 0));
+      VERBOSE_PRINT_VALUE(%s, *outTok);
+      break;
+    }
+    tok = strtok(NULL, " =\t\n");
+  }
+  free(tmpc);
+  tmpc = NULL;
+  tok = NULL;
+
+  /* ==== Get assig value ==== */
+  if (str_type == T_STRING)
+    getNextStr(in, &begin_val, &end_val);
+  else if (str_type == T_REGEX)
+    getNextStr(in, &begin_val, &end_val);
+  *outValue = strMkCpyInRange(begin_val, end_val-begin_val+1);
+
+  free(k_word);
+  k_word = NULL;
+}
+
+bool isAssignation(char *in, char **outTok, char **outValue, STRING_TYPE* str_type) {
   char *src = in;
   char *end = in;
   while (*end != '\0')
@@ -525,38 +576,53 @@ bool isAssignation(char *in, char **outTok, char **outValue) {
   char *subStr;
   int temp;
 
-  while (*src != '\0') {
-    if (*src == '=' && !isEmptyStrInRange(in, src - 1) &&
-        !isInsideOfStr(in, src)) {
-      if (isEmptyStrInRange(src + 1, end - 2)) {
+  int re_err_code = 0;
+  size_t re_err_offset = 0;
+  PCRE2_UCHAR *re_err_msg = NULL;
 
-        subStr = malloc(((src - 1) - in) + 2);
-        memset(subStr, '\0', ((src - 1) - in) + 2);
-        strncpy(subStr, in, (src - 1) - in);
+  pcre2_code *re_code_is_def_string;
+  char *re_exp_is_def_string = strMkCpy("^\\s*\\n*\\s*(?<s>[\\s\\n]*)string\\g<s>\\S+\\g<s>=\\g<s>(\"(((\\\\\")|[^\"])+)\"|(\"\"))\\g<s>;");
+  pcre2_code *re_code_is_def_regex;
+  char *re_exp_is_def_regex = strMkCpy("^\\s*\\n*\\s*(?<s>[\\s\\n]*)regex\\g<s>\\S+\\g<s>=\\g<s>(\\/(((\\\\\\/)|[^\\/])+)\\/|(\\/\\/))\\g<s>;");
 
-        fprintf(stderr, BKRED
-                "Error: empty value assigned to %s : \n\t%s\n\t%s\n" KDEFAULT,
-                subStr, in, genWrongUnderline(in, src + 1, end - 2));
 
-        free(subStr);
-        subStr = NULL;
-        exit(1);
-      }
-      temp = ((src - 1) - in) + 1;
-      *outTok = malloc(temp + 1);
-      memset(*outTok, '\0', temp + 1);
-      strncpy(*outTok, in, temp);
-
-      temp = ((end - 2) - (src + 1)) + 1;
-      *outValue = malloc(temp + 1);
-      memset(*outValue, '\0', temp + 1);
-      strncpy(*outValue, src + 1, temp);
-
-      return true;
-    }
-    src++;
+  /* Compile the expressions */
+  /*
+    TODO: Make some sort of init function to only compile these expressions once
+    and not every time this function is called
+  */
+  re_code_is_def_string = pcre2_compile((PCRE2_SPTR)re_exp_is_def_string, PCRE2_ZERO_TERMINATED, 0, &re_err_code, &re_err_offset, NULL);
+  free(re_exp_is_def_string);
+  re_exp_is_def_string = NULL;
+  if (re_code_is_def_string == NULL) {
+    fprintf(stderr, BKRED "REGEX COMPILATION FAILED!!\n" KDEFAULT);
+    re_err_msg = calloc(256, sizeof(PCRE2_UCHAR));
+    pcre2_get_error_message(re_err_code, re_err_msg, 256);
+    fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
+    free(re_err_msg);
   }
-  return false;
+  re_code_is_def_regex = pcre2_compile((PCRE2_SPTR)re_exp_is_def_regex, PCRE2_ZERO_TERMINATED, 0, &re_err_code, &re_err_offset, NULL);
+  free(re_exp_is_def_regex);
+  re_exp_is_def_regex = NULL;
+  if (re_code_is_def_regex == NULL) {
+    fprintf(stderr, BKRED "REGEX COMPILATION FAILED!!\n" KDEFAULT);
+    re_err_msg = calloc(256, sizeof(PCRE2_UCHAR));
+    pcre2_get_error_message(re_err_code, re_err_msg, 256);
+    fprintf(stderr, BKRED "%s\n" KDEFAULT, re_err_msg);
+    free(re_err_msg);
+  }
+
+  *str_type = getDefType(in, re_code_is_def_string, re_code_is_def_regex);
+  pcre2_code_free(re_code_is_def_string);
+  re_code_is_def_string = NULL;
+  pcre2_code_free(re_code_is_def_regex);
+  re_code_is_def_regex = NULL;
+  if (*str_type != T_NULL) {
+    getAssigAttr(in, outTok, outValue, *str_type);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 bool isStatement(char *in, char **outCall, char **outArg) {
@@ -600,6 +666,7 @@ void evalLine(char *currentBuffer) {
   char *statArg = NULL;
   char *assigTok = NULL;
   char *assigValue = NULL;
+  STRING_TYPE assig_type = T_NULL;
   char *listName = NULL;
   list *listItems = NULL;
   STRING_TYPE list_item_type = T_NULL;
@@ -614,7 +681,7 @@ void evalLine(char *currentBuffer) {
     evalStatement(currentBuffer, statCall, statArg);
     statCall = NULL;
     statArg = NULL;
-  } else if (isAssignation(currentBuffer, &assigTok, &assigValue)) {
+  } else if (isAssignation(currentBuffer, &assigTok, &assigValue, &assig_type)) {
     printf("ITS AN ASSIGNATION!!!\n");
     /* evalAssignation; */
     evalAssig(currentBuffer, assigTok, assigValue);

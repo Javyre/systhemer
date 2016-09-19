@@ -12,6 +12,10 @@
 #define DEF_STRING_KEYWORD "string"
 #define DEF_REGEX_KEYWORD "regex"
 
+#define RE_STRING_LITTERAL "(\"(((\\\\\")|[^\"])+)\"|(\"\"))"
+#define RE_REGEX_LITTERAL "(\\/(((\\\\\\/)|[^\\/])+)\\/|(\\/\\/))"
+#define RE_ANY_LITTERAL "(" RE_STRING_LITTERAL "|" RE_REGEX_LITTERAL ")"
+
 /* typedef unsigned char STRING_TYPE; */
 typedef enum {
   T_NULL = 0,

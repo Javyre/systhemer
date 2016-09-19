@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ $1 == "-t" ]
+then
+   cmake ../src&&make clean&&make&&valgrind --tool=memcheck --leak-check=full --show-reachable=yes --track-origins=yes ./systhemer -wvt
+   exit
+fi
+cmake ../src&&make clean&&make&&valgrind --tool=memcheck --leak-check=full --show-reachable=yes --track-origins=yes ./systhemer -wv

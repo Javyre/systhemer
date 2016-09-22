@@ -77,6 +77,7 @@ typedef unsigned char ESCAPE_TYPE;
 
 #define EXIT(exval) if (exit_on_err) {exit(exval);}
 
+
 bool verboseMode;
 bool exit_on_err;
 bool warnings_on;

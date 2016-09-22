@@ -8,6 +8,9 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
+char **g_re_exps;
+pcre2_code **g_re_codes;
+
 static programDef *currentProg;
 static programDefs progDefs;
 
@@ -94,11 +97,11 @@ void initRegExpressions() {
 
   g_re_exps = calloc(g_re_exps_size, sizeof(char *));
 
-  g_re_exp_is_def_regex_list =
+  g_re_exp_is_def_string_list =
     strMkCpy("def\\s+" DEF_STRING_KEYWORD "\\s+(\\S+)(?<s>[\\s\\n]*)\\{\\g<s>((?<str>" RE_STRING_LITTERAL ")\\g<s>,\\g<s>)*(\\g<str>\\g<s>)?\\};?");
   /* free(g_re_exp_is_def_regex_list); */
 
-  g_re_exp_is_def_string_list =
+  g_re_exp_is_def_regex_list =
     strMkCpy("def\\s+" DEF_REGEX_KEYWORD "\\s+(\\S+)(?<s>[\\s\\n]*)\\{\\g<s>((?<reg>" RE_REGEX_LITTERAL ")\\g<s>,\\g<s>)*(\\g<reg>\\g<s>)?\\};?");
 
   g_re_exp_is_def_string_assig =
@@ -420,7 +423,7 @@ STRING_TYPE getDefType(char *in, pcre2_code *re_code_is_def_string, pcre2_code *
     WARNING_PRINT("VALID STRING DEF");
     str_type = T_STRING;
   } else if (re_err_code == -1) {
-    re_match_data = pcre2_match_data_create_from_pattern(re_code_is_def_string, NULL); /* Create match data */
+    re_match_data = pcre2_match_data_create_from_pattern(re_code_is_def_regex, NULL); /* Create match data */
     re_err_code = pcre2_match(re_code_is_def_regex,                                   /* Test for match */
                               (PCRE2_SPTR)in,
                               strlen(in),
@@ -755,7 +758,7 @@ void evalList(char *currentBuffer, char *listName, list *content, STRING_TYPE st
       for (size_t i = 0; i < content->used; i++) {
         VERBOSE_PRINT_VALUE(%s, content->items[i]);
         strTrimStrAware(content->items[i]); //TODO: Replace this line with appropriate regex equivalent
-        regexUnregex(&content->items[i]); //TODO: Replace this line with appropriate regex equivalent
+        regexUnregex(&content->items[i]); //DONE: Replace this line with appropriate regex equivalent
         strRealloc(&content->items[i]);
         VERBOSE_PRINT_VALUE(%s, content->items[i]);
       }

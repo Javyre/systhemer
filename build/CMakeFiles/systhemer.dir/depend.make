@@ -12,8 +12,10 @@ CMakeFiles/systhemer.dir/main.c.o: /home/javier/Code/cpp/systhemer/src/tests.h
 CMakeFiles/systhemer.dir/main.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.h
 CMakeFiles/systhemer.dir/main.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
 
+CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/priv_unitheme.h
 CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/tests.c
 CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/tests.h
+CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.h
 CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
 
 CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/execUnitheme.h

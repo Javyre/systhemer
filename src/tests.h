@@ -20,5 +20,7 @@ void testRegex();
 void testRegexRmEscape();
 void testRegexUnregex();
 
+void testGetDefType();
+
 #endif
 #endif

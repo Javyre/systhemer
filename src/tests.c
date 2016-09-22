@@ -4,11 +4,15 @@
 
 #include <string.h>
 
+#ifndef PCRE2_CODE_UNIT_WIDTH
 #define PCRE2_CODE_UNIT_WIDTH 8
+#endif
 #include <pcre2.h>
 
 #include "tests.h"
 #include "utils.h"
+#include "unitheme.h"
+#include "priv_unitheme.h"
 
 #define UPDATE_CURR_PROG() do{ if (g_current_prog != NULL) free(g_current_prog); g_current_prog = NULL; g_current_prog = strMkCpy(__func__); g_num_errors_total += g_num_errors; g_num_errors = 0; g_call_num = 0; printf("\n%s%lu total test fails so far...\n" KDEFAULT, (g_num_errors_total > 0 ? BKRED : BKGRN), (unsigned long)g_num_errors_total); printf("=======================\n"); }while(0);
 
@@ -131,6 +135,7 @@ bool testStrExpect(const char* original, const char *exp, const char *result, co
 }
 
 size_t testAll() {
+  /* Begin tests... */
   testStrTrimStrAware();
   testIsInsideOfStr();
   testStrTrimInRange();
@@ -139,6 +144,10 @@ size_t testAll() {
   testIsInsideOfRegEx();
   testRegexRmEscape();
   testRegexUnregex();
+
+  testGetDefType();
+
+  /* End tests... */
 
   UPDATE_CURR_PROG();
 
@@ -431,5 +440,46 @@ void testRegex() {
 
 
 }
+
+#define TEST_GET_DEF_TYPE(rgnl, xpct, cd_strng, cd_rgx)                 \
+  do {                                                                  \
+    original = strMkCpy(rgnl);                                          \
+    output = getDefType(original, cd_strng, cd_rgx);                    \
+    str = strMkCpy((output != T_NULL && output == T_STRING) ? "T_STRING" : (output == T_REGEX ? "T_REGEX" : "T_NULL")); \
+    output = T_NULL;                                                    \
+    testStrExpect(original, xpct, str, __func__);                       \
+    free(original);                                                     \
+    free(str);                                                          \
+  } while (0);
+#define str_assig_code g_re_code_is_def_string_assig
+#define regex_assig_code g_re_code_is_def_regex_assig
+#define str_list_code g_re_code_is_def_string_list
+#define regex_list_code g_re_code_is_def_regex_list
+void testGetDefType() {
+  UPDATE_CURR_PROG();
+  initRegExpressions();
+  STRING_TYPE output = T_NULL;
+  char *str;
+  char *original;
+  VERBOSE_PRINT_VALUE(%s, g_re_exp_is_def_regex_assig);
+  VERBOSE_PRINT_VALUE(%s, g_re_exp_is_def_string_assig);
+  VERBOSE_PRINT_VALUE(%s, g_re_exp_is_def_regex_list);
+  VERBOSE_PRINT_VALUE(%s, g_re_exp_is_def_string_list);
+
+  TEST_GET_DEF_TYPE("string foo=\"bar\";", "T_STRING", str_assig_code, regex_assig_code);
+
+  TEST_GET_DEF_TYPE("regex foo=/bar/;", "T_REGEX", str_assig_code, regex_assig_code);
+
+  TEST_GET_DEF_TYPE("def string foo{\"bar\"};", "T_STRING", str_list_code, regex_list_code);
+
+  TEST_GET_DEF_TYPE("def regex foo{/bar/};", "T_REGEX", str_list_code, regex_list_code);
+
+  destroyRegExpressions();
+}
+#undef TEST_GET_DEF_TYPE
+#undef str_assig_code
+#undef regex_assig_code
+#undef str_list_code
+#undef regex_list_code
 
 #endif

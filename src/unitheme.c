@@ -36,20 +36,23 @@ void loadUniTheme(const char *filename) {
 
   while (fgets(buff, 256, UniThemeFile) != NULL) {
     currentLine++;
+    /* TODO: Implement #include <> like functionality to Unitheme files */
+
+    /* Skip empty lines */
     if (buff[0] == '\n' || buff[0] == '#') {
       continue;
     } else {
+      /* Handle non-empty lines */
       getFullLine(&buff, UniThemeFile);
-      // rmEscape(&buff);
       strTrimStrAware(buff);
       rmEscape(&buff);
       evalLine(buff);
     }
+
     tmp = realloc(buff, 256);
     if (tmp == NULL) {
       fprintf(stderr, BKRED "Error: Failed to realocate memory for the buff variable in the unitheme reader!" KDEFAULT);
       EXIT(1);
-
     } else {
       buff = tmp;
       tmp = NULL;

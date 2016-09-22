@@ -7,6 +7,28 @@
 #include <pcre2.h>
 
 void execUnitheme(programDefs *prgs) {
+  /*
+    Main loop : cycle through all program definitions {
+
+      If file exists :
+        - Allocate list of compiled regexprs
+        - loop : cycle through regexprs and compile them {}
+        - Initialize and open cfg_file
+        loop : cycle through lines of cfg_file {
+          loop : cycle through all compiled regexprs {
+            If compiled regexpr matches :
+              - Handle match
+            Else :
+              - Handle no-match
+            Endif
+          }
+        }
+        - Free allocated memory
+      Endif
+
+    }
+
+   */
   FILE *cfg_file;
   char *buff;
 
@@ -25,10 +47,13 @@ void execUnitheme(programDefs *prgs) {
     }
 
     /* if file exists */
-    if (prgs->progs[i]->path != NULL && access(prgs->progs[i]->path, F_OK) != -1) {
+    /* TODO: use a more platform independant alternative to access() */
+    if (prgs->progs[i]->path != NULL && strcmp("", prgs->progs[i]->path) != 0 && access(prgs->progs[i]->path, F_OK) != -1) {
 
       /* init and compile regular expressions (tokens) */
+      /* allocate list of compiled regexprs */
       tok_reg_comped = calloc(prgs->progs[i]->tokens->used +1, sizeof(pcre2_code *));
+      /* cycle through regexprs and compile them */
       for (size_t ii=0; ii < prgs->progs[i]->tokens->used; ii++) {
         VERBOSE_PRINT_VALUE(%s, prgs->progs[i]->tokens->items[ii]);
 
@@ -66,6 +91,9 @@ void execUnitheme(programDefs *prgs) {
             pcre2_match_data_free(match_data);                                          /* Dispose of the match data right away */
             if (err_code > 0) {
               WARNING_PRINT("FOUND MATCH!!!!!");
+
+              /* Handle match found */
+
             } else if (err_code != -1){                                                 /* Error code -1 means just no match */
               VERBOSE_PRINT_VALUE(%d, err_code);
               err_msg = malloc(256);

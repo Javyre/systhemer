@@ -576,7 +576,7 @@ void getAssigAttr(char *in, char **outTok, char **outValue, STRING_TYPE str_type
   if (str_type == T_STRING)
     getNextStr(in, &begin_val, &end_val);
   else if (str_type == T_REGEX)
-    getNextStr(in, &begin_val, &end_val);
+    getNextRegEx(in, &begin_val, &end_val);
   *outValue = strMkCpyInRange(begin_val, end_val-begin_val+1);
 
   free(k_word);

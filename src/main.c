@@ -12,6 +12,7 @@
 
 #include "utils.h"
 #include "unitheme.h"
+#include "systhemerUnitheme.h"
 
 int main(int argc, char *argv[]) {
   verboseMode = false;
@@ -35,7 +36,9 @@ int main(int argc, char *argv[]) {
     /*   EXIT(num_errs); */
   } else {
 #endif
-    loadUniTheme("../files/default3.uth");
+    /* loadUniTheme("../files/default3.uth"); */
+    sysUniStart();
+    /* runLex("../files/default4.uth"); */
     runExecUitheme();
 #ifndef NDEBUG
   }

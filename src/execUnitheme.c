@@ -18,6 +18,7 @@ void execUnitheme(programDefs *prgs) {
           loop : cycle through all compiled regexprs {
             If compiled regexpr matches :
               - Handle match
+              - Increment match count
             Else :
               - Handle no-match
             Endif
@@ -38,6 +39,8 @@ void execUnitheme(programDefs *prgs) {
 
   pcre2_code **tok_reg_comped;
   pcre2_match_data *match_data = NULL;
+
+  size_t num_matches = 0;
 
   /* Main loop cycles through all programs */
   for (size_t i=0; i < prgs->used; i++) {
@@ -94,6 +97,8 @@ void execUnitheme(programDefs *prgs) {
 
               /* Handle match found */
 
+              num_matches++;
+
             } else if (err_code != -1){                                                 /* Error code -1 means just no match */
               VERBOSE_PRINT_VALUE(%d, err_code);
               err_msg = malloc(256);
@@ -104,6 +109,9 @@ void execUnitheme(programDefs *prgs) {
           }
         }
       } /* end of cfg_file loop */
+
+      if (verboseMode)
+        printf(PACKAGE ": " BKBLU "%lu matches found\n" KDEFAULT, (unsigned long)num_matches);
 
       /* free allocated heap*/
       for (size_t ii=0; ii < prgs->progs[i]->tokens->used; ii++)

@@ -23,6 +23,9 @@ SUFFIXES =
 .SUFFIXES: .hpux_make_needs_suffix_list
 
 
+# Produce verbose output by default.
+VERBOSE = 1
+
 # Suppress display of executed commands.
 $(VERBOSE).SILENT:
 
@@ -123,6 +126,33 @@ systhemer/fast:
 	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/build
 .PHONY : systhemer/fast
 
+builtin_funcs.o: builtin_funcs.c.o
+
+.PHONY : builtin_funcs.o
+
+# target to build an object file
+builtin_funcs.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/builtin_funcs.c.o
+.PHONY : builtin_funcs.c.o
+
+builtin_funcs.i: builtin_funcs.c.i
+
+.PHONY : builtin_funcs.i
+
+# target to preprocess a source file
+builtin_funcs.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/builtin_funcs.c.i
+.PHONY : builtin_funcs.c.i
+
+builtin_funcs.s: builtin_funcs.c.s
+
+.PHONY : builtin_funcs.s
+
+# target to generate assembly for a file
+builtin_funcs.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/builtin_funcs.c.s
+.PHONY : builtin_funcs.c.s
+
 execUnitheme.o: execUnitheme.c.o
 
 .PHONY : execUnitheme.o
@@ -150,6 +180,33 @@ execUnitheme.c.s:
 	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/execUnitheme.c.s
 .PHONY : execUnitheme.c.s
 
+lex.yy.o: lex.yy.c.o
+
+.PHONY : lex.yy.o
+
+# target to build an object file
+lex.yy.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/lex.yy.c.o
+.PHONY : lex.yy.c.o
+
+lex.yy.i: lex.yy.c.i
+
+.PHONY : lex.yy.i
+
+# target to preprocess a source file
+lex.yy.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/lex.yy.c.i
+.PHONY : lex.yy.c.i
+
+lex.yy.s: lex.yy.c.s
+
+.PHONY : lex.yy.s
+
+# target to generate assembly for a file
+lex.yy.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/lex.yy.c.s
+.PHONY : lex.yy.c.s
+
 main.o: main.c.o
 
 .PHONY : main.o
@@ -176,6 +233,87 @@ main.s: main.c.s
 main.c.s:
 	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/main.c.s
 .PHONY : main.c.s
+
+memory.o: memory.c.o
+
+.PHONY : memory.o
+
+# target to build an object file
+memory.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/memory.c.o
+.PHONY : memory.c.o
+
+memory.i: memory.c.i
+
+.PHONY : memory.i
+
+# target to preprocess a source file
+memory.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/memory.c.i
+.PHONY : memory.c.i
+
+memory.s: memory.c.s
+
+.PHONY : memory.s
+
+# target to generate assembly for a file
+memory.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/memory.c.s
+.PHONY : memory.c.s
+
+parser.tab.o: parser.tab.c.o
+
+.PHONY : parser.tab.o
+
+# target to build an object file
+parser.tab.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/parser.tab.c.o
+.PHONY : parser.tab.c.o
+
+parser.tab.i: parser.tab.c.i
+
+.PHONY : parser.tab.i
+
+# target to preprocess a source file
+parser.tab.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/parser.tab.c.i
+.PHONY : parser.tab.c.i
+
+parser.tab.s: parser.tab.c.s
+
+.PHONY : parser.tab.s
+
+# target to generate assembly for a file
+parser.tab.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/parser.tab.c.s
+.PHONY : parser.tab.c.s
+
+systhemerUnitheme.o: systhemerUnitheme.c.o
+
+.PHONY : systhemerUnitheme.o
+
+# target to build an object file
+systhemerUnitheme.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/systhemerUnitheme.c.o
+.PHONY : systhemerUnitheme.c.o
+
+systhemerUnitheme.i: systhemerUnitheme.c.i
+
+.PHONY : systhemerUnitheme.i
+
+# target to preprocess a source file
+systhemerUnitheme.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/systhemerUnitheme.c.i
+.PHONY : systhemerUnitheme.c.i
+
+systhemerUnitheme.s: systhemerUnitheme.c.s
+
+.PHONY : systhemerUnitheme.s
+
+# target to generate assembly for a file
+systhemerUnitheme.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/systhemerUnitheme.c.s
+.PHONY : systhemerUnitheme.c.s
 
 tests.o: tests.c.o
 
@@ -267,12 +405,27 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... systhemer"
+	@echo "... builtin_funcs.o"
+	@echo "... builtin_funcs.i"
+	@echo "... builtin_funcs.s"
 	@echo "... execUnitheme.o"
 	@echo "... execUnitheme.i"
 	@echo "... execUnitheme.s"
+	@echo "... lex.yy.o"
+	@echo "... lex.yy.i"
+	@echo "... lex.yy.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... memory.o"
+	@echo "... memory.i"
+	@echo "... memory.s"
+	@echo "... parser.tab.o"
+	@echo "... parser.tab.i"
+	@echo "... parser.tab.s"
+	@echo "... systhemerUnitheme.o"
+	@echo "... systhemerUnitheme.i"
+	@echo "... systhemerUnitheme.s"
 	@echo "... tests.o"
 	@echo "... tests.i"
 	@echo "... tests.s"

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-file(GLOB SOURCES "*.cpp" "*.c")
+file(GLOB SOURCES "*.cpp" "*.c" "*.h")
 
 add_executable(systhemer ${SOURCES})
 

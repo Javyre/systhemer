@@ -1,7 +1,18 @@
 #include "unitheme.h"
+#include "memory.h"
 #include "priv_unitheme.h"
 #include "execUnitheme.h"
 #include "utils.h"
+#include "builtin_funcs.h"
+
+/* #include "lex.yy.c" */
+extern void lexRunLex(const char *in);
+extern FILE *yyin;
+extern int yylex();
+extern int yyparse();
+extern int yyerror(const char *p);
+extern int yylex_destroy(void);
+extern size_t yyerror_count;
 
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +24,535 @@ pcre2_code **g_re_codes;
 
 static programDef *currentProg;
 static programDefs progDefs;
+/* variableList *g_variables; */
+memory_holder *g_memory;
+friendly_names *g_friendlies;
+
+size_t g_num_defs;
+size_t g_size_defs;
+size_t g_used_defs;
+
+char **g_def_names;
+t_type *g_def_types;
+
+char **contexts;
+memory_holder **g_defs;
+
+memory_holder *g_input;
+output_holder *g_out_blocks;
+
+void uniInit(size_t min_num_blocks, size_t max_num_blocks, size_t num_fields,
+             char **field_names, t_type *field_types, int val_dyn_type) {
+
+  g_out_blocks = (output_holder *)malloc(sizeof(output_holder));
+  g_out_blocks->val_types = field_types;
+  g_out_blocks->val_names = field_names;
+  g_out_blocks->vals_size = num_fields;
+
+  g_out_blocks->min_blocks_used = min_num_blocks;
+  g_out_blocks->max_blocks_size = max_num_blocks;
+
+
+
+  /* g_out_blocks->blocks */
+  g_out_blocks->blocks_used = 0;
+  g_out_blocks->blocks_size = (max_num_blocks != 0) ? max_num_blocks : 20;
+
+  /* for (size_t i=0; i<g_out_blocks->blocks_size; i++) { */
+
+  /*   /\* g_defs[i] = (memory_holder *)malloc(sizeof(memory_holder)); *\/ */
+  /*   /\* memoryInit(g_defs[i], ); *\/ */
+
+  /* } */
+
+}
+
+void uniRead(const char *file_name, memory_holder *input,
+             output_holder **output) {
+  /* Initialize output blocks holder */
+  *output = g_out_blocks;
+  g_memory = (memory_holder *)malloc(sizeof(memory_holder));
+  memoryInit(g_memory, 20);
+
+  /* Set input block */
+  if (input != NULL)
+    g_input = input;
+  else
+    g_input = NULL;
+
+  /* Initialize friendlies */
+  g_friendlies = (friendly_names *)malloc(sizeof(friendly_names));
+  friendlyInit(g_friendlies, 20);
+
+  /* EXPERIMENTAL: null item and null pointer */
+  memory_item *null_item = (memory_item*)malloc(sizeof(memory_item));
+  null_item->str = strdup("NULL");
+  memory_address null_item_address = memoryInsert(g_memory, null_item, t_str);
+  friendlyInsert(g_friendlies, strdup("NULL"), null_item_address);
+
+  /* TODO: this next line might be useless */
+  defsInitArr(&progDefs, 5);
+
+  /* open file for reading and parse until end of file
+   * NOTE: each call of yyparse is each token and not line by line */
+  yyin = fopen(file_name, "r");
+  do {
+		yyparse();
+	} while (!feof(yyin));
+
+  /* For debugging purposes, print an illustration
+     of the current memory state */
+  if (verboseMode) {
+    printf("\n");
+    memoryIllustrateMap(g_friendlies, g_memory);
+    printf("\n");
+  }
+
+  /* Moved frees and destroys to uniDestroy()
+   * friendlyFree(g_friendlies);
+   * free(g_friendlies);
+   * 
+   * memoryFree(g_memory);
+   * free(g_memory); */
+
+  fclose(yyin);
+  yylex_destroy();
+
+  /* Error msg if not reaching minimum required output blocks
+   * NOTE: is this a runtime error? */
+  if (g_out_blocks->blocks_used < g_out_blocks->min_blocks_used) {
+    ERROR_PRINT("not enough output block definitions in %s", file_name);
+    yyerror_count++;
+  }
+
+  /* Print num or occured error */
+  VERBOSE_PRINT("%lu error(s) occured", (unsigned long)yyerror_count);
+}
+
+/* DESTROY THE EVIDENCE!
+ * Frees memory allocated during reading and free unitheme var memory */
+void uniDestroy() {
+  /* Destroy input blocks */
+  if (g_input != NULL)
+    memoryFree(g_input);
+
+  /* Destroy output blocks */
+  for (size_t i=0; i<g_out_blocks->blocks_used;i++)
+    memoryFree(outputGetBlockById(i));
+
+  for (size_t i=0; i<g_out_blocks->vals_size;i++) {
+    free(g_out_blocks->val_names[i]);
+  }
+  free(g_out_blocks->val_names);
+  free(g_out_blocks->val_types);
+  free(g_out_blocks);
+
+  /* Destroy friendly names */
+  friendlyFree(g_friendlies);
+  free(g_friendlies);
+
+  /* Destroy memory
+   * TODO: implement better memory optimization
+   *       than just freeing it at the end of execution */
+  memoryFree(g_memory);
+  free(g_memory);
+}
+
+memory_holder *outputGetBlockById(int block_num) {
+  if ((unsigned long)block_num < g_out_blocks->blocks_used) {
+    block_num += g_out_blocks->blocks_used;
+  }
+  return g_out_blocks->blocks[block_num];
+}
+
+void outputSetBlockById(int block_num, int offset, memory_holder *new_block) {
+  if ((unsigned long)block_num < g_out_blocks->blocks_used) {
+    block_num += g_out_blocks->blocks_used;
+  }
+  g_out_blocks->blocks[block_num + offset] = new_block;
+}
+
+char *outputGetBlockNameById(int block_num) {
+  if ((unsigned long)block_num < g_out_blocks->blocks_used) {
+    block_num += g_out_blocks->blocks_used;
+  }
+  return g_out_blocks->block_names[block_num];
+}
+
+void outputSetBlockNameById(int block_num, int offset, char *new_block_name) {
+  if ((unsigned long)block_num < g_out_blocks->blocks_used) {
+    block_num += g_out_blocks->blocks_used;
+  }
+  g_out_blocks->block_names[block_num + offset] = new_block_name;
+}
+
+size_t outputGetFieldIdByName(char *field_name) {
+  for (size_t i=0; i < g_out_blocks->vals_size; i++)
+    if (strcmp(g_out_blocks->val_names[i], field_name) == 0)
+      return i;
+
+  WARNING_PRINT("Couldn't find %s in defined field names list! (returning 0)",
+                field_name);
+  return 0;
+}
+
+/* Create and initialize new block */
+void outputCreateMemBlock(char *block_name) {
+  /* if will run out of space */
+  if (g_out_blocks->blocks_size <= g_out_blocks->blocks_used+1) {
+
+    /* if making room for one more block is allowed (under or equal to max) */
+    if (g_out_blocks->blocks_size+1 <= g_out_blocks->max_blocks_size) {
+
+      g_out_blocks->blocks = (memory_holder **)
+        realloc(g_out_blocks->blocks, g_out_blocks->blocks_size+1);
+
+      g_out_blocks->block_names = (char **)
+        realloc(g_out_blocks->block_names, g_out_blocks->blocks_size+1);
+
+      g_out_blocks->blocks_size++;
+    } else {
+      WARNING_PRINT("Reached maximum number of output blocks");
+    }
+  }
+
+  /* NOTE: id of -1 : last item */
+  /* NOTE: offset of +1 : item after last item (new item) */
+
+  /* Initialize new block */
+  outputSetBlockById(-1, +1, (memory_holder *)malloc(sizeof(memory_holder)));
+
+  /* Set the name */
+  outputSetBlockNameById(-1, +1, block_name);
+
+  /* Increment num of used blocks */
+  g_out_blocks->blocks_used++;
+}
+
+/* Insert field value into specified output block */
+void outputInsertFieldVal(const char *dest_block_name, char * dest_field_name,
+                          memory_address value) {
+
+  /* Find the id of the block to insert to by finding the name */
+  size_t block_id = 0;
+  bool block_id_unset = true;
+  for (size_t i=0; i<g_out_blocks->blocks_used; i++) {
+    if (strcmp(outputGetBlockNameById(i), dest_block_name) == 0) {
+      block_id = i;
+      block_id_unset = false;
+      break;
+    }
+    if (block_id_unset) {
+      WARNING_PRINT("Couldn't find %s in defined block names list!",
+                    dest_block_name);
+      return;
+    }
+  }
+
+  /* Set value to destination field id */
+  outputGetBlockById(block_id)->
+    content[outputGetFieldIdByName(dest_field_name)]->address = value;
+
+}
+
+/* void outputInsertMemBlock(memory_holder *block, char *block_name) { */
+/*   if (g_out_blocks->blocks_size <= g_out_blocks->blocks_used+1) { */
+/*     if (g_out_blocks->max_blocks_size <= g_out_blocks->blocks_size+1) { */
+/*       g_out_blocks->blocks = (memory_holder **)realloc(g_out_blocks->blocks, g_out_blocks->blocks_size+1); */
+/*       g_out_blocks->block_names = (char **)realloc(g_out_blocks->block_names, g_out_blocks->blocks_size+1); */
+
+/*       g_out_blocks->blocks_size++; */
+/*     } else { */
+/*       WARNING_PRINT("Reached maximum number of output blocks"); */
+/*     } */
+/*   } */
+
+/*   g_out_blocks->blocks[g_out_blocks->blocks_used] = block; */
+/*   g_out_blocks->block_names[g_out_blocks->blocks_used] = block_name; */
+
+/*   g_out_blocks->blocks_used++; */
+/* } */
+
+/* void unithemeInsert(memory_address addr, ) */
+
+void runLex(const char *filename) {
+  g_memory = (memory_holder *)malloc(sizeof(memory_holder));
+  memoryInit(g_memory, 20);
+
+  g_friendlies = (friendly_names *)malloc(sizeof(friendly_names));
+  friendlyInit(g_friendlies, 20);
+
+  memory_item *null_item = (memory_item*)malloc(sizeof(memory_item));
+  null_item->str = strdup("NULL");
+  memory_address null_item_address = memoryInsert(g_memory, null_item, t_str);
+  friendlyInsert(g_friendlies, strdup("NULL"), null_item_address);
+
+  defsInitArr(&progDefs, 5);
+  /* g_variables = (variableList *)malloc(sizeof(variableList)); */
+  /* varsInit(g_variables, 20); */
+
+  yyin = fopen(filename, "r");
+  do {
+		yyparse();
+	} while (!feof(yyin));
+  /* yylex(); */
+
+  if (verboseMode) {
+    printf("\n");
+    memoryIllustrateMap(g_friendlies, g_memory);
+    printf("\n");
+  }
+
+  fclose(yyin);
+  yylex_destroy();
+  /* varsFree(g_variables); */
+  /* free(g_variables); */
+
+  friendlyFree(g_friendlies);
+  free(g_friendlies);
+
+  memoryFree(g_memory);
+  free(g_memory);
+
+  if (g_out_blocks->blocks_used < g_out_blocks->min_blocks_used)
+    fprintf(stderr, BKRED "Error: not enough output block definitions in %s" KDEFAULT, filename);
+  VERBOSE_PRINT("%lu error(s) occured", (unsigned long)yyerror_count);
+}
+
+void handlePointerAssig(char *to_name, char *from_name) {
+  memory_item *mem_item = malloc(sizeof(memory_item));
+  mem_item->address = memoryGetAddresByFriendly(g_friendlies, from_name);
+  if (strcmp(from_name, "NULL") != 0 && mem_item->address == 0)
+    yyerror("(runtime error) identifier does not exist");
+
+
+  memory_address address = memoryInsert(g_memory, mem_item, t_addr);
+  friendlyInsert(g_friendlies, to_name, address);
+
+  memoryGetRootAddress(g_memory, address);
+
+  free(from_name);
+}
+
+void handleAssigDef(char *var_name, memory_address content, STRING_TYPE str_type) {
+  memory_address address;
+
+  /* keep parsing but dont actually handle anything if errors occure */
+  if (yyerror_count != 0) {
+  /* if (1) { */
+    /* free(content); */
+    free(var_name);
+    return;
+  }
+
+  /* create mem_item for insertion into memory */
+  memory_item *mem_item = malloc(sizeof(memory_item));
+  mem_item->address = content;
+
+  /* insert item and keep address */
+  address = memoryInsert(g_memory, mem_item, t_addr);
+  /* if (str_type == T_STRING) */
+  /*   address = memoryInsert(g_memory, mem_item, t_str); */
+  /* /\* else if (str_type == T_REGEX) *\/ */
+  /* else */
+  /*   address = memoryInsert(g_memory, mem_item, t_rgx); */
+
+
+  /* generate friendly name pointer */
+  friendlyInsert(g_friendlies, var_name, address);
+
+  /* /\* remove surrounding delimiters from strings or regexprs *\/ */
+  /* utilUnstring(&content, (DELIM_TYPE)str_type); */
+
+  /* /\* handling built-in variables is different than user-created ones *\/ */
+  /* if (strcmp(var_name, "prg_name") == 0) { */
+  /*   currentProg->name = content; */
+  /* } else if (strcmp(var_name, "prg_path") == 0) { */
+  /*   currentProg->path = content; */
+  /* } else if (strcmp(var_name, "prg_exec_before") == 0) { */
+  /*   currentProg->execBefore = content; */
+  /* } else if (strcmp(var_name, "prg_exec_after") == 0) { */
+  /*   currentProg->execAfter = content; */
+  /* } else { */
+  /*   varsInsertVar(g_variables, content, var_name, str_type); */
+  /* } */
+
+
+  /* VERBOSE_PRINT(BKYEL "variable %s is:\t %s", var_name, content); */
+}
+
+void handleListDef(char *list_name, t_ptr_list *content, STRING_TYPE str_type) {
+  /* keep parsing but dont actually handle anything if errors occure */
+  if (yyerror_count != 0) {
+    ptrListFree(content);
+    free(content);
+    free(list_name);
+    return;
+  }
+
+  /* create mem_item for insertion into memory */
+  memory_item *mem_item = malloc(sizeof(memory_item));
+  mem_item->list = content;
+
+  /* insert item and keep address */
+  memory_address address = memoryInsert(g_memory, mem_item, t_list);
+
+  /* generate friendly name pointer */
+  friendlyInsert(g_friendlies, list_name, address);
+
+  /* handling built-in variables is different than user-created ones */
+  /* if (strcmp(list_name, "tokens") == 0) { */
+  /*   currentProg->tokens = content; */
+  /* } else if (strcmp(list_name, "snippets") == 0) { */
+  /*   currentProg->snippets = content; */
+  /* } else { */
+  /*   varsInsertList(g_variables, content, list_name, str_type); */
+  /* } */
+
+  for (size_t i = 0; i < g_memory->content[address]->list->used; i++) {
+    VERBOSE_PRINT(BKYEL "%s %s content is: %lu %s",
+                  (str_type == T_STRING ? "string" : str_type == T_REGEX ? "regex" : "unknown"),
+                  memoryGetFriendlyByAddress(g_friendlies, address),
+                  (unsigned long)g_memory->content[address]->list->pointers[i],
+                  g_memory->content[memoryGetRootAddress(g_memory, g_memory->content[address]->list->pointers[i])]->str
+                  );
+  }
+}
+
+
+void handleFuncCall(char *func_name, memory_address param_address, STRING_TYPE param_type) {
+  /* keep parsing but dont actually handle anything if errors occur */
+  if (yyerror_count != 0) {
+    /* if (1) { */
+    /* free(content); */
+    free(func_name);
+    return;
+  }
+  
+  /* Built-in functions (written here in C) */
+  if (strcmp(func_name, "mkblock") == 0)
+    uni_mkblock(param_type, param_type);
+  else {
+    yyerror("Runtime error while running function: function does not exist");
+    free(func_name);
+    return;
+  }
+
+  /* User-defined functions (written in Unitheme file in uth)
+   * TODO: add support for user-defined functions */
+  if (1){;}
+
+  free(func_name);
+}
+
+
+/* /\* Allocates memory for the variableList content and initializes some values *\/ */
+/* void varsInit(variableList *vars, size_t initial_size) { */
+/*   /\* *vars = (variableList *)calloc(1, sizeof(variableList)); *\/ */
+
+/*   vars->list_names = (list *)malloc(sizeof(list)); */
+/*   vars->var_names = (list *)malloc(sizeof(list)); */
+/*   vars->vars= (list *)malloc(sizeof(list)); */
+
+/*   defsInitList(vars->list_names, initial_size); */
+/*   defsInitList(vars->var_names, initial_size); */
+/*   defsInitList(vars->vars, initial_size); */
+
+/*   vars->list_string_types = (STRING_TYPE *)calloc(initial_size, sizeof(STRING_TYPE)); */
+/*   vars->var_string_types = (STRING_TYPE *)calloc(initial_size, sizeof(STRING_TYPE)); */
+
+
+/*   vars->lists = (list **)calloc(initial_size, sizeof(list *)); */
+/*   vars->lists_used = 0; */
+/*   vars->lists_size = initial_size; */
+/*   memset(&vars->lists[0], 0, sizeof(list *) * initial_size); */
+/* } */
+
+/* /\* If needed expand allocated memory to make way for new item. Then inserts item. *\/ */
+/* void varsInsertList(variableList *vars, list *list, char *list_name, STRING_TYPE str_type) { */
+/*   /\* resize string type array if needed *\/ */
+/*   if (vars->list_names->used == vars->list_names->size-1) */
+/*     vars->list_string_types = realloc(vars->list_string_types, vars->list_names->size+20); */
+
+/*   /\* set name *\/ */
+/*   defsInsertList(vars->list_names, list_name); */
+
+/*   /\* set string type *\/ */
+/*   vars->list_string_types[vars->list_names->used-1] = str_type; */
+
+/*   /\* add list *\/ */
+/*   vars->lists[vars->lists_used] = list; */
+/*   vars->lists_used++; */
+/* } */
+
+/* /\* If needed expand allocated memory to make way for new item. Then inserts item. *\/ */
+/* void varsInsertVar(variableList *vars, char *value, char* var_name, STRING_TYPE str_type) { */
+/*   /\* resize string type array if needed *\/ */
+/*   if (vars->var_names->used == vars->var_names->size-1) */
+/*     vars->var_string_types = realloc(vars->var_string_types, vars->var_names->size+20); */
+
+/*   /\* set var name *\/ */
+/*   defsInsertList(vars->var_names, var_name); */
+
+/*   /\* set string type *\/ */
+/*   vars->var_string_types[vars->var_names->used-1] = str_type; */
+
+/*   /\* add var value*\/ */
+/*   defsInsertList(vars->vars, value); */
+/* } */
+
+/* /\* If found, returns the index of the list_name. If not, returns -1 *\/ */
+/* int varsLookupList(variableList *vars, const char *list_name) { */
+/*   /\* loop all var names until search term found and index returned *\/ */
+/*   for (size_t i=0; i<vars->list_names->used; i++) { */
+/*     if (strcmp(vars->list_names->items[i], list_name)) */
+/*       return i; */
+/*   } */
+
+/*   /\* return -1 if search term not found *\/ */
+/*   return -1; */
+/* } */
+
+/* /\* If found, returns the index of the var_name-> If not, returns -1 *\/ */
+/* int varsLookupVar(variableList *vars, const char *var_name) { */
+/*   /\* loop all var names until search term found and index returned *\/ */
+/*   for (size_t i=0; i<vars->var_names->used; i++) { */
+/*     if (strcmp(vars->var_names->items[i], var_name)) */
+/*       return i; */
+/*   } */
+
+/*   /\* return -1 if search term not found *\/ */
+/*   return -1; */
+/* } */
+
+/* /\* Frees all memory allocated by varsInit or modified by any of the insert functions *\/ */
+/* void varsFree(variableList *vars) { */
+/*   defsFreeList(vars->list_names); */
+/*   free(vars->list_names); */
+/*   for (size_t i=0; i<vars->lists_used; i++) { */
+/*     defsFreeList(vars->lists[i]); */
+/*     free(vars->lists[i]); */
+/*   } */
+/*   free(vars->lists); */
+/*   free(vars->list_string_types); */
+
+/*   defsFreeList(vars->var_names); */
+/*   free(vars->var_names); */
+/*   defsFreeList(vars->vars); */
+/*   free(vars->vars); */
+/*   free(vars->var_string_types); */
+
+
+/*   /\* free(vars); *\/ */
+/* } */
+
+
+
+
+/*
+  Hopefully if the conversion to flex + bison is successful
+  then most of the following code will be unused and eventually deleted
+*/
 
 void loadUniTheme(const char *filename) {
   char *buff = malloc(256);
@@ -159,15 +699,18 @@ void defsInitDef(const programDef *def, const size_t initial_tok_size) {
 }
 
 
-void defsInitList(list *list, size_t inital_list_size) {
-  list->items = (char **)calloc(inital_list_size, sizeof(char *));
-  list->used = 0;
-  list->size = inital_list_size;
-  memset(&list->items[0], 0, sizeof(char *) * inital_list_size);
+void defsInitList(list *listp, size_t inital_list_size) {
+  /* listp = (list *)calloc(1, sizeof(list)); */
+  listp->items = (char **)calloc(inital_list_size, sizeof(char *));
+  listp->used = 0;
+  listp->size = inital_list_size;
+  memset(&listp->items[0], 0, sizeof(char *) * inital_list_size);
 
 }
 
+/* DO NOT FREE element AFTER INSERTING */
 void defsInsertList(list *list, char *element) {
+  /* resize list allocated size if needed */
   if (list->used == list->size) {
     list->size *= 2;
     list->items = (char **)realloc(list->items, list->size * sizeof(char *));
@@ -176,6 +719,8 @@ void defsInsertList(list *list, char *element) {
       memset(&list->items[i], 0, sizeof(char *));
     }
   }
+
+  /* insert the item */
   list->items[list->used] = element;
   list->used++;
 }
@@ -714,11 +1259,9 @@ void evalStatement(char *currentBuffer, char *statCall, char *statArg) {
   printf("%s\n", statCall);
   printf("%s\n", statArg);
   free(statCall);
-  statCall = NULL;
   if (freeArg)
     free(statArg);
   VERBOSE_PRINT_VALUE(%p, statArg);
-  statArg = NULL;
 }
 
 void evalAssig(char *currentBuffer, char *tok, char *value, STRING_TYPE str_type) {

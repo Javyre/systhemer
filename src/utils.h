@@ -16,7 +16,6 @@
 #define RE_REGEX_LITTERAL "(\\/(((\\\\\\/)|[^\\/])+)\\/|(\\/\\/))"
 #define RE_ANY_LITTERAL "(" RE_STRING_LITTERAL "|" RE_REGEX_LITTERAL ")"
 
-/* typedef unsigned char STRING_TYPE; */
 typedef enum {
   T_NULL = 0,
   T_STRING,
@@ -26,18 +25,23 @@ typedef enum {
   SET_DELIM_CHAR(((str_tp) == T_NULL ? NULL_DELIM : (str_tp) == 1 ? STR_DELIM : REGEX_DELIM), dlm_chr); \
   SET_ESCAPE_CHAR(((str_tp) == T_NULL ? NULL_ESCAPE : (str_tp) == 1 ? STR_ESCAPE : REGEX_ESCAPE), scp_chr);
 
-typedef unsigned char DELIM_TYPE;
-#define NULL_DELIM 0
-#define STR_DELIM 1
-#define REGEX_DELIM 2
+/* NOTE: keep the values of enums: STRING_TYPE,
+   DELIM_TYPE and ESCAPE_TYPE the same
+   (for casting reasons i.e.: (STRING_TYPE)STR_DELIM -> T_STRING)*/
+typedef enum {
+  NULL_DELIM = 0,
+  STR_DELIM,
+  REGEX_DELIM
+} DELIM_TYPE;
 #define STR_DELIM_CHAR '\"'
 #define REGEX_DELIM_CHAR '/'
 #define SET_DELIM_CHAR(dlm_tp, dlm_chr) const char dlm_chr = (dlm_tp == NULL_DELIM) ? '\0' : (dlm_tp == 1 ? STR_DELIM_CHAR : REGEX_DELIM_CHAR);
 
-typedef unsigned char ESCAPE_TYPE;
-#define NULL_ESCAPE 0
-#define STR_ESCAPE 1
-#define REGEX_ESCAPE 2
+typedef enum {
+  NULL_ESCAPE = 0,
+  STR_ESCAPE,
+  REGEX_ESCAPE,
+}ESCAPE_TYPE;
 #define STR_ESCAPE_CHAR '\\'
 #define REGEX_ESCAPE_CHAR '\\'
 /* The following SET_DELIM_CHAR is modified to suppress compile warnings */
@@ -65,15 +69,50 @@ typedef unsigned char ESCAPE_TYPE;
 #define BKWHT  "\e[1;37m"
 
 #define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\x1b[0m" "\n", token);
-#define WARNING_PRINT(message) if(warnings_on) printf(PACKAGE ": " BKYEL"%s" "\x1b[0m" "\n", message);
+
+/* Note: The following PRINT_VALUES macros are deprecated and
+   are present for backwards compatibility purposes */
 #define WARNING_PRINT_VALUE(type, token) if (warnings_on) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKYEL);}
-#define VERBOSE_PRINT(message) if(verboseMode) printf(PACKAGE ": " BKBLU "%s" "\x1b[0m" "\n", message);
 #define VERBOSE_PRINT_VALUE(type, token) if (verboseMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKBLU);}
+#ifndef NDEBUG
+#define TEST_PRINT_VALUE(type, token) if (testsMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKNRM );}
+#endif
+
+/* Old PRINT macros... */
+/* #define WARNING_PRINT(message) if(warnings_on) printf(PACKAGE ": " BKYEL"%s" "\x1b[0m" "\n", message); */
+/* #define WARNING_PRINT_VALUE(type, token) if (warnings_on) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKYEL);} */
+/* #define VERBOSE_PRINT(message) if(verboseMode) printf(PACKAGE ": " BKBLU "%s" "\x1b[0m" "\n", message); */
+/* #define VERBOSE_PRINT_VALUE(type, token) if (verboseMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKBLU);} */
+
+/* New PRINT macros... (call the non-HELPER variants)
+ * (backwards compatible with old macros but support formatting) */
+#define WARNING_PRINT_HELPER(fmt, ...) printf(PACKAGE ": " BKYEL fmt "\x1b[0m" "\n%s", __VA_ARGS__);
+#define WARNING_PRINT(...) if(verboseMode) {VERBOSE_PRINT_HELPER(__VA_ARGS__, "");}
+
+#define VERBOSE_PRINT_HELPER(fmt, ...) printf(PACKAGE ": " BKBLU fmt "\x1b[0m" "\n%s", __VA_ARGS__);
+#define VERBOSE_PRINT(...) if(verboseMode) {VERBOSE_PRINT_HELPER(__VA_ARGS__, "");}
+
 #ifndef NDEBUG
 #define TEST_PRINT(message) if (testsMode) {printf(PACKAGE ": " BKNRM "%s" "\x1b[0m" "\n", message);}
 #define T_PRINT(message, ...) if (testsMode) {printf(BKNRM message KDEFAULT, __VA_ARGS__);}
-#define TEST_PRINT_VALUE(type, token) if (testsMode) {printf(PACKAGE ": "); PRINT_VALUE(type, token, BKNRM );}
 #endif
+
+/* TODO: perfect error msgs or make an error msg util library of sorts */
+#define ERROR_PRINT_HELPER(fmt, ...) fprintf(stderr, BKRED PACKAGE " ERROR" ": " fmt "\x1b[0m" "\n%s", __VA_ARGS__);
+#define ERROR_PRINT(...) if(1) {ERROR_PRINT_HELPER(__VA_ARGS__, "");}
+
+/* strcatf: example usage:
+ *   char *s = strdup("123");
+ *   strcatf(s, " 45 %d", 678);
+ *   printf("%s", s);
+ * output:
+ *   > 123 45 678
+ */
+#define strcatf_HELPER(s, fmt, ...) sprintf(s+strlen(s), fmt "%s" , __VA_ARGS__);
+#define strcatf(s, ...) if(1) {strcatf_HELPER(s, __VA_ARGS__, "");}
+
+
+
 
 #define EXIT(exval) if (exit_on_err) {exit(exval);}
 

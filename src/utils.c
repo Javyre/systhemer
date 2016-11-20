@@ -29,7 +29,7 @@ void printHelp(const int exval) {
 }
 
 void verboseMessage(const char *message) { //\e[1;34m and \e[m make text blue
-  VERBOSE_PRINT(message)
+  VERBOSE_PRINT("%s", message);
 }
 
 void testMessage(const char *message) {

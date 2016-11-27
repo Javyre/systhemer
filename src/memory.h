@@ -60,9 +60,8 @@ t_type memoryGetRootType(memory_holder *mem, memory_address addr);
 
 memory_address memoryGetRootAddress(memory_holder *mem, memory_address mem_addr);
 
-void memoryIllustrateMap(friendly_names *friendly, memory_holder *mem);
 
-void memoryIllustrateMapN(friendly_names *friendly, memory_holder *mem, size_t depth);
+void memoryIllustrateMap(friendly_names *friendly, memory_holder *mem, size_t depth);
 
 void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem, memory_address i, size_t depth);
 

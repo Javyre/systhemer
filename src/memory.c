@@ -101,84 +101,7 @@ memory_address memoryGetRootAddress(memory_holder *mem, memory_address mem_addr)
   return mem_addr;
 }
 
-void memoryIllustrateMap(friendly_names *friendly, memory_holder *mem) {
-  char buff[(256*8)+1];
-  char list_content[(256*8)+1];
-  char *name, *name2;
-  char fname[256], fname2[256];
-  memory_address a;
-  for (memory_address i=0; i<mem->used; i++) {
-    /* Print friendly name (if it exists) as well as the address */
-    name = memoryGetFriendlyByAddress_se(friendly, i);
-    sprintf(fname, "%s%s" BKCYN, (name != NULL ? " - " BKYEL : ""), (name!= NULL ? name : ""));
-    if (name != NULL)
-      /* if there is a friendly name */
-      sprintf(buff, "[" BKGRN "%lu" BKCYN "%s]->", (unsigned long)i, fname);
-    else
-      /* if not */
-      sprintf(buff, "[%lu%s]->", (unsigned long)i, fname);
-
-    /* if it's a string of any type */
-    if (mem->content_type[i] == t_str || mem->content_type[i] == t_rgx) {
-      if (name != NULL)
-        sprintf(buff+strlen(buff), BKYEL "{%s}" BKCYN, mem->content[i]->str);
-      else
-        sprintf(buff+strlen(buff), "{%s}", mem->content[i]->str);
-
-    /* if it's a list */
-    } else if (mem->content_type[i] == t_list) {
-      /* Print contents of list */
-      for (size_t ii=0; ii<mem->content[i]->list->used; ii++) {
-        sprintf(list_content+strlen(list_content), "%lu, ", (unsigned long)mem->content[i]->list->pointers[ii]);
-      }
-      list_content[strlen(list_content)-2] = '\0';
-      /* sprintf(buff+strlen(buff), BKYEL "[%s]" BKCYN, list_content); */
-      if (name != NULL) {
-        strcatf(buff, BKYEL "[%s]" BKCYN, list_content);
-      } else {
-        sprintf(buff+strlen(buff), "[%s]", list_content);
-      }
-
-    /* if it's a pointer to another memoryitem */
-    } else if (mem->content_type[i] == t_addr) {
-      a = i;
-      /* find root address while printing every address in the chain */
-      while (mem->content_type[a] == t_addr) {
-        a = mem->content[a]->address;
-        name2 = memoryGetFriendlyByAddress_se(friendly, a);
-        sprintf(fname2, "%s%s" BKCYN, (name2 != NULL ? " - " BKYEL : ""), (name2!= NULL ? name2 : ""));
-        if (name2 != NULL)
-          sprintf(buff+strlen(buff), "[" BKGRN "%lu" BKCYN "%s]->", (unsigned long)a, fname2);
-        else
-          sprintf(buff+strlen(buff), "[%lu%s]->", (unsigned long)a, fname2);
-      }
-      /* if root address is a string of any type */
-      if (mem->content_type[a] == t_str || mem->content_type[a] == t_rgx) {
-        if (name != NULL)
-          sprintf(buff+strlen(buff), BKYEL "{%s}" BKCYN, mem->content[a]->str);
-        else
-          sprintf(buff+strlen(buff), "{%s}", mem->content[a]->str);
-
-      /* if root address is a list */
-      } else if (mem->content_type[a] == t_list) {
-        for (size_t ii=0; ii<mem->content[a]->list->used; ii++) {
-          sprintf(list_content+strlen(list_content), "%lu, ", (unsigned long)mem->content[a]->list->pointers[ii]);
-        }
-        list_content[strlen(list_content)-2] = '\0';
-        if (name != NULL)
-          sprintf(buff+strlen(buff), BKYEL "[%s]" BKCYN, list_content);
-        else
-          sprintf(buff+strlen(buff), "[%s]", list_content);
-      }
-    }
-    printf(BKCYN "%s\n" KDEFAULT, buff);
-    buff[0] = '\0';
-    list_content[0] = '\0';
-    fname[0] = '\0';
-  }
-}
-
-void memoryIllustrateMapN(friendly_names *friendly, memory_holder *mem,
+void memoryIllustrateMap(friendly_names *friendly, memory_holder *mem,
                           size_t depth) {
   for (memory_address i=0; i<mem->used; i++) {
     memoryIllustrateItem(friendly, mem, i, depth);
@@ -223,6 +146,9 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
 
   /* if it's a list */
   } else if (mem->content_type[i] == t_list) {
+    /* following line is to avoid appending to non-initialized string */
+    list_content[0] = '\0';
+
     /* Print contents of list (not expanding like for addresses section) */
     for (size_t ii=0; ii<mem->content[i]->list->used; ii++) {
       strcatf(list_content, "%lu, ", (unsigned long)mem->content[i]->list->pointers[ii]);

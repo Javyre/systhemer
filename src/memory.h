@@ -62,6 +62,10 @@ memory_address memoryGetRootAddress(memory_holder *mem, memory_address mem_addr)
 
 void memoryIllustrateMap(friendly_names *friendly, memory_holder *mem);
 
+void memoryIllustrateMapN(friendly_names *friendly, memory_holder *mem, size_t depth);
+
+void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem, memory_address i, size_t depth);
+
 memory_address memoryGetAddresByFriendly(friendly_names *friendly, char *identifier);
 
 char *memoryGetFriendlyByAddress_m(friendly_names *friendly, memory_address address, bool suppress_errors);

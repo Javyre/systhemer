@@ -104,7 +104,8 @@ void uniRead(const char *file_name, memory_holder *input,
      of the current memory state */
   if (verboseMode) {
     printf("\n");
-    memoryIllustrateMap(g_friendlies, g_memory);
+    /* memoryIllustrateMap(g_friendlies, g_memory); */
+    memoryIllustrateMapN(g_friendlies, g_memory, 10);
     printf("\n");
   }
 

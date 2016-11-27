@@ -44,7 +44,7 @@ output_holder *g_out_blocks;
 void uniInit(size_t min_num_blocks, size_t max_num_blocks, size_t num_fields,
              char **field_names, t_type *field_types, int val_dyn_type) {
 
-  g_out_blocks = (output_holder *)malloc(sizeof(output_holder));
+  g_out_blocks = (output_holder *)calloc(1, sizeof(output_holder));
   g_out_blocks->val_types = field_types;
   g_out_blocks->val_names = field_names;
   g_out_blocks->vals_size = num_fields;
@@ -57,6 +57,11 @@ void uniInit(size_t min_num_blocks, size_t max_num_blocks, size_t num_fields,
   /* g_out_blocks->blocks */
   g_out_blocks->blocks_used = 0;
   g_out_blocks->blocks_size = (max_num_blocks != 0) ? max_num_blocks : 20;
+
+  g_out_blocks->blocks = (memory_holder **)calloc(g_out_blocks->blocks_size,
+                                                  sizeof(memory_holder *));
+  g_out_blocks->block_names =
+      (char **)calloc(g_out_blocks->blocks_size, sizeof(char *));
 
   /* for (size_t i=0; i<g_out_blocks->blocks_size; i++) { */
 
@@ -132,20 +137,30 @@ void uniRead(const char *file_name, memory_holder *input,
 /* DESTROY THE EVIDENCE!
  * Frees memory allocated during reading and free unitheme var memory */
 void uniDestroy() {
+  VERBOSE_PRINT("DESTROYING")
+
   /* Destroy input blocks */
   if (g_input != NULL)
     memoryFree(g_input);
 
   /* Destroy output blocks */
-  for (size_t i=0; i<g_out_blocks->blocks_used;i++)
+  for (size_t i=0; i<g_out_blocks->blocks_used;i++) {
+    VERBOSE_PRINT("FREEING MEMORY BLOCK: %lu", i)
     memoryFree(outputGetBlockById(i));
+    free(outputGetBlockById(i));
+    g_out_blocks->blocks[i] = NULL;
+    outputSetBlockById(i, +0, NULL);
+    freennull(g_out_blocks->block_names[i]);
+  }
 
   for (size_t i=0; i<g_out_blocks->vals_size;i++) {
-    free(g_out_blocks->val_names[i]);
+    freennull(g_out_blocks->val_names[i]);
   }
-  free(g_out_blocks->val_names);
-  free(g_out_blocks->val_types);
-  free(g_out_blocks);
+  freennull(g_out_blocks->val_names);
+  freennull(g_out_blocks->val_types);
+  freennull(g_out_blocks->blocks);
+  freennull(g_out_blocks->block_names);
+  freennull(g_out_blocks);
 
   /* Destroy friendly names */
   friendlyFree(g_friendlies);
@@ -159,28 +174,28 @@ void uniDestroy() {
 }
 
 memory_holder *outputGetBlockById(int block_num) {
-  if ((unsigned long)block_num < g_out_blocks->blocks_used) {
+  if (block_num < 0) {
     block_num += g_out_blocks->blocks_used;
   }
   return g_out_blocks->blocks[block_num];
 }
 
 void outputSetBlockById(int block_num, int offset, memory_holder *new_block) {
-  if ((unsigned long)block_num < g_out_blocks->blocks_used) {
+  if (block_num < 0) {
     block_num += g_out_blocks->blocks_used;
   }
   g_out_blocks->blocks[block_num + offset] = new_block;
 }
 
 char *outputGetBlockNameById(int block_num) {
-  if ((unsigned long)block_num < g_out_blocks->blocks_used) {
+  if (block_num < 0) {
     block_num += g_out_blocks->blocks_used;
   }
   return g_out_blocks->block_names[block_num];
 }
 
 void outputSetBlockNameById(int block_num, int offset, char *new_block_name) {
-  if ((unsigned long)block_num < g_out_blocks->blocks_used) {
+  if (block_num < 0) {
     block_num += g_out_blocks->blocks_used;
   }
   g_out_blocks->block_names[block_num + offset] = new_block_name;
@@ -220,7 +235,7 @@ void outputCreateMemBlock(char *block_name) {
   /* NOTE: offset of +1 : item after last item (new item) */
 
   /* Initialize new block */
-  outputSetBlockById(-1, +1, (memory_holder *)malloc(sizeof(memory_holder)));
+  outputSetBlockById(-1, +1, (memory_holder *)calloc(1, sizeof(memory_holder)));
 
   /* Set the name */
   outputSetBlockNameById(-1, +1, block_name);

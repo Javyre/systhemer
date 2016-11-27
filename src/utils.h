@@ -112,6 +112,7 @@ typedef enum {
 #define strcatf(s, ...) if(1) {strcatf_HELPER(s, __VA_ARGS__, "");}
 
 
+#define freennull(p) do { free(p); p=NULL; } while (0);
 
 
 #define EXIT(exval) if (exit_on_err) {exit(exval);}

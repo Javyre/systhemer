@@ -79,25 +79,13 @@ t_type memoryGetRootType(memory_holder *mem, memory_address addr) {
 
 memory_address memoryGetRootAddress(memory_holder *mem, memory_address mem_addr) {
   printf(BKGRN);
+
   if (verboseMode)
-    printf("[%lu]", (unsigned long)mem_addr);
+    memoryIllustrateItem(NULL, mem, mem_addr, 999);
 
   while (mem->content_type[mem_addr] == t_addr) {
     mem_addr = mem->content[mem_addr]->address;
-    if (verboseMode)
-      printf("->[%lu]", (unsigned long)mem_addr);
   }
-
-  if (verboseMode) {
-    if (mem->content_type[mem_addr] == t_str || mem->content_type[mem_addr] == t_rgx) {
-      printf("->{%s}\n", mem->content[mem_addr]->str);
-    } else {
-      printf("\n");
-    }
-  }
-
-  printf(KDEFAULT);
-
   return mem_addr;
 }
 
@@ -118,7 +106,10 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
   /* for (memory_address i=0; i<mem->used; i++) { */
 
   /* Print friendly name (if it exists) as well as the address */
-  name = memoryGetFriendlyByAddress_se(friendly, i);
+  if (friendly != NULL)
+    name = memoryGetFriendlyByAddress_se(friendly, i);
+  else
+    name = NULL;
   sprintf(fname, "%s%s" BKCYN, (name != NULL ? " - " BKYEL : ""),
           (name != NULL ? name : ""));
   if (name != NULL)
@@ -192,6 +183,7 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
     a = mem->content[a]->address;
     if ((depth-1)>0) {
       memoryIllustrateItem(friendly, mem, a, depth-1);
+      printf(KDEFAULT);
     } else {
       printf(BKCYN "\n" KDEFAULT);
       return;

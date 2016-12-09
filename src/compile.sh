@@ -11,6 +11,9 @@ make clean -j 3 && \
 make -j 3 && \
 valgrind --tool=memcheck --leak-check=full \
          --show-reachable=yes --track-origins=yes \
+         ./systhemer -vwt && \
+valgrind --tool=memcheck --leak-check=full \
+         --show-reachable=yes --track-origins=yes \
          ./systhemer -vw
 cd ../src
 echo $(pwd)

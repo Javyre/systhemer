@@ -446,7 +446,9 @@ void handleFuncCall(char *func_name, memory_address param_address, STRING_TYPE p
   
   /* Built-in functions (written here in C) */
   if (strcmp(func_name, "mkblock") == 0)
-    uni_mkblock(param_type, param_type);
+    uni_mkblock(param_address, param_type);
+  else if (strcmp(func_name, "print") == 0)
+    uni_print(param_address, param_type);
   else {
     yyerror("Runtime error while running function: function does not exist");
     free(func_name);

@@ -21,6 +21,8 @@ def regex lkj = { p1 };
 def regex rlist = { p1, p2, p3 };
 
 # ---------- defining first block -----------
+print("Making block names first def...\n");
 mkblock("first def");
+print("Block \"def\" should now be created\n");
 
 def string firstField = "Hello, world!";

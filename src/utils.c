@@ -508,19 +508,47 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
   SET_DELIM_CHAR(delim, delim_char);
   SET_ESCAPE_CHAR(escape , escape_char);
 
+  bool override_inside = false;
+
   char *src = str;
   while (*src != '\0') {
-    if (utilIsInsideOf(str, src, delim, escape)) {
-      if ( delim == STR_DELIM && *src == escape_char && (src[1] == delim_char || src[1] == escape_char)) {
+    if (utilIsInsideOf(str, src, delim, escape) || override_inside) {
+      if ( delim == STR_DELIM && src[0] == escape_char &&
+           (src[1] == delim_char  ||
+            src[1] == escape_char ||
+            src[1] == 'n')) {
+
+
+        /* foo\"bar -> foo"bar
+         *    ^gets popped out
+         * src should be pointing to '\'
+         * str should be pointing to first char in string */
+        strOverlap(str, str, (src - 1), (src + 1), NULL);
+
+        if (*src == 'n')
+          *src = '\n';
+        else if (*src == delim_char)
+          override_inside = !override_inside;
+
+        /* foo"bar
+         *    ^src  */
+        src++;
+        /* foo"bar
+         *     ^src
+         * since src is already pointing to the
+         * next character to be analysed we can
+         * continue to the next loop direclty */
+        continue;
+      } else if ( delim == REGEX_DELIM && src[0] == escape_char && (src[1] == delim_char)) {
         strOverlap(str, str, (src - 1), (src + 1), NULL);
         src++;
-      } else if ( delim == REGEX_DELIM && *src == escape_char && (src[1] == delim_char)) {
-          strOverlap(str, str, (src - 1), (src + 1), NULL);
-          src++;
+
+      /* If it's a string that we're processing */
       } else if (delim == STR_DELIM) {
-        if(*src == '\\' && (src[1] != '\"')) {
-          fprintf(stderr, BKRED "Error: Found escape character inside of string "
-                  "with invalid successor \"%c\": \n\t%s\n\t%s\n",
+        if (*src == '\\' && (src[1] != '\"')) {
+          fprintf(stderr,
+                  BKRED "Error: Found escape character inside of string with "
+                        "invalid successor \"%c\": \n\t%s\n\t%s\n",
                   src[1], str, genWrongUnderline(str, src, src + 1));
           EXIT(1);
         }

@@ -17,14 +17,14 @@ int yycolumn = 0;
     yycolumn += yyleng;
 }
 /* --------------------------------------- */
-/* STRING  https://regex101.com/r/9Navnv/1 */
+/* STRING  https://regex101.com/r/9Navnv/2 */
 /* REGEXPR https://regex101.com/r/GOrFiv/1 */
 /* COMMENT https://regex101.com/r/4FTMVM/1 */
 /* --------------------------------------- */
 
 WHITESPACE [ \t]
 BLANK      \s*\n*\s*
-STRING     (\"((\\\")|(\\\\)|[^\\\"])+\"|\"\")
+STRING     (\"((\\\")|(\\\\)|(\\n)|[^\\\"])+\"|\"\")
 REGEXPR    (\/((\\\/)|(\\\\)|[^\/\\])+\/|\/\/)
 COMMENT    [ \t]*#.*
 

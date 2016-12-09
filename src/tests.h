@@ -20,6 +20,9 @@ void testRegex();
 void testRegexRmEscape();
 void testRegexUnregex();
 
+void testStringRmEscape();
+void testStrUnstring();
+
 void testGetDefType();
 
 #endif

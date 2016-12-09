@@ -145,6 +145,10 @@ size_t testAll() {
   testRegexRmEscape();
   testRegexUnregex();
 
+  testStringRmEscape();
+  testStrUnstring();
+
+
   testGetDefType();
 
   /* End tests... */
@@ -325,11 +329,82 @@ void testRegexUnregex() {
   char *str;
 
   TEST_REGEX_UNREGEX("  /foo/  ", "  foo  ");
+  /* TEST_REGEX_UNREGEX("  /\\foo\\/  ", "  \foo\  "); */
+  /* TEST_REGEX_UNREGEX("  /\\\/foo\/\\/  ", "  \/foo/\  "); */
 
   original = NULL;
   str = NULL;
 }
 #undef TEST_REGEX_UNREGEX
+
+#define TEST_STR_UNSTRING(rgnl, xpct)             \
+  do {                                            \
+    original = strMkCpy(rgnl);                    \
+    str = strMkCpy(original);                     \
+    strUnstring(&str);                            \
+    testStrExpect(original, xpct, str, __func__); \
+    free(original);                               \
+    free(str);                                    \
+  } while (0);
+
+void testStrUnstring() {
+  UPDATE_CURR_PROG();
+  char *original;
+  char *str;
+
+  TEST_STR_UNSTRING("  \"foo\"  ", "  foo  ");
+  TEST_STR_UNSTRING("\"foo \\\\ \\\\ \"", "foo \\ \\ ");
+  TEST_STR_UNSTRING("\" foo \\\\\\\\ \"", " foo \\\\ ");
+  /* TEST_STR_UNSTRING("\"foo \\ \"", "foo \ "); */
+  /* TEST_REGEX_UNREGEX("  /\\foo\\/  ", "  \foo\  "); */
+  /* TEST_REGEX_UNREGEX("  /\\\/foo\/\\/  ", "  \/foo/\  "); */
+
+  original = NULL;
+  str = NULL;
+}
+#undef TEST_STR_UNSTRING
+
+#define TEST_STR_RM_ESCAPE(rgnl, xpct)            \
+  do {                                            \
+    original = strMkCpy(rgnl);                    \
+    str = strMkCpy(original);                     \
+    strRmEscape(str);                             \
+    testStrExpect(original, xpct, str, __func__); \
+    free(original);                               \
+    free(str);                                    \
+  } while (0);
+void testStringRmEscape() {
+  UPDATE_CURR_PROG();
+  char *original;
+  char *str;
+
+  /* === Should Change === */
+  /* "\\" -> "\" */
+  TEST_STR_RM_ESCAPE("\"\\\\\"", "\"\\\"");
+  TEST_STR_RM_ESCAPE("\\\\", "\\\\"); /* Needs quotes */
+  /* "n\"" -> "n"" */
+  TEST_STR_RM_ESCAPE("\"n\\\"\"", "\"n\"\"");
+
+  /* "\\\\" -> "\\" */
+  TEST_STR_RM_ESCAPE("\"\\\\\\\\\"", "\"\\\\\"");
+
+  /* "\\" -> "\" */
+  TEST_STR_RM_ESCAPE("\"\\\\\"", "\"\\\"");
+
+  /* " foo \\\\ " -> " foo \\ " */
+  TEST_STR_RM_ESCAPE("\" foo \\\\\\\\ \"", "\" foo \\\\ \"");
+  /* /\* === Shouldnt Change === *\/ */
+  /* /\* /\n/ -> /\n/ *\/ */
+  /* TEST_STR_RM_ESCAPE("/\\n/", "/\\n/"); */
+  /* /\* \n/\n/ -> \n/\n/ *\/ */
+  /* TEST_STR_RM_ESCAPE("\\n/\\n/", "\\n/\\n/"); */
+  /* /\* /\n/\/ -> /\n/\/ *\/ */
+  /* TEST_STR_RM_ESCAPE("/\\n/\\/", "/\\n/\\/"); */
+
+  str = NULL;
+  original = NULL;
+}
+#undef TEST_STR_RM_ESCAPE
 
 #define TEST_STR_TRIM_IN_RANGE(rgnl, xpct, frm, to) \
   do {                                              \

@@ -16,3 +16,12 @@ void uni_mkblock (memory_address block_name_addr, STRING_TYPE str_type){
   outputCreateMemBlock(
       strdup(memoryGetRootItem(g_memory, block_name_addr)->str));
 }
+
+void uni_print(memory_address block_name_addr, STRING_TYPE str_type) {
+  if (str_type != T_STRING) {
+    yyerror("");
+    return;
+  }
+
+  printf("%s", memoryGetRootItem(g_memory, block_name_addr)->str);
+}

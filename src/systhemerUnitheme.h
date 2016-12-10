@@ -3,6 +3,6 @@
 
 #include "unitheme.h"
 
-void sysUniStart();
+void sysUniStart(const char *file_name);
 
 #endif

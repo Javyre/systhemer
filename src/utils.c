@@ -13,7 +13,7 @@ bool testsMode = false;
 
 void printHelp(const int exval) {
   printf("%s,%s show working getopt example\n", PACKAGE, VERSION);
-  printf("%s [-h] [-V]\n\n", PACKAGE);
+  printf("%s [-h] [-V] <uth file path>\n\n", PACKAGE);
 
 #ifndef NDEBUG
   printf("  -t              set test flag (verbose + run tests)\n");
@@ -92,6 +92,7 @@ void parseArgs(int argc, char *argv[]) {
       printHelp(1);
       break;
     }
+    g_uth_fpath = argv[optind];
   }
 }
 

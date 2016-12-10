@@ -37,7 +37,13 @@ int main(int argc, char *argv[]) {
   } else {
 #endif
     /* loadUniTheme("../files/default3.uth"); */
-    sysUniStart();
+    /* sysUniStart("../files/default4.uth"); */
+    if (g_uth_fpath != NULL)
+      sysUniStart(g_uth_fpath);
+    else {
+      fprintf(stderr, BKRED "no file name entered!\n" KDEFAULT);
+      printHelp(1);
+    }
     /* runLex("../files/default4.uth"); */
     runExecUitheme();
 #ifndef NDEBUG

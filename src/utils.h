@@ -125,6 +125,8 @@ typedef enum {
     }                                                                          \
   } while (0);
 
+
+char *g_uth_fpath;
 bool verboseMode;
 bool exit_on_err;
 bool warnings_on;

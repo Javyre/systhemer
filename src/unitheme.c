@@ -137,7 +137,10 @@ void uniRead(const char *file_name, memory_holder *input,
 /* DESTROY THE EVIDENCE!
  * Frees memory allocated during reading and free unitheme var memory */
 void uniDestroy() {
-  VERBOSE_PRINT("DESTROYING")
+  VERBOSE_PRINT("DESTROYING");
+
+  /* Destroy memory allocated during built-in function calls */
+  uni_garbage_collect();
 
   /* Destroy input blocks */
   if (g_input != NULL)

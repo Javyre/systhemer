@@ -43,6 +43,8 @@ void uni_set_color(memory_address color_name_addr, STRING_TYPE str_type) {
     g_current_print_color = strdup(KBLU);
   else if (strcmp(tmp, "bold_blue") == 0)
     g_current_print_color = strdup(BKBLU);
+  else
+    yyerror("runtime error (color name not found)");
 }
 
 void uni_print(memory_address string_addr, STRING_TYPE str_type) {
@@ -54,4 +56,10 @@ void uni_print(memory_address string_addr, STRING_TYPE str_type) {
   printf(KDEFAULT "%s%s" KDEFAULT,
          g_current_print_color != NULL ? g_current_print_color : "",
          memoryGetRootItem(g_memory, string_addr)->str);
+}
+
+void uni_garbage_collect() {
+  if (g_current_print_color != NULL)
+    free(g_current_print_color);
+  g_current_print_color = NULL;
 }

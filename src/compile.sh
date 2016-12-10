@@ -14,6 +14,6 @@ valgrind --tool=memcheck --leak-check=full \
          ./systhemer -vwt && \
 valgrind --tool=memcheck --leak-check=full \
          --show-reachable=yes --track-origins=yes \
-         ./systhemer -vw
+         ./systhemer -vw ../files/default4.uth
 cd ../src
 echo $(pwd)

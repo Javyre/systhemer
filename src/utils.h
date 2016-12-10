@@ -114,9 +114,16 @@ typedef enum {
 
 #define freennull(p) do { free(p); p=NULL; } while (0);
 
-
-#define EXIT(exval) if (exit_on_err) {exit(exval);}
-
+#define EXIT(exval)                                                            \
+  do {                                                                         \
+    if (exval == 2) {                                                          \
+      yyerror("probably runtime error (some function returned exit code 2!)"); \
+      break;                                                                   \
+    }                                                                          \
+    if (exit_on_err) {                                                         \
+      exit(exval);                                                             \
+    }                                                                          \
+  } while (0);
 
 bool verboseMode;
 bool exit_on_err;

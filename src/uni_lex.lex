@@ -17,14 +17,17 @@ int yycolumn = 0;
     yycolumn += yyleng;
 }
 /* --------------------------------------- */
-/* STRING  https://regex101.com/r/9Navnv/2 */
+/* STRING  https://regex101.com/r/9Navnv/4 */
 /* REGEXPR https://regex101.com/r/GOrFiv/1 */
 /* COMMENT https://regex101.com/r/4FTMVM/1 */
 /* --------------------------------------- */
 
 WHITESPACE [ \t]
 BLANK      \s*\n*\s*
-STRING     (\"((\\\")|(\\\\)|(\\n)|[^\\\"])+\"|\"\")
+/* STRING     (\"((\\\")|(\\\\)|(\\n)|[^\\\"])+\"|\"\")
+ * STRING     (\"((\\\S)|[^\\\"])+\"|\"\")
+ * \S is not supported by flex so we use equivalent: [^\r\n\t\f ] */
+STRING     (\"((\\[^\r\n\t\f ])|[^\\\"])+\"|\"\")
 REGEXPR    (\/((\\\/)|(\\\\)|[^\/\\])+\/|\/\/)
 COMMENT    [ \t]*#.*
 

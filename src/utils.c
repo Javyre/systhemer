@@ -542,6 +542,7 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
       } else if ( delim == REGEX_DELIM && src[0] == escape_char && (src[1] == delim_char)) {
         strOverlap(str, str, (src - 1), (src + 1), NULL);
         src++;
+        continue;
 
       /* If it's a string that we're processing */
       } else if (delim == STR_DELIM) {
@@ -550,7 +551,7 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
                   BKRED "Error: Found escape character inside of string with "
                         "invalid successor \"%c\": \n\t%s\n\t%s\n",
                   src[1], str, genWrongUnderline(str, src, src + 1));
-          EXIT(1);
+          EXIT(2);
         }
       }
     }

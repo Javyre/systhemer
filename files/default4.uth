@@ -24,6 +24,10 @@ def regex rlist = { p1, p2, p3 };
 print("Making block names first def...\n");
 mkblock("first def");
 print("Block \"def\" should now be created\n");
-print("WADDUP\tasdasdjahk");
+
+set_color("bold_red");
+print("WADDUP\t\tasdasdjahk\n");
+set_color("default");
+print("default color now\n");
 
 def string firstField = "Hello, world!";

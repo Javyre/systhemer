@@ -516,7 +516,8 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
       if ( delim == STR_DELIM && src[0] == escape_char &&
            (src[1] == delim_char  ||
             src[1] == escape_char ||
-            src[1] == 'n')) {
+            src[1] == 'n'         ||
+            src[1] == 't')) {
 
 
         /* foo\"bar -> foo"bar
@@ -527,6 +528,8 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
 
         if (*src == 'n')
           *src = '\n';
+        else if (*src == 't')
+          *src = '\t';
         else if (*src == delim_char)
           override_inside = !override_inside;
 

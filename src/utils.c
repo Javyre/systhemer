@@ -12,7 +12,7 @@ bool verboseMode = true;
 bool testsMode = false;
 
 void printHelp(const int exval) {
-  printf("%s,%s show working getopt example\n", PACKAGE, VERSION);
+  printf("%s,%s\n", PACKAGE, VERSION);
   printf("%s [-h] [-V] <uth file path>\n\n", PACKAGE);
 
 #ifndef NDEBUG
@@ -48,13 +48,21 @@ void parseArgs(int argc, char *argv[]) {
     {"exitonerr", no_argument, NULL, 'e'}};
   int opt;
 
-  // Checks for commands
-  /* if(argc == 1) {
+  /* set non '-' argument to be the file path */
+  g_uth_fpath = NULL;
+  for (int ac=0; ac<argc; ac++) {
+    printf("%s\n", argv[ac]);
+    if (argv[ac][0] != '-')
+      g_uth_fpath = argv[ac];
+  }
+
+  /* Checks for commands */
+  if(argc == 1) {
     fprintf(stderr, "This program needs arguments....\n\n");
     printHelp(1);
-    }*/
+    }
 
-  // Main loop that checks each toggle and argument
+  /* Main loop that checks each toggle and argument */
   while ((opt = getopt_long(argc, argv,
 #ifndef NDEBUG
                             "t"
@@ -92,7 +100,9 @@ void parseArgs(int argc, char *argv[]) {
       printHelp(1);
       break;
     }
-    g_uth_fpath = argv[optind];
+
+
+    /* g_uth_fpath = argv[optind]; */
   }
 }
 

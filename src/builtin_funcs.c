@@ -6,9 +6,12 @@ char *g_current_print_color = NULL;
 
 #define FUNC_CALL_ERR(...) do {} while (0);
 
-void uni_mkblock (memory_address block_name_addr, STRING_TYPE str_type){
-  if (str_type != T_STRING) {
-    yyerror("");
+void uni_mkblock (memory_address block_name_addr){
+  memory_item *root_list = memoryGetRootItem(g_memory, block_name_addr);
+  if (root_list->list->used != 1 ||
+      memoryGetRootType(g_memory, root_list->list->pointers[0]) != t_str) {
+    yyerror("runtime error"
+            " (mkblock takes only one parameter of type string!)");
     return;
   }
 
@@ -16,19 +19,22 @@ void uni_mkblock (memory_address block_name_addr, STRING_TYPE str_type){
    * then decide if it should dup it or just use and then free the place in
    * memory (also TODO: make memory esable by item for optimization) */
   outputCreateMemBlock(
-      strdup(memoryGetRootItem(g_memory, block_name_addr)->str));
+      strdup(memoryGetRootItem(g_memory, root_list->list->pointers[0])->str));
 }
 
-void uni_set_color(memory_address color_name_addr, STRING_TYPE str_type) {
-  if (str_type != T_STRING) {
-    yyerror("");
+void uni_set_color(memory_address color_name_addr) {
+  memory_item *root_list = memoryGetRootItem(g_memory, color_name_addr);
+  if (root_list->list->used != 1 ||
+      memoryGetRootType(g_memory, root_list->list->pointers[0]) != t_str) {
+    yyerror("runtime error"
+            " (set_color takes only one parameter of type string!)");
     return;
   }
 
   if (g_current_print_color != NULL)
     free(g_current_print_color);
 
-  char *tmp = memoryGetRootItem(g_memory, color_name_addr)->str;
+  char *tmp = memoryGetRootItem(g_memory, root_list->list->pointers[0])->str;
   if (strcmp(tmp, "default") == 0)
     g_current_print_color = strdup(KDEFAULT);
   else if (strcmp(tmp, "red") == 0)
@@ -47,15 +53,29 @@ void uni_set_color(memory_address color_name_addr, STRING_TYPE str_type) {
     yyerror("runtime error (color name not found)");
 }
 
-void uni_print(memory_address string_addr, STRING_TYPE str_type) {
-  if (str_type != T_STRING) {
-    yyerror("");
-    return;
+void uni_print(memory_address string_list_addr) {
+  memory_item *root_list = memoryGetRootItem(g_memory, string_list_addr);
+
+  for (size_t i=0; i<root_list->list->used; i++)
+    if (memoryGetRootType(g_memory, root_list->list->pointers[i]) != t_str) {
+      yyerror("runtime error (one of the arguments passed to print function is't of type string)");
+      return;
+    }
+
+
+  for (size_t i = 0; i < root_list->list->used; i++) {
+    memory_item *root_item;
+    root_item = memoryGetRootItem(g_memory, root_list->list->pointers[i]);
+
+    /* printf("%d", memoryGetRootType(
+     *                  g_memory, memoryGetRootAddress(
+     *                                g_memory, root_list->list->pointers[i]))); */
+
+    printf("%s%s" KDEFAULT,
+           g_current_print_color != NULL ? g_current_print_color : KDEFAULT,
+           root_item->str);
   }
 
-  printf(KDEFAULT "%s%s" KDEFAULT,
-         g_current_print_color != NULL ? g_current_print_color : "",
-         memoryGetRootItem(g_memory, string_addr)->str);
 }
 
 void uni_garbage_collect() {

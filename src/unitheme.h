@@ -170,9 +170,11 @@ void runLex(const char *filename);
 
 void handlePointerAssig(char *to_name, char *from_name);
 
-void handleAssigDef(char *var_name, memory_address content, STRING_TYPE str_type);
+void handleAssigDef(char *var_name, memory_address content);
 
-void handleListDef(char *list_name, t_ptr_list *content, STRING_TYPE str_type);
+void handleFuncCall(char *func_name, memory_address param_list_address);
+
+/* void handleListDef(char *list_name, t_ptr_list *content, STRING_TYPE str_type); */
 
 /* ---------------------------------------------------------------------- */
 

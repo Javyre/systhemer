@@ -352,7 +352,7 @@ void handlePointerAssig(char *to_name, char *from_name) {
   free(from_name);
 }
 
-void handleAssigDef(char *var_name, memory_address content, STRING_TYPE str_type) {
+void handleAssigDef(char *var_name, memory_address content) {
   memory_address address;
 
   /* keep parsing but dont actually handle anything if errors occure */
@@ -399,46 +399,47 @@ void handleAssigDef(char *var_name, memory_address content, STRING_TYPE str_type
   /* VERBOSE_PRINT(BKYEL "variable %s is:\t %s", var_name, content); */
 }
 
-void handleListDef(char *list_name, t_ptr_list *content, STRING_TYPE str_type) {
-  /* keep parsing but dont actually handle anything if errors occure */
-  if (yyerror_count != 0) {
-    ptrListFree(content);
-    free(content);
-    free(list_name);
-    return;
-  }
+/* void handleListDef(char *list_name, t_ptr_list *content, STRING_TYPE str_type) {
+ *   memory_address address;
+ *   /\* keep parsing but dont actually handle anything if errors occure *\/
+ *   if (yyerror_count != 0) {
+ *     ptrListFree(content);
+ *     free(content);
+ *     free(list_name);
+ *     return;
+ *   }
+ * 
+ *   /\* create mem_item for insertion into memory *\/
+ *   memory_item *mem_item = malloc(sizeof(memory_item));
+ *   mem_item->list = content;
+ * 
+ *   /\* insert item and keep address *\/
+ *   address = memoryInsert(g_memory, mem_item, t_list);
+ * 
+ *   /\* generate friendly name pointer *\/
+ *   friendlyInsert(g_friendlies, list_name, address);
+ * 
+ *   /\* handling built-in variables is different than user-created ones *\/
+ *   /\* if (strcmp(list_name, "tokens") == 0) { *\/
+ *   /\*   currentProg->tokens = content; *\/
+ *   /\* } else if (strcmp(list_name, "snippets") == 0) { *\/
+ *   /\*   currentProg->snippets = content; *\/
+ *   /\* } else { *\/
+ *   /\*   varsInsertList(g_variables, content, list_name, str_type); *\/
+ *   /\* } *\/
+ * 
+ *   for (size_t i = 0; i < g_memory->content[address]->list->used; i++) {
+ *     VERBOSE_PRINT(BKYEL "%s %s content is: %lu %s",
+ *                   (str_type == T_STRING ? "string" : str_type == T_REGEX ? "regex" : "unknown"),
+ *                   memoryGetFriendlyByAddress(g_friendlies, address),
+ *                   (unsigned long)g_memory->content[address]->list->pointers[i],
+ *                   g_memory->content[memoryGetRootAddress(g_memory, g_memory->content[address]->list->pointers[i])]->str
+ *                   );
+ *   }
+ * } */
 
-  /* create mem_item for insertion into memory */
-  memory_item *mem_item = malloc(sizeof(memory_item));
-  mem_item->list = content;
 
-  /* insert item and keep address */
-  memory_address address = memoryInsert(g_memory, mem_item, t_list);
-
-  /* generate friendly name pointer */
-  friendlyInsert(g_friendlies, list_name, address);
-
-  /* handling built-in variables is different than user-created ones */
-  /* if (strcmp(list_name, "tokens") == 0) { */
-  /*   currentProg->tokens = content; */
-  /* } else if (strcmp(list_name, "snippets") == 0) { */
-  /*   currentProg->snippets = content; */
-  /* } else { */
-  /*   varsInsertList(g_variables, content, list_name, str_type); */
-  /* } */
-
-  for (size_t i = 0; i < g_memory->content[address]->list->used; i++) {
-    VERBOSE_PRINT(BKYEL "%s %s content is: %lu %s",
-                  (str_type == T_STRING ? "string" : str_type == T_REGEX ? "regex" : "unknown"),
-                  memoryGetFriendlyByAddress(g_friendlies, address),
-                  (unsigned long)g_memory->content[address]->list->pointers[i],
-                  g_memory->content[memoryGetRootAddress(g_memory, g_memory->content[address]->list->pointers[i])]->str
-                  );
-  }
-}
-
-
-void handleFuncCall(char *func_name, memory_address param_address, STRING_TYPE param_type) {
+void handleFuncCall(char *func_name, memory_address param_list_address) {
   /* keep parsing but dont actually handle anything if errors occur */
   if (yyerror_count != 0) {
     /* if (1) { */
@@ -446,14 +447,14 @@ void handleFuncCall(char *func_name, memory_address param_address, STRING_TYPE p
     free(func_name);
     return;
   }
-  
+
   /* Built-in functions (written here in C) */
   if (strcmp(func_name, "mkblock") == 0)
-    uni_mkblock(param_address, param_type);
+    uni_mkblock(param_list_address);
   else if (strcmp(func_name, "print") == 0)
-    uni_print(param_address, param_type);
+    uni_print(param_list_address);
   else if (strcmp(func_name, "set_color") == 0)
-    uni_set_color(param_address, param_type);
+    uni_set_color(param_list_address);
   else {
     yyerror("Runtime error while running function: function does not exist");
     free(func_name);

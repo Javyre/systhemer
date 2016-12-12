@@ -1,33 +1,46 @@
-def string path  =       "../files/test/testcfg";
-def regex  foo =       /testcfg/;
-def string pathd  =       "../files/test/testcfg";
+def path  =       "../files/test/testcfg";
+def foo =       /testcfg/;
+def pathd  =       "../files/test/testcfg";
 
-def string bar = {
+def bar = {
   "item1",
   "item2",
   "item3"
   , "tasd", "asdasdaasds"
 };
 
-def regex baz = {/item1/, /item2/, /item3/};
+def baz = {/item1/, /item2/, /item3/};
 
 def goo = baz;
 
-def regex p1 = /a/;
-def regex p2 = /b/;
-def regex p3 = /c/;
+def p1 = /a/;
+def p2 = /b/;
+def p3 = /c/;
 
-def regex lkj = { p1 };
-def regex rlist = { p1, p2, p3 };
+def lkj = { p1 };
+def rlist = { p1, p2, p3 };
 
 # ---------- defining first block -----------
-print("Making block names first def...\n");
-mkblock("first def");
-print("Block \"def\" should now be created\n");
+print{"Making block names first def...\n"};
+mkblock{"first def"};
+print{"Block \"def\" should now be created\n"};
 
-set_color("bold_red");
-print("WADDUP\t\tasdasdjahk\n");
-set_color("default");
-print("default color now\n");
+set_color{"bold_red"};
+print{"WADDUP\t\tasdasdjahk\n"};
+set_color{"default"};
+print{"default color now\n"};
 
-def string firstField = "Hello, world!";
+print{"waht\n"};
+
+
+
+def list1 = {"1", {"98089", "79679"}};
+
+
+def pr = {"test\n"};
+print pr;
+
+def ppr = "test2";
+print {"ppr is: ", ppr, "\n"};
+
+def firstField = "Hello, world!";

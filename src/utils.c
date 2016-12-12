@@ -50,8 +50,8 @@ void parseArgs(int argc, char *argv[]) {
 
   /* set non '-' argument to be the file path */
   g_uth_fpath = NULL;
-  for (int ac=0; ac<argc; ac++) {
-    printf("%s\n", argv[ac]);
+  for (int ac=1; ac<argc; ac++) {
+    /* printf("arg %s\n", argv[ac]); */
     if (argv[ac][0] != '-')
       g_uth_fpath = argv[ac];
   }
@@ -130,6 +130,7 @@ char *strMkCpyInRange(const char *from, size_t numchars) {
 }
 char *strMkCpy(const char *in) { return strMkCpyInRange(in, 0); }
 
+/* NOTE: marked for removal on next code cleanup */
 void strTrim(char *in) {
   char *firstin = in; // Hold position of first char in char* in
   char *source = in;  // Used to rewrite char* in
@@ -157,6 +158,7 @@ void strTrim(char *in) {
   in = firstin;
 }
 
+/* NOTE: marked for removal on next code cleanup */
 void strTrimInRange(char *from, char *to) {
   char *src = from;    // Hold position of first char in char* in
   char *source = from; // Used to rewrite char* in

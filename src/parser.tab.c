@@ -424,16 +424,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  18
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   27
+#define YYLAST   26
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  19
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  13
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  24
+#define YYNRULES  23
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  38
+#define YYNSTATES  37
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -483,7 +483,7 @@ static const yytype_uint8 yyrline[] =
 {
        0,    48,    48,    49,    50,    51,    52,    55,    62,    63,
       64,    68,    81,    98,   112,   117,   131,   139,   148,   154,
-     155,   170,   171,   174,   183
+     170,   171,   174,   183
 };
 #endif
 
@@ -528,7 +528,7 @@ static const yytype_int8 yypact[] =
      -10,   -12,    -3,     0,     5,     6,   -13,     9,    -3,   -13,
      -13,   -13,   -13,   -13,    -3,   -13,   -13,   -13,   -13,    16,
       17,    18,   -13,   -13,    -3,    -2,   -13,   -13,    11,   -13,
-     -13,   -13,   -13,   -13,    15,   -13,    15,   -13
+     -13,   -13,   -13,   -13,   -13,   -13,   -13
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -536,16 +536,16 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     0,     7,     0,     0,    23,
-      24,    10,    11,     8,    13,     9,    21,    22,     1,     0,
+       0,     0,     0,     0,     0,     0,     7,     0,     0,    22,
+      23,    10,    11,     8,    13,     9,    20,    21,     1,     0,
        0,     0,     3,     5,     0,     0,    17,    18,     0,    14,
-       6,     2,     4,    12,    16,    19,    15,    20
+       6,     2,     4,    12,    16,    19,    15
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -13,   -13,    22,    -5,    23,   -13,   -13,   -13,    13,   -13,
+     -13,   -13,    21,    -5,    22,   -13,   -13,   -13,    12,   -13,
      -13,   -13,   -13
 };
 
@@ -563,14 +563,14 @@ static const yytype_uint8 yytable[] =
 {
       18,    19,     1,    25,    34,     8,     7,    35,     2,    28,
       22,    23,     1,     9,    10,    11,    24,    36,     2,    33,
-      35,    30,    31,    32,    37,    20,    21,    29
+      35,    30,    31,    32,    20,    21,    29
 };
 
 static const yytype_uint8 yycheck[] =
 {
        0,     1,    12,     8,     6,     8,    18,     9,    18,    14,
        5,     5,    12,    16,    17,    18,     7,     6,    18,    24,
-       9,     5,     5,     5,     9,     3,     3,    14
+       9,     5,     5,     5,     3,     3,    14
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -580,7 +580,7 @@ static const yytype_uint8 yystos[] =
        0,    12,    18,    20,    21,    23,    24,    18,     8,    16,
       17,    18,    22,    25,    26,    29,    30,    31,     0,     1,
       21,    23,     5,     5,     7,    22,    27,    28,    22,    27,
-       5,     5,     5,    22,     6,     9,     6,     9
+       5,     5,     5,    22,     6,     9,     6
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -588,7 +588,7 @@ static const yytype_uint8 yyr1[] =
 {
        0,    19,    20,    20,    20,    20,    20,    21,    22,    22,
       22,    23,    24,    25,    26,    26,    26,    26,    27,    28,
-      28,    29,    29,    30,    31
+      29,    29,    30,    31
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -596,7 +596,7 @@ static const yytype_uint8 yyr2[] =
 {
        0,     2,     3,     2,     3,     2,     3,     1,     1,     1,
        1,     2,     4,     1,     2,     3,     3,     2,     1,     2,
-       3,     1,     1,     1,     1
+       1,     1,     1,     1
 };
 
 
@@ -1488,13 +1488,7 @@ yyreduce:
 #line 1489 "parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 155 "parser.y" /* yacc.c:1646  */
-    { (yyval.addr) = (yyvsp[-2].addr); }
-#line 1495 "parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 23:
+  case 22:
 #line 174 "parser.y" /* yacc.c:1646  */
     {
   memory_item *item = malloc(sizeof(memory_item));
@@ -1503,10 +1497,10 @@ yyreduce:
   strUnstring(&g_memory->content[memoryGetRootAddress(g_memory, (yyval.addr))]->str);
   VERBOSE_PRINT("string litteral %s in %lu"  , g_memory->content[memoryGetRootAddress(g_memory, (yyval.addr))]->str , (unsigned long)(yyval.addr));
  }
-#line 1507 "parser.tab.c" /* yacc.c:1646  */
+#line 1501 "parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
+  case 23:
 #line 183 "parser.y" /* yacc.c:1646  */
     {
   memory_item *item = malloc(sizeof(memory_item));
@@ -1515,11 +1509,11 @@ yyreduce:
   regexUnregex(&g_memory->content[memoryGetRootAddress(g_memory, (yyval.addr))]->str);
   VERBOSE_PRINT("regex litteral %s in %lu"  , g_memory->content[memoryGetRootAddress(g_memory, (yyval.addr))]->str, (unsigned long)(yyval.addr));
  }
-#line 1519 "parser.tab.c" /* yacc.c:1646  */
+#line 1513 "parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1523 "parser.tab.c" /* yacc.c:1646  */
+#line 1517 "parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

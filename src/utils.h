@@ -130,6 +130,8 @@ char *g_uth_fpath;
 bool verboseMode;
 bool exit_on_err;
 bool warnings_on;
+bool o_illustrate_recursive_list;
+bool o_illustrate_print_non_friendlied;
 
 #ifndef NDEBUG
 bool testsMode;

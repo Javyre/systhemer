@@ -45,6 +45,8 @@ void parseArgs(int argc, char *argv[]) {
     {"version"  , no_argument, NULL, 'V'},
     {"verbose"  , no_argument, NULL, 'v'},
     {"warnings" , no_argument, NULL, 'w'},
+    {"illustrate-recursive-list", no_argument, NULL, 'r'},
+    {"illustrate-print-non-friendlied", no_argument, NULL, 'F'},
     {"exitonerr", no_argument, NULL, 'e'}};
   int opt;
 
@@ -67,7 +69,7 @@ void parseArgs(int argc, char *argv[]) {
 #ifndef NDEBUG
                             "t"
 #endif
-                            "hVvew", long_options, NULL)) != -1) {
+                            "hVvewrF", long_options, NULL)) != -1) {
     switch (opt) {
 #ifndef NDEBUG
     case 't':
@@ -94,6 +96,12 @@ void parseArgs(int argc, char *argv[]) {
     case 'w':
       warnings_on = true;
       printf("%s: Warnings enabled '%c'\n", PACKAGE, optopt);
+      break;
+    case 'r':
+      o_illustrate_recursive_list = true;
+      break;
+    case 'F':
+      o_illustrate_print_non_friendlied = true;
       break;
     case '?':
       fprintf(stderr, "%s: Error - No such option: `%c'\n\n", PACKAGE, optopt);

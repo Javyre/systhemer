@@ -32,7 +32,7 @@ print{"default color now\n"};
 
 print{"waht\n"};
 
-
+def g = {"test item",; # <-- should not work (parser bug)
 
 def list1 = {"1", {"98089", "79679"}};
 

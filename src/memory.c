@@ -81,7 +81,7 @@ memory_address memoryGetRootAddress(memory_holder *mem, memory_address mem_addr)
   printf(BKGRN);
 
   if (verboseMode)
-    memoryIllustrateItem(NULL, mem, mem_addr, 999);
+    memoryIllustrateItem(NULL, mem, mem_addr, 999, true);
 
   while (mem->content_type[mem_addr] == t_addr) {
     mem_addr = mem->content[mem_addr]->address;
@@ -92,12 +92,13 @@ memory_address memoryGetRootAddress(memory_holder *mem, memory_address mem_addr)
 void memoryIllustrateMap(friendly_names *friendly, memory_holder *mem,
                           size_t depth) {
   for (memory_address i=0; i<mem->used; i++) {
-    memoryIllustrateItem(friendly, mem, i, depth);
+    if (memoryGetFriendlyByAddress_se(friendly, i) != NULL || o_illustrate_print_non_friendlied)
+      memoryIllustrateItem(friendly, mem, i, depth, true);
   }
 }
 
 void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
-                          memory_address i, size_t depth) {
+                          memory_address i, size_t depth, bool do_newline) {
   char buff[(256 * 8) + 1];
   char list_content[(256*8)+1];
   char *name, *name2;
@@ -129,7 +130,10 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
     }
     /* we treat t_str and t_rgx as final values
      * so we terminate the buff string and return */
-    printf(BKCYN "%s\n" KDEFAULT, buff);
+    if (do_newline)
+      printf(BKCYN "%s\n" KDEFAULT, buff);
+    else
+      printf(BKCYN "%s" KDEFAULT, buff);
     buff[0] = '\0';
     list_content[0] = '\0';
     fname[0] = '\0';
@@ -138,42 +142,52 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
   /* if it's a list */
   } else if (mem->content_type[i] == t_list) {
     /* following line is to avoid appending to non-initialized string */
-    list_content[0] = '\0';
+    /* list_content[0] = '\0'; */
+
+    if (name != NULL) {
+      strcatf(buff, BKYEL "<" BKCYN);
+    } else {
+      strcatf(buff, "<");
+    }
+    printf(BKCYN "%s" KDEFAULT, buff);
 
     /* Print contents of list (not expanding like for addresses section) */
     for (size_t ii=0; ii<mem->content[i]->list->used; ii++) {
-      strcatf(list_content, "%lu, ", (unsigned long)mem->content[i]->list->pointers[ii]);
-    }
-    /* finish off the string */
-    list_content[strlen(list_content)-2] = '\0';
-    /* if has a friendly name then highlight it while adding to the buff string */
-    if (name != NULL) {
-      strcatf(buff, BKYEL "[%s]" BKCYN, list_content);
-    } else {
-      strcatf(buff, "[%s]", list_content);
+      /* strcatf(list_content, "%lu, ", (unsigned long)mem->content[i]->list->pointers[ii]); */
+      if (o_illustrate_recursive_list)
+        memoryIllustrateItem(friendly, mem, mem->content[i]->list->pointers[ii],
+                             depth - 1, false);
+      else
+        printf(BKCYN "[%lu]", (unsigned long)mem->content[i]->list->pointers[ii]);
+      if (ii != mem->content[i]->list->used-1)
+        printf(BKCYN ", ");
     }
 
+    if (name != NULL) {
+      printf(BKYEL ">%s" KDEFAULT, do_newline ? "\n" : "");
+    } else {
+      printf(BKCYN ">%s" KDEFAULT, do_newline ? "\n" : "");
+    }
+    /* finish off the string */
+    /* list_content[strlen(list_content)-2] = '\0'; */
+    /* if has a friendly name then highlight it while adding to the buff string */
+    /* if (name != NULL) { */
+    /*   strcatf(buff, BKYEL "[%s]" BKCYN, list_content); */
+    /* } else { */
+    /*   strcatf(buff, "[%s]", list_content); */
+    /* } */
+
     /* for now, we treat list as final item and return */
-    printf(BKCYN "%s\n" KDEFAULT, buff);
+    /* printf(BKCYN "%s\n" KDEFAULT, buff); */
     buff[0] = '\0';
     list_content[0] = '\0';
     fname[0] = '\0';
     return;
 
 
-    /* if it's a pointer to another memoryitem */
+  /* if it's a pointer to another memoryitem */
   } else if (mem->content_type[i] == t_addr) {
     a = i;
-    /* find root address while printing every address in the chain */
-    /* while (mem->content_type[a] == t_addr) { */
-    /*   a = mem->content[a]->address; */
-    /*   name2 = memoryGetFriendlyByAddress_se(friendly, a); */
-    /*   sprintf(fname2, "%s%s" BKCYN, (name2 != NULL ? " - " BKYEL : ""), (name2!= NULL ? name2 : "")); */
-    /*   if (name2 != NULL) */
-    /*     sprintf(buff+strlen(buff), "[" BKGRN "%lu" BKCYN "%s]->", (unsigned long)a, fname2); */
-    /*   else */
-    /*     sprintf(buff+strlen(buff), "[%lu%s]->", (unsigned long)a, fname2); */
-    /* } */
 
     printf(BKCYN "%s", buff);
     buff[0] = '\0';
@@ -182,21 +196,16 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
 
     a = mem->content[a]->address;
     if ((depth-1)>0) {
-      memoryIllustrateItem(friendly, mem, a, depth-1);
+      memoryIllustrateItem(friendly, mem, a, depth-1, do_newline);
       printf(KDEFAULT);
     } else {
-      printf(BKCYN "\n" KDEFAULT);
+      if (do_newline)
+        printf(BKCYN "\n" KDEFAULT);
+      else
+        printf(KDEFAULT);
       return;
     }
-
   }
-
-  /* if (depth == 0) { */
-  /*   printf(BKCYN "%s\n" KDEFAULT, buff); */
-  /*   buff[0] = '\0'; */
-  /*   list_content[0] = '\0'; */
-  /*   fname[0] = '\0'; */
-  /* } */
 }
 
 memory_address memoryGetAddresByFriendly(friendly_names *friendly, char *identifier) {

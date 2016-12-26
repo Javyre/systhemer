@@ -58,16 +58,28 @@ definition
 /* function_call
  *  : TIDENTIFIER LPAREN string_p RPAREN { handleFuncCall($1, $3, T_STRING); } */
 
+pointer
+: list_content_p
+| str_p
+| TIDENTIFIER { $$ = memoryGetAddresByFriendly(g_friendlies, $1); free($1); }
+
 function_call
- : TIDENTIFIER list_content_p { handleFuncCall($1, $2); }
- | TIDENTIFIER TIDENTIFIER    {
-   handleFuncCall($1, memoryGetAddresByFriendly(g_friendlies, $2));
-   free($2);
+ /* : TIDENTIFIER list_content_p { handleFuncCall($1, $2); } */
+ : TIDENTIFIER pointer        {
+   if(memoryGetRootType(g_memory, $2) == t_list) {
+     handleFuncCall($1, $2);
+   } else {
+     yyerror("semantic error (pointer root does not represent a list)");
+   }
  }
+/* | TIDENTIFIER TIDENTIFIER    {
+ *   handleFuncCall($1, memoryGetAddresByFriendly(g_friendlies, $2));
+ *   free($2);
+ * } */
 
 variable_def
 : KDEF TIDENTIFIER KEQUALS pointer         { handleAssigDef($2, $4); }
-| KDEF TIDENTIFIER KEQUALS TIDENTIFIER     { handlePointerAssig($2, $4); }
+/* | KDEF TIDENTIFIER KEQUALS TIDENTIFIER     { handlePointerAssig($2, $4); } */
  /* : KDEF TIDENTIFIER KEQUALS string_p        { handleAssigDef($2, $4); }
   * | KDEF TIDENTIFIER KEQUALS regex_p         { handleAssigDef($2, $4); }
   * | KDEF TIDENTIFIER KEQUALS TIDENTIFIER     { handlePointerAssig($2, $4); }
@@ -81,9 +93,6 @@ variable_def
 /* list_def
  *  : KDEF KSTRING TIDENTIFIER KEQUALS list_content { handleListDef($3, $5, T_STRING); }
  *  | KDEF KREGEX  TIDENTIFIER KEQUALS list_content { handleListDef($3, $5, T_REGEX); } */
-pointer
-: list_content_p
-| str_p
 
 list_content_p
  : list_content {
@@ -105,25 +114,26 @@ list_content
    VERBOSE_PRINT("-last list item: \t%lu into (%p)", (unsigned long)$2, $$);
  }
 /* nth item */
- | list_content str_p KCOMMA {
+ | list_content pointer KCOMMA {
    ptrListInsert($$, $2);
    VERBOSE_PRINT("-list item: \t%lu into (%p)", (unsigned long)$2, $$);
  }
-| list_content TIDENTIFIER KCOMMA {
-  memory_address address = memoryGetAddresByFriendly(g_friendlies , $2);
-  free($2);
-  /* if (g_memory->content_type[(memoryGetRootAddress(g_memory, address))] != t_rgx)
-   *   yyerror("type missmatch"); */
-  ptrListInsert($$, address);
-  VERBOSE_PRINT("-list item: \t%lu into (%p)", (unsigned long)$2, $$);
- }
+/* | list_content TIDENTIFIER KCOMMA {
+ *   memory_address address = memoryGetAddresByFriendly(g_friendlies , $2);
+ *   free($2);
+ *   /\* if (g_memory->content_type[(memoryGetRootAddress(g_memory, address))] != t_rgx)
+ *    *   yyerror("type missmatch"); *\/
+ *   ptrListInsert($$, address);
+ *   VERBOSE_PRINT("-list item: \t%lu into (%p)", (unsigned long)$2, $$);
+ *  } */
 /* first item */
- | first_list_item {
+ /* | first_list_item { */
+ | LBRACE pointer KCOMMA {
    $$ = (t_ptr_list *)malloc(sizeof(t_ptr_list));
    ptrListInit($$, 20);
 
-   ptrListInsert($$, $1);
-   VERBOSE_PRINT("-first list item: \t%lu into (%p)", (unsigned long)$1, $$);
+   ptrListInsert($$, $2);
+   VERBOSE_PRINT("-first list item: \t%lu into (%p)", (unsigned long)$2, $$);
  }
 /* only item */
  | LBRACE last_list_item {
@@ -141,21 +151,18 @@ last_list_item
  }
 
 last_list_itemp
-: str_p                 RBRACE      { $$ = $1; }
-| str_p          KCOMMA RBRACE      { $$ = $1; }
-| list_content_p        RBRACE      { $$ = $1; }
-| list_content_p KCOMMA RBRACE      { $$ = $1; }
-| TIDENTIFIER           RBRACE      { $$ = memoryGetAddresByFriendly(g_friendlies , $1); free($1); }
-| TIDENTIFIER    KCOMMA RBRACE      { $$ = memoryGetAddresByFriendly(g_friendlies , $1); free($1); }
+: pointer               RBRACE      { $$ = $1; }
+/* | pointer        KCOMMA RBRACE      { $$ = $1; } /\* CAUSES SHIFT/REDUCE CONFLICT *\/ */
+/* | TIDENTIFIER           RBRACE      { $$ = memoryGetAddresByFriendly(g_friendlies , $1); free($1); }
+ * | TIDENTIFIER    KCOMMA RBRACE      { $$ = memoryGetAddresByFriendly(g_friendlies , $1); free($1); } */
 
-first_list_item
-: LBRACE str_p          KCOMMA { $$ = $2; }
-| LBRACE list_content_p KCOMMA { $$ = $2; }
-| LBRACE TIDENTIFIER    KCOMMA { $$ = memoryGetAddresByFriendly(g_friendlies , $2);
-   free($2);
-   /* if (g_memory->content_type[(memoryGetRootAddress(g_memory, $$))] != t_str)
-    *   yyerror("type missmatch"); */
- }
+/* first_list_item */
+/* : LBRACE pointer        KCOMMA      { $$ = $2; } */
+/* | LBRACE TIDENTIFIER    KCOMMA { $$ = memoryGetAddresByFriendly(g_friendlies , $2);
+ *    free($2);
+ *    /\* if (g_memory->content_type[(memoryGetRootAddress(g_memory, $$))] != t_str)
+ *     *   yyerror("type missmatch"); *\/
+ *  } */
 
 /* --------------------------------------------------------------------------- */
 

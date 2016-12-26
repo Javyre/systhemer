@@ -1,0 +1,941 @@
+<?xml version="1.0"?>
+
+<bison-xml-report version="3.0.4" bug-report="bug-bison@gnu.org" url="http://www.gnu.org/software/bison/">
+
+  <filename>parser.y</filename>
+
+  <grammar>
+    <rules>
+      <rule number="0" usefulness="useful">
+        <lhs>$accept</lhs>
+        <rhs>
+          <symbol>line</symbol>
+          <symbol>$end</symbol>
+        </rhs>
+      </rule>
+      <rule number="1" usefulness="useful">
+        <lhs>line</lhs>
+        <rhs>
+          <symbol>line</symbol>
+          <symbol>definition</symbol>
+          <symbol>KSEMI</symbol>
+        </rhs>
+      </rule>
+      <rule number="2" usefulness="useful">
+        <lhs>line</lhs>
+        <rhs>
+          <symbol>definition</symbol>
+          <symbol>KSEMI</symbol>
+        </rhs>
+      </rule>
+      <rule number="3" usefulness="useful">
+        <lhs>line</lhs>
+        <rhs>
+          <symbol>line</symbol>
+          <symbol>function_call</symbol>
+          <symbol>KSEMI</symbol>
+        </rhs>
+      </rule>
+      <rule number="4" usefulness="useful">
+        <lhs>line</lhs>
+        <rhs>
+          <symbol>function_call</symbol>
+          <symbol>KSEMI</symbol>
+        </rhs>
+      </rule>
+      <rule number="5" usefulness="useful">
+        <lhs>line</lhs>
+        <rhs>
+          <symbol>line</symbol>
+          <symbol>error</symbol>
+          <symbol>KSEMI</symbol>
+        </rhs>
+      </rule>
+      <rule number="6" usefulness="useful">
+        <lhs>definition</lhs>
+        <rhs>
+          <symbol>variable_def</symbol>
+        </rhs>
+      </rule>
+      <rule number="7" usefulness="useful">
+        <lhs>pointer</lhs>
+        <rhs>
+          <symbol>list_content_p</symbol>
+        </rhs>
+      </rule>
+      <rule number="8" usefulness="useful">
+        <lhs>pointer</lhs>
+        <rhs>
+          <symbol>str_p</symbol>
+        </rhs>
+      </rule>
+      <rule number="9" usefulness="useful">
+        <lhs>pointer</lhs>
+        <rhs>
+          <symbol>TIDENTIFIER</symbol>
+        </rhs>
+      </rule>
+      <rule number="10" usefulness="useful">
+        <lhs>function_call</lhs>
+        <rhs>
+          <symbol>TIDENTIFIER</symbol>
+          <symbol>pointer</symbol>
+        </rhs>
+      </rule>
+      <rule number="11" usefulness="useful">
+        <lhs>variable_def</lhs>
+        <rhs>
+          <symbol>KDEF</symbol>
+          <symbol>TIDENTIFIER</symbol>
+          <symbol>KEQUALS</symbol>
+          <symbol>pointer</symbol>
+        </rhs>
+      </rule>
+      <rule number="12" usefulness="useful">
+        <lhs>list_content_p</lhs>
+        <rhs>
+          <symbol>list_content</symbol>
+        </rhs>
+      </rule>
+      <rule number="13" usefulness="useful">
+        <lhs>list_content</lhs>
+        <rhs>
+          <symbol>list_content</symbol>
+          <symbol>last_list_item</symbol>
+        </rhs>
+      </rule>
+      <rule number="14" usefulness="useful">
+        <lhs>list_content</lhs>
+        <rhs>
+          <symbol>list_content</symbol>
+          <symbol>pointer</symbol>
+          <symbol>KCOMMA</symbol>
+        </rhs>
+      </rule>
+      <rule number="15" usefulness="useful">
+        <lhs>list_content</lhs>
+        <rhs>
+          <symbol>first_list_item</symbol>
+        </rhs>
+      </rule>
+      <rule number="16" usefulness="useful">
+        <lhs>list_content</lhs>
+        <rhs>
+          <symbol>LBRACE</symbol>
+          <symbol>last_list_item</symbol>
+        </rhs>
+      </rule>
+      <rule number="17" usefulness="useful">
+        <lhs>last_list_item</lhs>
+        <rhs>
+          <symbol>last_list_itemp</symbol>
+        </rhs>
+      </rule>
+      <rule number="18" usefulness="useful">
+        <lhs>last_list_itemp</lhs>
+        <rhs>
+          <symbol>pointer</symbol>
+          <symbol>RBRACE</symbol>
+        </rhs>
+      </rule>
+      <rule number="19" usefulness="useful">
+        <lhs>last_list_itemp</lhs>
+        <rhs>
+          <symbol>pointer</symbol>
+          <symbol>KCOMMA</symbol>
+          <symbol>RBRACE</symbol>
+        </rhs>
+      </rule>
+      <rule number="20" usefulness="useful">
+        <lhs>first_list_item</lhs>
+        <rhs>
+          <symbol>LBRACE</symbol>
+          <symbol>pointer</symbol>
+          <symbol>KCOMMA</symbol>
+        </rhs>
+      </rule>
+      <rule number="21" usefulness="useful">
+        <lhs>str_p</lhs>
+        <rhs>
+          <symbol>string_p</symbol>
+        </rhs>
+      </rule>
+      <rule number="22" usefulness="useful">
+        <lhs>str_p</lhs>
+        <rhs>
+          <symbol>regex_p</symbol>
+        </rhs>
+      </rule>
+      <rule number="23" usefulness="useful">
+        <lhs>string_p</lhs>
+        <rhs>
+          <symbol>TSTR</symbol>
+        </rhs>
+      </rule>
+      <rule number="24" usefulness="useful">
+        <lhs>regex_p</lhs>
+        <rhs>
+          <symbol>TRGXP</symbol>
+        </rhs>
+      </rule>
+    </rules>
+    <terminals>
+      <terminal symbol-number="0" token-number="0" name="$end" usefulness="useful"/>
+      <terminal symbol-number="1" token-number="256" name="error" usefulness="useful"/>
+      <terminal symbol-number="3" token-number="258" name="KSTRING" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="4" token-number="259" name="KREGEX" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="5" token-number="260" name="KSEMI" usefulness="useful"/>
+      <terminal symbol-number="6" token-number="261" name="KCOMMA" usefulness="useful"/>
+      <terminal symbol-number="7" token-number="262" name="KEQUALS" usefulness="useful"/>
+      <terminal symbol-number="8" token-number="263" name="LBRACE" usefulness="useful"/>
+      <terminal symbol-number="9" token-number="264" name="RBRACE" usefulness="useful"/>
+      <terminal symbol-number="10" token-number="265" name="KBEGINDEF" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="11" token-number="266" name="KENDDEF" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="12" token-number="267" name="KDEF" usefulness="useful"/>
+      <terminal symbol-number="13" token-number="268" name="KPERIOD" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="14" token-number="269" name="LPAREN" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="15" token-number="270" name="RPAREN" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="16" token-number="271" name="TSTR" usefulness="useful"/>
+      <terminal symbol-number="17" token-number="272" name="TRGXP" usefulness="useful"/>
+      <terminal symbol-number="18" token-number="273" name="TIDENTIFIER" usefulness="useful"/>
+    </terminals>
+    <nonterminals>
+      <nonterminal symbol-number="19" name="$accept" usefulness="useful"/>
+      <nonterminal symbol-number="20" name="line" usefulness="useful"/>
+      <nonterminal symbol-number="21" name="definition" usefulness="useful"/>
+      <nonterminal symbol-number="22" name="pointer" usefulness="useful"/>
+      <nonterminal symbol-number="23" name="function_call" usefulness="useful"/>
+      <nonterminal symbol-number="24" name="variable_def" usefulness="useful"/>
+      <nonterminal symbol-number="25" name="list_content_p" usefulness="useful"/>
+      <nonterminal symbol-number="26" name="list_content" usefulness="useful"/>
+      <nonterminal symbol-number="27" name="last_list_item" usefulness="useful"/>
+      <nonterminal symbol-number="28" name="last_list_itemp" usefulness="useful"/>
+      <nonterminal symbol-number="29" name="first_list_item" usefulness="useful"/>
+      <nonterminal symbol-number="30" name="str_p" usefulness="useful"/>
+      <nonterminal symbol-number="31" name="string_p" usefulness="useful"/>
+      <nonterminal symbol-number="32" name="regex_p" usefulness="useful"/>
+      <nonterminal symbol-number="33" name="first_list_itemp" usefulness="useless-in-grammar"/>
+    </nonterminals>
+  </grammar>
+
+  <automaton>
+
+    <state number="0">
+      <itemset>
+        <item rule-number="0" point="0"/>
+        <item rule-number="1" point="0"/>
+        <item rule-number="2" point="0"/>
+        <item rule-number="3" point="0"/>
+        <item rule-number="4" point="0"/>
+        <item rule-number="5" point="0"/>
+        <item rule-number="6" point="0"/>
+        <item rule-number="10" point="0"/>
+        <item rule-number="11" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KDEF" state="1"/>
+          <transition type="shift" symbol="TIDENTIFIER" state="2"/>
+          <transition type="goto" symbol="line" state="3"/>
+          <transition type="goto" symbol="definition" state="4"/>
+          <transition type="goto" symbol="function_call" state="5"/>
+          <transition type="goto" symbol="variable_def" state="6"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="1">
+      <itemset>
+        <item rule-number="11" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="TIDENTIFIER" state="7"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="2">
+      <itemset>
+        <item rule-number="7" point="0"/>
+        <item rule-number="8" point="0"/>
+        <item rule-number="9" point="0"/>
+        <item rule-number="10" point="1"/>
+        <item rule-number="12" point="0"/>
+        <item rule-number="13" point="0"/>
+        <item rule-number="14" point="0"/>
+        <item rule-number="15" point="0"/>
+        <item rule-number="16" point="0"/>
+        <item rule-number="20" point="0"/>
+        <item rule-number="21" point="0"/>
+        <item rule-number="22" point="0"/>
+        <item rule-number="23" point="0"/>
+        <item rule-number="24" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="LBRACE" state="8"/>
+          <transition type="shift" symbol="TSTR" state="9"/>
+          <transition type="shift" symbol="TRGXP" state="10"/>
+          <transition type="shift" symbol="TIDENTIFIER" state="11"/>
+          <transition type="goto" symbol="pointer" state="12"/>
+          <transition type="goto" symbol="list_content_p" state="13"/>
+          <transition type="goto" symbol="list_content" state="14"/>
+          <transition type="goto" symbol="first_list_item" state="15"/>
+          <transition type="goto" symbol="str_p" state="16"/>
+          <transition type="goto" symbol="string_p" state="17"/>
+          <transition type="goto" symbol="regex_p" state="18"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="3">
+      <itemset>
+        <item rule-number="0" point="1"/>
+        <item rule-number="1" point="1"/>
+        <item rule-number="3" point="1"/>
+        <item rule-number="5" point="1"/>
+        <item rule-number="6" point="0"/>
+        <item rule-number="10" point="0"/>
+        <item rule-number="11" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="$end" state="19"/>
+          <transition type="shift" symbol="error" state="20"/>
+          <transition type="shift" symbol="KDEF" state="1"/>
+          <transition type="shift" symbol="TIDENTIFIER" state="2"/>
+          <transition type="goto" symbol="definition" state="21"/>
+          <transition type="goto" symbol="function_call" state="22"/>
+          <transition type="goto" symbol="variable_def" state="6"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="4">
+      <itemset>
+        <item rule-number="2" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KSEMI" state="23"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="5">
+      <itemset>
+        <item rule-number="4" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KSEMI" state="24"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="6">
+      <itemset>
+        <item rule-number="6" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="6" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="7">
+      <itemset>
+        <item rule-number="11" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KEQUALS" state="25"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="8">
+      <itemset>
+        <item rule-number="7" point="0"/>
+        <item rule-number="8" point="0"/>
+        <item rule-number="9" point="0"/>
+        <item rule-number="12" point="0"/>
+        <item rule-number="13" point="0"/>
+        <item rule-number="14" point="0"/>
+        <item rule-number="15" point="0"/>
+        <item rule-number="16" point="0"/>
+        <item rule-number="16" point="1"/>
+        <item rule-number="17" point="0"/>
+        <item rule-number="18" point="0"/>
+        <item rule-number="19" point="0"/>
+        <item rule-number="20" point="0"/>
+        <item rule-number="20" point="1"/>
+        <item rule-number="21" point="0"/>
+        <item rule-number="22" point="0"/>
+        <item rule-number="23" point="0"/>
+        <item rule-number="24" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="LBRACE" state="8"/>
+          <transition type="shift" symbol="TSTR" state="9"/>
+          <transition type="shift" symbol="TRGXP" state="10"/>
+          <transition type="shift" symbol="TIDENTIFIER" state="11"/>
+          <transition type="goto" symbol="pointer" state="26"/>
+          <transition type="goto" symbol="list_content_p" state="13"/>
+          <transition type="goto" symbol="list_content" state="14"/>
+          <transition type="goto" symbol="last_list_item" state="27"/>
+          <transition type="goto" symbol="last_list_itemp" state="28"/>
+          <transition type="goto" symbol="first_list_item" state="15"/>
+          <transition type="goto" symbol="str_p" state="16"/>
+          <transition type="goto" symbol="string_p" state="17"/>
+          <transition type="goto" symbol="regex_p" state="18"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="9">
+      <itemset>
+        <item rule-number="23" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="23" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="10">
+      <itemset>
+        <item rule-number="24" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="24" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="11">
+      <itemset>
+        <item rule-number="9" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="9" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="12">
+      <itemset>
+        <item rule-number="10" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="10" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="13">
+      <itemset>
+        <item rule-number="7" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="7" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="14">
+      <itemset>
+        <item rule-number="7" point="0"/>
+        <item rule-number="8" point="0"/>
+        <item rule-number="9" point="0"/>
+        <item rule-number="12" point="0"/>
+        <item rule-number="12" point="1">
+          <lookaheads>
+            <symbol>KSEMI</symbol>
+            <symbol>KCOMMA</symbol>
+            <symbol>RBRACE</symbol>
+          </lookaheads>
+        </item>
+        <item rule-number="13" point="0"/>
+        <item rule-number="13" point="1"/>
+        <item rule-number="14" point="0"/>
+        <item rule-number="14" point="1"/>
+        <item rule-number="15" point="0"/>
+        <item rule-number="16" point="0"/>
+        <item rule-number="17" point="0"/>
+        <item rule-number="18" point="0"/>
+        <item rule-number="19" point="0"/>
+        <item rule-number="20" point="0"/>
+        <item rule-number="21" point="0"/>
+        <item rule-number="22" point="0"/>
+        <item rule-number="23" point="0"/>
+        <item rule-number="24" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="LBRACE" state="8"/>
+          <transition type="shift" symbol="TSTR" state="9"/>
+          <transition type="shift" symbol="TRGXP" state="10"/>
+          <transition type="shift" symbol="TIDENTIFIER" state="11"/>
+          <transition type="goto" symbol="pointer" state="29"/>
+          <transition type="goto" symbol="list_content_p" state="13"/>
+          <transition type="goto" symbol="list_content" state="14"/>
+          <transition type="goto" symbol="last_list_item" state="30"/>
+          <transition type="goto" symbol="last_list_itemp" state="28"/>
+          <transition type="goto" symbol="first_list_item" state="15"/>
+          <transition type="goto" symbol="str_p" state="16"/>
+          <transition type="goto" symbol="string_p" state="17"/>
+          <transition type="goto" symbol="regex_p" state="18"/>
+        </transitions>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="12" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="15">
+      <itemset>
+        <item rule-number="15" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="15" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="16">
+      <itemset>
+        <item rule-number="8" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="8" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="17">
+      <itemset>
+        <item rule-number="21" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="21" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="18">
+      <itemset>
+        <item rule-number="22" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="22" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="19">
+      <itemset>
+        <item rule-number="0" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="accept" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="20">
+      <itemset>
+        <item rule-number="5" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KSEMI" state="31"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="21">
+      <itemset>
+        <item rule-number="1" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KSEMI" state="32"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="22">
+      <itemset>
+        <item rule-number="3" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KSEMI" state="33"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="23">
+      <itemset>
+        <item rule-number="2" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="2" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="24">
+      <itemset>
+        <item rule-number="4" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="4" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="25">
+      <itemset>
+        <item rule-number="7" point="0"/>
+        <item rule-number="8" point="0"/>
+        <item rule-number="9" point="0"/>
+        <item rule-number="11" point="3"/>
+        <item rule-number="12" point="0"/>
+        <item rule-number="13" point="0"/>
+        <item rule-number="14" point="0"/>
+        <item rule-number="15" point="0"/>
+        <item rule-number="16" point="0"/>
+        <item rule-number="20" point="0"/>
+        <item rule-number="21" point="0"/>
+        <item rule-number="22" point="0"/>
+        <item rule-number="23" point="0"/>
+        <item rule-number="24" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="LBRACE" state="8"/>
+          <transition type="shift" symbol="TSTR" state="9"/>
+          <transition type="shift" symbol="TRGXP" state="10"/>
+          <transition type="shift" symbol="TIDENTIFIER" state="11"/>
+          <transition type="goto" symbol="pointer" state="34"/>
+          <transition type="goto" symbol="list_content_p" state="13"/>
+          <transition type="goto" symbol="list_content" state="14"/>
+          <transition type="goto" symbol="first_list_item" state="15"/>
+          <transition type="goto" symbol="str_p" state="16"/>
+          <transition type="goto" symbol="string_p" state="17"/>
+          <transition type="goto" symbol="regex_p" state="18"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="26">
+      <itemset>
+        <item rule-number="18" point="1"/>
+        <item rule-number="19" point="1"/>
+        <item rule-number="20" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KCOMMA" state="35"/>
+          <transition type="shift" symbol="RBRACE" state="36"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="27">
+      <itemset>
+        <item rule-number="16" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="16" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="28">
+      <itemset>
+        <item rule-number="17" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="17" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="29">
+      <itemset>
+        <item rule-number="14" point="2"/>
+        <item rule-number="18" point="1"/>
+        <item rule-number="19" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="KCOMMA" state="37"/>
+          <transition type="shift" symbol="RBRACE" state="36"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="30">
+      <itemset>
+        <item rule-number="13" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="13" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="31">
+      <itemset>
+        <item rule-number="5" point="3"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="5" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="32">
+      <itemset>
+        <item rule-number="1" point="3"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="1" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="33">
+      <itemset>
+        <item rule-number="3" point="3"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="3" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="34">
+      <itemset>
+        <item rule-number="11" point="4"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="11" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="35">
+      <itemset>
+        <item rule-number="19" point="2"/>
+        <item rule-number="20" point="3">
+          <lookaheads>
+            <symbol>KSEMI</symbol>
+            <symbol>KCOMMA</symbol>
+            <symbol>LBRACE</symbol>
+            <symbol>RBRACE</symbol>
+            <symbol>TSTR</symbol>
+            <symbol>TRGXP</symbol>
+            <symbol>TIDENTIFIER</symbol>
+          </lookaheads>
+        </item>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="RBRACE" state="38"/>
+        </transitions>
+        <errors/>
+        <reductions>
+          <reduction symbol="RBRACE" rule="20" enabled="false"/>
+          <reduction symbol="$default" rule="20" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="36">
+      <itemset>
+        <item rule-number="18" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="18" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="37">
+      <itemset>
+        <item rule-number="14" point="3">
+          <lookaheads>
+            <symbol>KSEMI</symbol>
+            <symbol>KCOMMA</symbol>
+            <symbol>LBRACE</symbol>
+            <symbol>RBRACE</symbol>
+            <symbol>TSTR</symbol>
+            <symbol>TRGXP</symbol>
+            <symbol>TIDENTIFIER</symbol>
+          </lookaheads>
+        </item>
+        <item rule-number="19" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="RBRACE" state="38"/>
+        </transitions>
+        <errors/>
+        <reductions>
+          <reduction symbol="RBRACE" rule="14" enabled="false"/>
+          <reduction symbol="$default" rule="14" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="38">
+      <itemset>
+        <item rule-number="19" point="3"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="19" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+  </automaton>
+</bison-xml-report>

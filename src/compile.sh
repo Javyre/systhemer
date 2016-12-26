@@ -2,7 +2,7 @@
 
 cd ../src
 flex uni_lex.lex
-bison -d parser.y
+bison -rall -d parser.y
 
 cd ../build
 echo "current dir:" $(pwd)

@@ -29,6 +29,8 @@ typedef struct {
   memory_address *pointers;
   size_t used;
   size_t size;
+
+  bool yy_has_last_item; /* used in the parser (ignore this variable) */
 } t_ptr_list;
 
 typedef union {

@@ -2,6 +2,8 @@ Nonterminals useless in grammar
 
    first_list_item
    first_list_itemp
+   last_list_item
+   last_list_itemp
 
 
 Terminals unused in grammar
@@ -15,65 +17,65 @@ Terminals unused in grammar
    RPAREN
 
 
+State 0 conflicts: 2 shift/reduce
+
+
 Grammar
 
     0 $accept: line $end
 
-    1 line: line definition KSEMI
-    2     | definition KSEMI
-    3     | line function_call KSEMI
-    4     | function_call KSEMI
-    5     | line error KSEMI
+    1 line: %empty
+    2     | line definition KSEMI
+    3     | definition KSEMI
+    4     | line function_call KSEMI
+    5     | function_call KSEMI
+    6     | line error KSEMI
 
-    6 definition: variable_def
+    7 definition: variable_def
 
-    7 pointer: list_content_p
-    8        | str_p
-    9        | TIDENTIFIER
+    8 pointer: list_content_p
+    9        | str_p
+   10        | TIDENTIFIER
 
-   10 function_call: TIDENTIFIER pointer
+   11 function_call: TIDENTIFIER pointer
 
-   11 variable_def: KDEF TIDENTIFIER KEQUALS pointer
+   12 variable_def: KDEF TIDENTIFIER KEQUALS pointer
 
-   12 list_content_p: list_content
+   13 list_content_p: LBRACE list_content RBRACE
 
-   13 list_content: list_content last_list_item
-   14             | list_content pointer KCOMMA
-   15             | LBRACE pointer KCOMMA
-   16             | LBRACE last_list_item
+   14 list_content: list_content pointer
+   15             | list_content pointer KCOMMA
+   16             | pointer KCOMMA
+   17             | pointer
 
-   17 last_list_item: last_list_itemp
+   18 str_p: string_p
+   19      | regex_p
 
-   18 last_list_itemp: pointer RBRACE
+   20 string_p: TSTR
 
-   19 str_p: string_p
-   20      | regex_p
-
-   21 string_p: TSTR
-
-   22 regex_p: TRGXP
+   21 regex_p: TRGXP
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-error (256) 5
+error (256) 6
 KSTRING (258)
 KREGEX (259)
-KSEMI (260) 1 2 3 4 5
-KCOMMA (261) 14 15
-KEQUALS (262) 11
-LBRACE (263) 15 16
-RBRACE (264) 18
+KSEMI (260) 2 3 4 5 6
+KCOMMA (261) 15 16
+KEQUALS (262) 12
+LBRACE (263) 13
+RBRACE (264) 13
 KBEGINDEF (265)
 KENDDEF (266)
-KDEF (267) 11
+KDEF (267) 12
 KPERIOD (268)
 LPAREN (269)
 RPAREN (270)
-TSTR (271) 21
-TRGXP (272) 22
-TIDENTIFIER (273) 9 10 11
+TSTR (271) 20
+TRGXP (272) 21
+TIDENTIFIER (273) 10 11 12
 
 
 Nonterminals, with rules where they appear
@@ -81,45 +83,46 @@ Nonterminals, with rules where they appear
 $accept (19)
     on left: 0
 line (20)
-    on left: 1 2 3 4 5, on right: 0 1 3 5
+    on left: 1 2 3 4 5 6, on right: 0 2 4 6
 definition (21)
-    on left: 6, on right: 1 2
+    on left: 7, on right: 2 3
 pointer (22)
-    on left: 7 8 9, on right: 10 11 14 15 18
+    on left: 8 9 10, on right: 11 12 14 15 16 17
 function_call (23)
-    on left: 10, on right: 3 4
+    on left: 11, on right: 4 5
 variable_def (24)
-    on left: 11, on right: 6
-list_content_p (25)
     on left: 12, on right: 7
+list_content_p (25)
+    on left: 13, on right: 8
 list_content (26)
-    on left: 13 14 15 16, on right: 12 13 14
-last_list_item (27)
-    on left: 17, on right: 13 16
-last_list_itemp (28)
-    on left: 18, on right: 17
-str_p (29)
-    on left: 19 20, on right: 8
-string_p (30)
+    on left: 14 15 16 17, on right: 13 14 15
+str_p (27)
+    on left: 18 19, on right: 9
+string_p (28)
+    on left: 20, on right: 18
+regex_p (29)
     on left: 21, on right: 19
-regex_p (31)
-    on left: 22, on right: 20
 
 
 State 0
 
     0 $accept: . line $end
-    1 line: . line definition KSEMI
-    2     | . definition KSEMI
-    3     | . line function_call KSEMI
-    4     | . function_call KSEMI
-    5     | . line error KSEMI
-    6 definition: . variable_def
-   10 function_call: . TIDENTIFIER pointer
-   11 variable_def: . KDEF TIDENTIFIER KEQUALS pointer
+    1 line: . %empty  [$end, error, KDEF, TIDENTIFIER]
+    2     | . line definition KSEMI
+    3     | . definition KSEMI
+    4     | . line function_call KSEMI
+    5     | . function_call KSEMI
+    6     | . line error KSEMI
+    7 definition: . variable_def
+   11 function_call: . TIDENTIFIER pointer
+   12 variable_def: . KDEF TIDENTIFIER KEQUALS pointer
 
     KDEF         shift, and go to state 1
     TIDENTIFIER  shift, and go to state 2
+
+    KDEF         [reduce using rule 1 (line)]
+    TIDENTIFIER  [reduce using rule 1 (line)]
+    $default     reduce using rule 1 (line)
 
     line           go to state 3
     definition     go to state 4
@@ -129,26 +132,22 @@ State 0
 
 State 1
 
-   11 variable_def: KDEF . TIDENTIFIER KEQUALS pointer
+   12 variable_def: KDEF . TIDENTIFIER KEQUALS pointer
 
     TIDENTIFIER  shift, and go to state 7
 
 
 State 2
 
-    7 pointer: . list_content_p
-    8        | . str_p
-    9        | . TIDENTIFIER
-   10 function_call: TIDENTIFIER . pointer
-   12 list_content_p: . list_content
-   13 list_content: . list_content last_list_item
-   14             | . list_content pointer KCOMMA
-   15             | . LBRACE pointer KCOMMA
-   16             | . LBRACE last_list_item
-   19 str_p: . string_p
-   20      | . regex_p
-   21 string_p: . TSTR
-   22 regex_p: . TRGXP
+    8 pointer: . list_content_p
+    9        | . str_p
+   10        | . TIDENTIFIER
+   11 function_call: TIDENTIFIER . pointer
+   13 list_content_p: . LBRACE list_content RBRACE
+   18 str_p: . string_p
+   19      | . regex_p
+   20 string_p: . TSTR
+   21 regex_p: . TRGXP
 
     LBRACE       shift, and go to state 8
     TSTR         shift, and go to state 9
@@ -157,341 +156,301 @@ State 2
 
     pointer         go to state 12
     list_content_p  go to state 13
-    list_content    go to state 14
-    str_p           go to state 15
-    string_p        go to state 16
-    regex_p         go to state 17
+    str_p           go to state 14
+    string_p        go to state 15
+    regex_p         go to state 16
 
 
 State 3
 
     0 $accept: line . $end
-    1 line: line . definition KSEMI
-    3     | line . function_call KSEMI
-    5     | line . error KSEMI
-    6 definition: . variable_def
-   10 function_call: . TIDENTIFIER pointer
-   11 variable_def: . KDEF TIDENTIFIER KEQUALS pointer
+    2 line: line . definition KSEMI
+    4     | line . function_call KSEMI
+    6     | line . error KSEMI
+    7 definition: . variable_def
+   11 function_call: . TIDENTIFIER pointer
+   12 variable_def: . KDEF TIDENTIFIER KEQUALS pointer
 
-    $end         shift, and go to state 18
-    error        shift, and go to state 19
+    $end         shift, and go to state 17
+    error        shift, and go to state 18
     KDEF         shift, and go to state 1
     TIDENTIFIER  shift, and go to state 2
 
-    definition     go to state 20
-    function_call  go to state 21
+    definition     go to state 19
+    function_call  go to state 20
     variable_def   go to state 6
 
 
 State 4
 
-    2 line: definition . KSEMI
+    3 line: definition . KSEMI
 
-    KSEMI  shift, and go to state 22
+    KSEMI  shift, and go to state 21
 
 
 State 5
 
-    4 line: function_call . KSEMI
+    5 line: function_call . KSEMI
 
-    KSEMI  shift, and go to state 23
+    KSEMI  shift, and go to state 22
 
 
 State 6
 
-    6 definition: variable_def .
+    7 definition: variable_def .
 
-    $default  reduce using rule 6 (definition)
+    $default  reduce using rule 7 (definition)
 
 
 State 7
 
-   11 variable_def: KDEF TIDENTIFIER . KEQUALS pointer
+   12 variable_def: KDEF TIDENTIFIER . KEQUALS pointer
 
-    KEQUALS  shift, and go to state 24
+    KEQUALS  shift, and go to state 23
 
 
 State 8
 
-    7 pointer: . list_content_p
-    8        | . str_p
-    9        | . TIDENTIFIER
-   12 list_content_p: . list_content
-   13 list_content: . list_content last_list_item
-   14             | . list_content pointer KCOMMA
-   15             | . LBRACE pointer KCOMMA
-   15             | LBRACE . pointer KCOMMA
-   16             | . LBRACE last_list_item
-   16             | LBRACE . last_list_item
-   17 last_list_item: . last_list_itemp
-   18 last_list_itemp: . pointer RBRACE
-   19 str_p: . string_p
-   20      | . regex_p
-   21 string_p: . TSTR
-   22 regex_p: . TRGXP
+    8 pointer: . list_content_p
+    9        | . str_p
+   10        | . TIDENTIFIER
+   13 list_content_p: . LBRACE list_content RBRACE
+   13               | LBRACE . list_content RBRACE
+   14 list_content: . list_content pointer
+   15             | . list_content pointer KCOMMA
+   16             | . pointer KCOMMA
+   17             | . pointer
+   18 str_p: . string_p
+   19      | . regex_p
+   20 string_p: . TSTR
+   21 regex_p: . TRGXP
 
     LBRACE       shift, and go to state 8
     TSTR         shift, and go to state 9
     TRGXP        shift, and go to state 10
     TIDENTIFIER  shift, and go to state 11
 
-    pointer          go to state 25
-    list_content_p   go to state 13
-    list_content     go to state 14
-    last_list_item   go to state 26
-    last_list_itemp  go to state 27
-    str_p            go to state 15
-    string_p         go to state 16
-    regex_p          go to state 17
+    pointer         go to state 24
+    list_content_p  go to state 13
+    list_content    go to state 25
+    str_p           go to state 14
+    string_p        go to state 15
+    regex_p         go to state 16
 
 
 State 9
 
-   21 string_p: TSTR .
+   20 string_p: TSTR .
 
-    $default  reduce using rule 21 (string_p)
+    $default  reduce using rule 20 (string_p)
 
 
 State 10
 
-   22 regex_p: TRGXP .
+   21 regex_p: TRGXP .
 
-    $default  reduce using rule 22 (regex_p)
+    $default  reduce using rule 21 (regex_p)
 
 
 State 11
 
-    9 pointer: TIDENTIFIER .
+   10 pointer: TIDENTIFIER .
 
-    $default  reduce using rule 9 (pointer)
+    $default  reduce using rule 10 (pointer)
 
 
 State 12
 
-   10 function_call: TIDENTIFIER pointer .
+   11 function_call: TIDENTIFIER pointer .
 
-    $default  reduce using rule 10 (function_call)
+    $default  reduce using rule 11 (function_call)
 
 
 State 13
 
-    7 pointer: list_content_p .
-
-    $default  reduce using rule 7 (pointer)
-
-
-State 14
-
-    7 pointer: . list_content_p
-    8        | . str_p
-    9        | . TIDENTIFIER
-   12 list_content_p: . list_content
-   12               | list_content .  [KSEMI, KCOMMA, RBRACE]
-   13 list_content: . list_content last_list_item
-   13             | list_content . last_list_item
-   14             | . list_content pointer KCOMMA
-   14             | list_content . pointer KCOMMA
-   15             | . LBRACE pointer KCOMMA
-   16             | . LBRACE last_list_item
-   17 last_list_item: . last_list_itemp
-   18 last_list_itemp: . pointer RBRACE
-   19 str_p: . string_p
-   20      | . regex_p
-   21 string_p: . TSTR
-   22 regex_p: . TRGXP
-
-    LBRACE       shift, and go to state 8
-    TSTR         shift, and go to state 9
-    TRGXP        shift, and go to state 10
-    TIDENTIFIER  shift, and go to state 11
-
-    $default  reduce using rule 12 (list_content_p)
-
-    pointer          go to state 28
-    list_content_p   go to state 13
-    list_content     go to state 14
-    last_list_item   go to state 29
-    last_list_itemp  go to state 27
-    str_p            go to state 15
-    string_p         go to state 16
-    regex_p          go to state 17
-
-
-State 15
-
-    8 pointer: str_p .
+    8 pointer: list_content_p .
 
     $default  reduce using rule 8 (pointer)
 
 
+State 14
+
+    9 pointer: str_p .
+
+    $default  reduce using rule 9 (pointer)
+
+
+State 15
+
+   18 str_p: string_p .
+
+    $default  reduce using rule 18 (str_p)
+
+
 State 16
 
-   19 str_p: string_p .
+   19 str_p: regex_p .
 
     $default  reduce using rule 19 (str_p)
 
 
 State 17
 
-   20 str_p: regex_p .
-
-    $default  reduce using rule 20 (str_p)
-
-
-State 18
-
     0 $accept: line $end .
 
     $default  accept
 
 
+State 18
+
+    6 line: line error . KSEMI
+
+    KSEMI  shift, and go to state 26
+
+
 State 19
 
-    5 line: line error . KSEMI
+    2 line: line definition . KSEMI
 
-    KSEMI  shift, and go to state 30
+    KSEMI  shift, and go to state 27
 
 
 State 20
 
-    1 line: line definition . KSEMI
+    4 line: line function_call . KSEMI
 
-    KSEMI  shift, and go to state 31
+    KSEMI  shift, and go to state 28
 
 
 State 21
 
-    3 line: line function_call . KSEMI
+    3 line: definition KSEMI .
 
-    KSEMI  shift, and go to state 32
+    $default  reduce using rule 3 (line)
 
 
 State 22
 
-    2 line: definition KSEMI .
+    5 line: function_call KSEMI .
 
-    $default  reduce using rule 2 (line)
+    $default  reduce using rule 5 (line)
 
 
 State 23
 
-    4 line: function_call KSEMI .
-
-    $default  reduce using rule 4 (line)
-
-
-State 24
-
-    7 pointer: . list_content_p
-    8        | . str_p
-    9        | . TIDENTIFIER
-   11 variable_def: KDEF TIDENTIFIER KEQUALS . pointer
-   12 list_content_p: . list_content
-   13 list_content: . list_content last_list_item
-   14             | . list_content pointer KCOMMA
-   15             | . LBRACE pointer KCOMMA
-   16             | . LBRACE last_list_item
-   19 str_p: . string_p
-   20      | . regex_p
-   21 string_p: . TSTR
-   22 regex_p: . TRGXP
+    8 pointer: . list_content_p
+    9        | . str_p
+   10        | . TIDENTIFIER
+   12 variable_def: KDEF TIDENTIFIER KEQUALS . pointer
+   13 list_content_p: . LBRACE list_content RBRACE
+   18 str_p: . string_p
+   19      | . regex_p
+   20 string_p: . TSTR
+   21 regex_p: . TRGXP
 
     LBRACE       shift, and go to state 8
     TSTR         shift, and go to state 9
     TRGXP        shift, and go to state 10
     TIDENTIFIER  shift, and go to state 11
 
-    pointer         go to state 33
+    pointer         go to state 29
     list_content_p  go to state 13
-    list_content    go to state 14
-    str_p           go to state 15
-    string_p        go to state 16
-    regex_p         go to state 17
+    str_p           go to state 14
+    string_p        go to state 15
+    regex_p         go to state 16
+
+
+State 24
+
+   16 list_content: pointer . KCOMMA
+   17             | pointer .  [LBRACE, RBRACE, TSTR, TRGXP, TIDENTIFIER]
+
+    KCOMMA  shift, and go to state 30
+
+    $default  reduce using rule 17 (list_content)
 
 
 State 25
 
-   15 list_content: LBRACE pointer . KCOMMA
-   18 last_list_itemp: pointer . RBRACE
+    8 pointer: . list_content_p
+    9        | . str_p
+   10        | . TIDENTIFIER
+   13 list_content_p: . LBRACE list_content RBRACE
+   13               | LBRACE list_content . RBRACE
+   14 list_content: list_content . pointer
+   15             | list_content . pointer KCOMMA
+   18 str_p: . string_p
+   19      | . regex_p
+   20 string_p: . TSTR
+   21 regex_p: . TRGXP
 
-    KCOMMA  shift, and go to state 34
-    RBRACE  shift, and go to state 35
+    LBRACE       shift, and go to state 8
+    RBRACE       shift, and go to state 31
+    TSTR         shift, and go to state 9
+    TRGXP        shift, and go to state 10
+    TIDENTIFIER  shift, and go to state 11
+
+    pointer         go to state 32
+    list_content_p  go to state 13
+    str_p           go to state 14
+    string_p        go to state 15
+    regex_p         go to state 16
 
 
 State 26
 
-   16 list_content: LBRACE last_list_item .
+    6 line: line error KSEMI .
 
-    $default  reduce using rule 16 (list_content)
+    $default  reduce using rule 6 (line)
 
 
 State 27
 
-   17 last_list_item: last_list_itemp .
+    2 line: line definition KSEMI .
 
-    $default  reduce using rule 17 (last_list_item)
+    $default  reduce using rule 2 (line)
 
 
 State 28
 
-   14 list_content: list_content pointer . KCOMMA
-   18 last_list_itemp: pointer . RBRACE
+    4 line: line function_call KSEMI .
 
-    KCOMMA  shift, and go to state 36
-    RBRACE  shift, and go to state 35
+    $default  reduce using rule 4 (line)
 
 
 State 29
 
-   13 list_content: list_content last_list_item .
+   12 variable_def: KDEF TIDENTIFIER KEQUALS pointer .
 
-    $default  reduce using rule 13 (list_content)
+    $default  reduce using rule 12 (variable_def)
 
 
 State 30
 
-    5 line: line error KSEMI .
+   16 list_content: pointer KCOMMA .
 
-    $default  reduce using rule 5 (line)
+    $default  reduce using rule 16 (list_content)
 
 
 State 31
 
-    1 line: line definition KSEMI .
+   13 list_content_p: LBRACE list_content RBRACE .
 
-    $default  reduce using rule 1 (line)
+    $default  reduce using rule 13 (list_content_p)
 
 
 State 32
 
-    3 line: line function_call KSEMI .
+   14 list_content: list_content pointer .  [LBRACE, RBRACE, TSTR, TRGXP, TIDENTIFIER]
+   15             | list_content pointer . KCOMMA
 
-    $default  reduce using rule 3 (line)
+    KCOMMA  shift, and go to state 33
+
+    $default  reduce using rule 14 (list_content)
 
 
 State 33
 
-   11 variable_def: KDEF TIDENTIFIER KEQUALS pointer .
-
-    $default  reduce using rule 11 (variable_def)
-
-
-State 34
-
-   15 list_content: LBRACE pointer KCOMMA .
+   15 list_content: list_content pointer KCOMMA .
 
     $default  reduce using rule 15 (list_content)
-
-
-State 35
-
-   18 last_list_itemp: pointer RBRACE .
-
-    $default  reduce using rule 18 (last_list_itemp)
-
-
-State 36
-
-   14 list_content: list_content pointer KCOMMA .
-
-    $default  reduce using rule 14 (list_content)

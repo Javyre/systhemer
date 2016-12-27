@@ -356,12 +356,12 @@ void handleAssigDef(char *var_name, memory_address content) {
   memory_address address;
 
   /* keep parsing but dont actually handle anything if errors occure */
-  if (yyerror_count != 0) {
-  /* if (1) { */
-    /* free(content); */
-    free(var_name);
-    return;
-  }
+  /* if (yyerror_count != 0) { */
+  /* /\* if (1) { *\/ */
+  /*   /\* free(content); *\/ */
+  /*   free(var_name); */
+  /*   return; */
+  /* } */
 
   /* create mem_item for insertion into memory */
   memory_item *mem_item = malloc(sizeof(memory_item));

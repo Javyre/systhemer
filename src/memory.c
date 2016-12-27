@@ -145,9 +145,9 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
     /* list_content[0] = '\0'; */
 
     if (name != NULL) {
-      strcatf(buff, BKYEL "<" BKCYN);
+      strcatf(buff, BKYEL ILISTO BKCYN);
     } else {
-      strcatf(buff, "<");
+      strcatf(buff, ILISTO);
     }
     printf(BKCYN "%s" KDEFAULT, buff);
 
@@ -164,9 +164,9 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
     }
 
     if (name != NULL) {
-      printf(BKYEL ">%s" KDEFAULT, do_newline ? "\n" : "");
+      printf(BKYEL ILISTC "%s" KDEFAULT, do_newline ? "\n" : "");
     } else {
-      printf(BKCYN ">%s" KDEFAULT, do_newline ? "\n" : "");
+      printf(BKCYN ILISTC "%s" KDEFAULT, do_newline ? "\n" : "");
     }
     /* finish off the string */
     /* list_content[strlen(list_content)-2] = '\0'; */

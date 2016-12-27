@@ -13,7 +13,6 @@ extern char *yytext;
 extern int yycolumn;
 extern char linebuf[];
 
-
 int yyerror(char *p);
 size_t yyerror_count = 0;
 
@@ -32,20 +31,20 @@ size_t yyerror_count = 0;
 %token <str> TSTR TRGXP TIDENTIFIER
 /* %type <addr> first_string_list_item last_string_list_item first_string_list_itemp last_string_list_itemp
  * %type <addr> first_regex_list_item last_regex_list_item first_regex_list_itemp last_regex_list_itemp */
-%type <addr> first_list_item last_list_item first_list_itemp last_list_itemp
-%type <addr> string_p regex_p list_content_p str_p pointer
+%type <addr> first_list_item last_list_item first_list_itemp last_list_itemp %type <addr> string_p regex_p list_content_p str_p pointer
 /* %type <ptr_lst> string_list_content
  * %type <ptr_lst> regex_list_content */
 %type <ptr_lst> list_content
 
-%destructor { free($$); } <str>
+%destructor { VERBOSE_PRINT("FREEING STRING %s", $$); free($$); } <str>
 %destructor { defsFreeList($$); free($$); } <lst>
-%destructor { ptrListFree($$); free($$); } <ptr_lst>
+%destructor { VERBOSE_PRINT("FREEING PTR LIST %p", $$); ptrListFree($$); free($$); } <ptr_lst>
 
 %%
 
 line
- : line definition KSEMI
+ : %empty
+ | line definition KSEMI
  | definition KSEMI
  | line function_call KSEMI
  | function_call KSEMI
@@ -65,11 +64,12 @@ pointer
 
 function_call
  /* : TIDENTIFIER list_content_p { handleFuncCall($1, $2); } */
- : TIDENTIFIER pointer        {
+ : TIDENTIFIER pointer {
    if(memoryGetRootType(g_memory, $2) == t_list) {
      handleFuncCall($1, $2);
    } else {
      yyerror("semantic error (pointer root does not represent a list)");
+     YYERROR;
    }
  }
 /* | TIDENTIFIER TIDENTIFIER    {
@@ -95,10 +95,10 @@ variable_def
  *  | KDEF KREGEX  TIDENTIFIER KEQUALS list_content { handleListDef($3, $5, T_REGEX); } */
 
 list_content_p
- : list_content {
+ : LBRACE list_content RBRACE {
    /* create mem_item for insertion into memory */
    memory_item *item = malloc(sizeof(memory_item));
-   item->list = $1;
+   item->list = $2;
 
    /* insert item and keep address */
    $$ = memoryInsert(g_memory, item, t_list);
@@ -109,49 +109,53 @@ list_content_p
 
 list_content
 /* last item */
- : list_content last_list_item {
+ : list_content pointer{
+   if ($$->yy_has_last_item) {
+     yyerror("semantic error: list content already contains last item");
+     YYERROR;
+     /* EXIT(1); */
+   }
+   $$->yy_has_last_item = true;
    ptrListInsert($$, $2);
    VERBOSE_PRINT("-last list item: \t%lu into (%p)", (unsigned long)$2, $$);
  }
 /* nth item */
  | list_content pointer KCOMMA {
+   if ($$->yy_has_last_item) {
+     yyerror("semantic error: list content already contains last item");
+     YYERROR;
+     /* EXIT(1); */
+   }
    ptrListInsert($$, $2);
    VERBOSE_PRINT("-list item: \t%lu into (%p)", (unsigned long)$2, $$);
  }
-/* | list_content TIDENTIFIER KCOMMA {
- *   memory_address address = memoryGetAddresByFriendly(g_friendlies , $2);
- *   free($2);
- *   /\* if (g_memory->content_type[(memoryGetRootAddress(g_memory, address))] != t_rgx)
- *    *   yyerror("type missmatch"); *\/
- *   ptrListInsert($$, address);
- *   VERBOSE_PRINT("-list item: \t%lu into (%p)", (unsigned long)$2, $$);
- *  } */
 /* first item */
- /* | first_list_item { */
- | LBRACE pointer KCOMMA {
+ | pointer KCOMMA {
    $$ = (t_ptr_list *)malloc(sizeof(t_ptr_list));
    ptrListInit($$, 20);
+   $$->yy_has_last_item = false;
 
-   ptrListInsert($$, $2);
-   VERBOSE_PRINT("-first list item: \t%lu into (%p)", (unsigned long)$2, $$);
+   ptrListInsert($$, $1);
+   VERBOSE_PRINT("-first list item: \t%lu into (%p)", (unsigned long)$1, $$);
  }
 /* only item */
- | LBRACE last_list_item {
+ | pointer {
    $$ = (t_ptr_list *)malloc(sizeof(t_ptr_list));
    ptrListInit($$, 20);
+   $$->yy_has_last_item = true;
 
-   ptrListInsert($$, $2);
-   VERBOSE_PRINT("-only list item: \t%lu into (%p)", (unsigned long)$2, $$);
+   ptrListInsert($$, $1);
+   VERBOSE_PRINT("-only list item: \t%lu into (%p)", (unsigned long)$1, $$);
  }
 
-last_list_item
-: last_list_itemp     { $$ = $1;
-   /* if (g_memory->content_type[(memoryGetRootAddress(g_memory, $$))] != t_str)
-    *   yyerror("type missmatch"); */
- }
+/* last_list_item */
+/* : last_list_itemp     { $$ = $1; */
+/*    /\* if (g_memory->content_type[(memoryGetRootAddress(g_memory, $$))] != t_str) */
+/*     *   yyerror("type missmatch"); *\/ */
+/*  } */
 
-last_list_itemp
-: pointer               RBRACE      { $$ = $1; }
+/* last_list_itemp */
+/* : pointer               RBRACE      { $$ = $1; } */
 /* | pointer        KCOMMA RBRACE      { $$ = $1; } /\* CAUSES SHIFT/REDUCE CONFLICT *\/ */
 /* | TIDENTIFIER           RBRACE      { $$ = memoryGetAddresByFriendly(g_friendlies , $1); free($1); }
  * | TIDENTIFIER    KCOMMA RBRACE      { $$ = memoryGetAddresByFriendly(g_friendlies , $1); free($1); } */

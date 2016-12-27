@@ -68,6 +68,9 @@ typedef enum {
 #define KDEFAULT "\x1b[0m"
 #define BKWHT    "\e[1;37m"
 
+#define ILISTO   BKRED "<" BKRED
+#define ILISTC   BKRED ">" BKRED
+
 #define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\x1b[0m" "\n", token);
 
 /* Note: The following PRINT_VALUES macros are deprecated and

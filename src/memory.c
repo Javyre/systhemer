@@ -102,6 +102,7 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
   char buff[(256 * 8) + 1];
   char list_content[(256*8)+1];
   char *name, *name2;
+  char *value;
   char fname[256], fname2[256];
   memory_address a;
   /* for (memory_address i=0; i<mem->used; i++) { */
@@ -122,12 +123,19 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
 
   /* if it's a string of any type */
   if (mem->content_type[i] == t_str || mem->content_type[i] == t_rgx) {
+    /* restring the value */
+    value = strdup(mem->content[i]->str);
+    utilRestring(&value, mem->content_type[i] == t_str ? STR_DELIM : REGEX_DELIM);
+
     /* if has a name then highlight value */
     if (name != NULL) {
-      strcatf(buff, BKYEL "{%s}" BKCYN, mem->content[i]->str);
+      strcatf(buff, BKYEL "{%s}" BKCYN, value);
     } else {
-      strcatf(buff, "{%s}", mem->content[i]->str);
+      strcatf(buff, "{%s}", value);
     }
+    free(value);
+    value=NULL;
+
     /* we treat t_str and t_rgx as final values
      * so we terminate the buff string and return */
     if (do_newline)

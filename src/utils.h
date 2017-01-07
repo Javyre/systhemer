@@ -4,6 +4,7 @@
 //C includes (that we use in this header)
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 //Package defines and dev options (constant)
 #define PACKAGE "SysThemer"
@@ -50,6 +51,20 @@ typedef enum {
 #define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = (scp_tp == NULL_ESCAPE) ? '\0' : '\\';
 /* #define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = (scp_tp == NULL_ESCAPE) ? '\0' : (scp_tp == 1 ? STR_ESCAPE_CHAR : REGEX_ESCAPE_CHAR); */
 
+typedef struct {
+  const char esc_char;      /* would be '\\' */
+  /* const char *escaped[205];   /\* would be "n" for the newline character ("\\n") *\/
+   * const char *unescaped[5]; /\* would be the actual newline character          *\/ */
+  const char *escaped[26];   /* would be "n" for the newline character ("\\n") */
+  const char *unescaped[26]; /* would be the actual newline character          */
+  const size_t num_escs;
+  const char delim_char;
+  const bool allow_unrecongnized_escs;
+} type_attrs;
+
+extern type_attrs g_string_attrs;
+extern type_attrs g_regex_attrs;
+
 #define KNRM     "\x1B[0m"
 #define BKNRM    "\e[1;0m"
 #define KRED     "\x1B[31m"
@@ -68,8 +83,8 @@ typedef enum {
 #define KDEFAULT "\x1b[0m"
 #define BKWHT    "\e[1;37m"
 
-#define ILISTO   BKRED "<" BKRED
-#define ILISTC   BKRED ">" BKRED
+#define ILISTO   BKRED "(" BKRED
+#define ILISTC   BKRED ")" BKRED
 
 #define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\x1b[0m" "\n", token);
 
@@ -89,8 +104,8 @@ typedef enum {
 
 /* New PRINT macros... (call the non-HELPER variants)
  * (backwards compatible with old macros but support formatting) */
-#define WARNING_PRINT_HELPER(fmt, ...) printf(PACKAGE ": " BKYEL fmt "\x1b[0m" "\n%s", __VA_ARGS__);
-#define WARNING_PRINT(...) if(verboseMode) {VERBOSE_PRINT_HELPER(__VA_ARGS__, "");}
+#define WARNING_PRINT_HELPER(fmt, ...) printf(PACKAGE ": " BKYEL fmt "\x1b[0m" "(warning message from %s)\n", __VA_ARGS__);
+#define WARNING_PRINT(...) if(verboseMode) {VERBOSE_PRINT_HELPER(__VA_ARGS__, __func__);}
 
 #define VERBOSE_PRINT_HELPER(fmt, ...) printf(PACKAGE ": " BKBLU fmt "\x1b[0m" "\n%s", __VA_ARGS__);
 #define VERBOSE_PRINT(...) if(verboseMode) {VERBOSE_PRINT_HELPER(__VA_ARGS__, "");}
@@ -101,8 +116,22 @@ typedef enum {
 #endif
 
 /* TODO: perfect error msgs or make an error msg util library of sorts */
-#define ERROR_PRINT_HELPER(fmt, ...) fprintf(stderr, BKRED PACKAGE " ERROR" ": " fmt "\x1b[0m" "\n%s", __VA_ARGS__);
-#define ERROR_PRINT(...) if(1) {ERROR_PRINT_HELPER(__VA_ARGS__, "");}
+#define ERROR_PRINT_HELPER(fmt, ...) fprintf(stderr, BKRED PACKAGE " ERROR" ": " fmt "\x1b[0m" " (error in %s)\n", __VA_ARGS__);
+#define ERROR_PRINT(...) if(1) {ERROR_PRINT_HELPER(__VA_ARGS__, __func__);}
+
+#define HANDLE_REALLOC(t, p, s)                                                \
+  do {                                                                         \
+    t *ma_tmp = (t *)realloc(p, sizeof(t) * (s));                              \
+    if (ma_tmp != NULL)                                                        \
+      p = ma_tmp;                                                              \
+    else {                                                                     \
+      ERROR_PRINT(                                                             \
+          "realloc failed! while trying to reallocate memory for %s %s in "    \
+          "function: %s",                                                      \
+          #t, #p, __func__);                                                   \
+      EXIT(1);                                                                 \
+    }                                                                          \
+  } while (0);
 
 /* strcatf: example usage:
  *   char *s = strdup("123");
@@ -165,10 +194,16 @@ void strRmEscape(char *str);
 void regexRmEscape(char *str);
 
 void strOverlap(char *dest, char *from, char *to, char *from2, char *to2);
+void strInsert(char *dest, const char *dest_end, const char *from,
+               const char *to);
 
 void utilUnstring(char **str, DELIM_TYPE delim);
 void strUnstring(char **str);
 void regexUnregex(char **str);
+
+void utilRestring(char **str, DELIM_TYPE delim);
+void strRestring(char **str);
+void regexReregex(char **str);
 
 int getNextStr(char *in, char **out_begin, char** out_end);
 int getNextRegEx(char *in, char **out_begin, char** out_end);

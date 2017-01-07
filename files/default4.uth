@@ -9,6 +9,8 @@ def bar = {
   , "tasd", "asdasdaasds"
 };
 
+def strn = "\"";
+
 def baz = {/item1/, /item2/, /item3/};
 
 def goo = baz;

@@ -11,6 +11,15 @@
 bool verboseMode = true;
 bool testsMode = false;
 
+type_attrs g_string_attrs = {'\\',
+                             {"\\", "\"", "n",  "t" }, /* escaped   */
+                             {"\\", "\"", "\n", "\t"}, /* unescaped */
+                             4, '\"', false};
+type_attrs g_regex_attrs  = {'\\',
+                             {"/"},
+                             {"/"},
+                             1, '/', true};
+
 void printHelp(const int exval) {
   printf("%s,%s\n", PACKAGE, VERSION);
   printf("%s [-h] [-V] <uth file path>\n\n", PACKAGE);
@@ -45,8 +54,8 @@ void parseArgs(int argc, char *argv[]) {
     {"version"  , no_argument, NULL, 'V'},
     {"verbose"  , no_argument, NULL, 'v'},
     {"warnings" , no_argument, NULL, 'w'},
-    {"illustrate-recursive-list", no_argument, NULL, 'r'},
-    {"illustrate-print-non-friendlied", no_argument, NULL, 'F'},
+    {"ill-recur-list"       , no_argument, NULL, 'r'},
+    {"ill-print-non-friend" , no_argument, NULL, 'F'},
     {"exitonerr", no_argument, NULL, 'e'}};
   int opt;
 
@@ -128,6 +137,8 @@ char *genWrongUnderline(char *line, char *from, char *to) {
   }
   return underline;
 }
+
+/* strndup isnt always there... */
 char *strMkCpyInRange(const char *from, size_t numchars) {
   if (numchars == 0) {
     numchars = strlen(from);
@@ -136,7 +147,10 @@ char *strMkCpyInRange(const char *from, size_t numchars) {
   strncpy(out, from, numchars);
   return out;
 }
-char *strMkCpy(const char *in) { return strMkCpyInRange(in, 0); }
+/* NOTE: deprecated and marked for removal on next code cleanup
+ * USE STRDUP INSTEAD */
+/* char *strMkCpy(const char *in) { return strMkCpyInRange(in, 0); } */
+inline char *strMkCpy(const char *in) { return strdup(in); }
 
 /* NOTE: marked for removal on next code cleanup */
 void strTrim(char *in) {
@@ -162,7 +176,7 @@ void strTrim(char *in) {
   else
     *source = '\0';
 
-  VERBOSE_PRINT_VALUE(%s, firstin);
+  /* VERBOSE_PRINT_VALUE(%s, firstin); */
   in = firstin;
 }
 
@@ -303,9 +317,14 @@ bool utilIsInsideOf(char *str, char *pos, const DELIM_TYPE delim, const ESCAPE_T
       set_on_next = false;
     }
 
+    /* if the current char is the first char
+     * and is the delim char */
     if (*src == delim_char && src == str) {
-      is_in_str = (is_in_str) ? false : true;
-    } else if (*src == delim_char && *(src - 1) != escape_char && src != str) {
+      is_in_str = true;
+
+    /* if the current char is the delim char
+     * and the prev. char is'nt and escape char  */
+    } else if (*src == delim_char && *(src - 1) != escape_char) {
       if (is_in_str) {
         set_on_next = true;
       } else {
@@ -313,11 +332,15 @@ bool utilIsInsideOf(char *str, char *pos, const DELIM_TYPE delim, const ESCAPE_T
       }
     }
 
+    /* return is_in_str once we've hit the given position */
     if (src == pos) {
       return is_in_str;
     }
     src++;
   }
+
+  /* if we haven't returned yet, there is a problem: */
+
   if (pos < str || pos > src) {
     fprintf(
         stderr, BKRED
@@ -333,7 +356,8 @@ bool utilIsInsideOf(char *str, char *pos, const DELIM_TYPE delim, const ESCAPE_T
         pos, pos, str, str, src, src);
     EXIT(1);
   } else if (*pos == escape_char && *(pos-1) != escape_char) {
-    WARNING_PRINT("Warning: Passed an escape character to isInsideOfStr() this isn't supposed to happen!\n")
+    WARNING_PRINT("Warning: Passed an escape character to isInsideOfStr() as "
+                  "pos this isn't supposed to happen!\n")
   }
   fprintf(stderr, BKRED "Error: something went wrong in function "
                         "utilIsInsideOf()... src never matched pos\n" KDEFAULT);
@@ -517,67 +541,113 @@ void strOverlap(char *dest, char *from, char *to, char *from2, char *to2) {
   free(holder2);
 }
 
+/* inserts `from`-`to` right before the `dest` character
+ * while only shifting the `dest`-`dest_end` substring */
+/* WARNING: make sure you have allocated the right amount
+ * of memory to `from` before inserting anything into it! */
+/* WARNING: call to strRealloc is recommended after calling this function
+ * unless you have allocated the exact amount of space needed */
+void strInsert(char *dest, const char *dest_end, const char *from, const char *to) {
+
+  /* defaults the to and dest_end params to be the address of the nullchar */
+  if (dest_end == NULL) dest_end = dest+strlen(dest);
+  if (to == NULL) to = from+strlen(from);
+
+  ptrdiff_t ins_len  = to - from;
+  ptrdiff_t dest_len = dest_end - dest;
+
+  /* using holder to avoid strncpy dest and source overlapping */
+  char *holder = calloc(dest_len+1, sizeof(char));
+  strncpy(holder, dest, dest_len+1);
+
+  strncpy(dest+ins_len, holder, dest_len+1);
+  strncpy(dest, from, ins_len);
+
+  free(holder);
+}
+
 void strRealloc(char **str) {
-  *str = realloc(*str, strlen(*str) + 1);
-  if (*str == NULL) {
-    fprintf(stderr, "Error: failed to reallocate variable in heap");
-    EXIT(1);
-  }
+  HANDLE_REALLOC(char, *str, strlen(*str) + 1);
 }
 
 void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
-  SET_DELIM_CHAR(delim, delim_char);
-  SET_ESCAPE_CHAR(escape , escape_char);
+  /* SET_DELIM_CHAR(delim, delim_char);
+   * SET_ESCAPE_CHAR(escape , escape_char); */
+
+  type_attrs ty_at = delim==STR_DELIM ? g_string_attrs : g_regex_attrs;
 
   bool override_inside = false;
 
   char *src = str;
   while (*src != '\0') {
     if (utilIsInsideOf(str, src, delim, escape) || override_inside) {
-      if ( delim == STR_DELIM && src[0] == escape_char &&
-           (src[1] == delim_char  ||
-            src[1] == escape_char ||
-            src[1] == 'n'         ||
-            src[1] == 't')) {
-
-
-        /* foo\"bar -> foo"bar
-         *    ^gets popped out
-         * src should be pointing to '\'
-         * str should be pointing to first char in string */
-        strOverlap(str, str, (src - 1), (src + 1), NULL);
-
-        if (*src == 'n')
-          *src = '\n';
-        else if (*src == 't')
-          *src = '\t';
-        else if (*src == delim_char)
-          override_inside = !override_inside;
-
-        /* foo"bar
-         *    ^src  */
-        src++;
-        /* foo"bar
-         *     ^src
-         * since src is already pointing to the
-         * next character to be analysed we can
-         * continue to the next loop direclty */
-        continue;
-      } else if ( delim == REGEX_DELIM && src[0] == escape_char && (src[1] == delim_char)) {
-        strOverlap(str, str, (src - 1), (src + 1), NULL);
-        src++;
-        continue;
-
-      /* If it's a string that we're processing */
-      } else if (delim == STR_DELIM) {
-        if (*src == '\\' && (src[1] != '\"')) {
+      if (src[0] == ty_at.esc_char) {
+        bool has_been_rmed = false;
+        for (size_t i=0; i<ty_at.num_escs; i++) {
+          /* using the first char of escaped and unescaped for now
+           * (possible future support for multi-char escape modifiers...) */
+          if (src[1] == ty_at.escaped[i][0]) {
+            strOverlap(str, str, (src - 1), (src + 1), NULL);
+            if (*src == ty_at.delim_char)
+              override_inside = !override_inside;
+            *src = ty_at.unescaped[i][0];
+            has_been_rmed = true;
+            break;
+          }
+        }
+        if (!has_been_rmed && !ty_at.allow_unrecongnized_escs){
           fprintf(stderr,
                   BKRED "Error: Found escape character inside of string with "
-                        "invalid successor \"%c\": \n\t%s\n\t%s\n",
+                  "invalid successor \"%c\": \n\t%s\n\t%s\n",
                   src[1], str, genWrongUnderline(str, src, src + 1));
           EXIT(2);
         }
       }
+
+      /* if ( delim == STR_DELIM && src[0] == escape_char &&
+       *      (src[1] == delim_char  ||
+       *       src[1] == escape_char ||
+       *       src[1] == 'n'         ||
+       *       src[1] == 't')) {
+       * 
+       * 
+       *   /\* foo\"bar -> foo"bar
+       *    *    ^gets popped out
+       *    * src should be pointing to '\'
+       *    * str should be pointing to first char in string *\/
+       *   strOverlap(str, str, (src - 1), (src + 1), NULL);
+       * 
+       *   if (*src == 'n')
+       *     *src = '\n';
+       *   else if (*src == 't')
+       *     *src = '\t';
+       *   else if (*src == delim_char)
+       *     override_inside = !override_inside;
+       * 
+       *   /\* foo"bar
+       *    *    ^src  *\/
+       *   src++;
+       *   /\* foo"bar
+       *    *     ^src
+       *    * since src is already pointing to the
+       *    * next character to be analysed we can
+       *    * continue to the next loop direclty *\/
+       *   continue;
+       * } else if ( delim == REGEX_DELIM && src[0] == escape_char && (src[1] == delim_char)) {
+       *   strOverlap(str, str, (src - 1), (src + 1), NULL);
+       *   src++;
+       *   continue;
+       * 
+       * /\* If it's a string that we're processing and the escape modifier hasn't been recognized*\/
+       * } else if (delim == STR_DELIM) {
+       *   if (*src == '\\' && (src[1] != '\"')) {
+       *     fprintf(stderr,
+       *             BKRED "Error: Found escape character inside of string with "
+       *                   "invalid successor \"%c\": \n\t%s\n\t%s\n",
+       *             src[1], str, genWrongUnderline(str, src, src + 1));
+       *     EXIT(2);
+       *   }
+       * } */
     }
     src++;
   }
@@ -594,9 +664,9 @@ void regexRmEscape(char *str) {
 void utilUnstring(char **str, DELIM_TYPE delim) {
   SET_DELIM_CHAR(delim, delim_char);
 
-  VERBOSE_PRINT_VALUE(%s, *str);
+  /* VERBOSE_PRINT_VALUE(%s, *str); */
   strRmEscape(*str);
-  VERBOSE_PRINT_VALUE(%s, *str);
+  /* VERBOSE_PRINT_VALUE(%s, *str); */
   /* get rid of opening delim char */
   for (size_t i = 0; i < strlen(*str); i++) {
     if ((*str)[i] == delim_char) {
@@ -620,7 +690,7 @@ void utilUnstring(char **str, DELIM_TYPE delim) {
   }
 
   /* get rid of the space character added at the beginning */
-  VERBOSE_PRINT_VALUE(%s, *str);
+  /* VERBOSE_PRINT_VALUE(%s, *str); */
   if ((*str)[0] == ' ') {
     for (size_t i = 0; i < strlen(*str); i++) {
       (*str)[i] = (*str)[i + 1];
@@ -628,13 +698,13 @@ void utilUnstring(char **str, DELIM_TYPE delim) {
   }
 
   /* get rid of the space character added at the end */
-  VERBOSE_PRINT_VALUE(%s, *str);
+  /* VERBOSE_PRINT_VALUE(%s, *str); */
   (*str)[strlen(*str) - 1] =
       ((*str)[strlen(*str) - 1] == ' ') ? '\0' : (*str)[strlen(*str) - 1];
 
   /* reallocate and return */
   strRealloc(str);
-  VERBOSE_PRINT_VALUE(%s, *str);
+  /* VERBOSE_PRINT_VALUE(%s, *str); */
   return;
 }
 
@@ -645,6 +715,36 @@ void strUnstring(char **str) {
 void regexUnregex(char **str) {
   utilUnstring(str, REGEX_DELIM);
 }
+
+/* IMPORTANT NOTE: INCOMPLETE WIP FUNCTION
+ * (i want to push the commit before i finish this function) */
+void utilRestring(char **str, DELIM_TYPE delim) {
+  HANDLE_REALLOC(char, *str, (strlen(*str)*2)+1);
+
+  type_attrs ty_at = delim==STR_DELIM ? g_string_attrs : g_regex_attrs;
+  char *esc_char = strdup(&ty_at.esc_char);
+
+  /* VERBOSE_PRINT("%s", *str); */
+  /* for (size_t i=0; i<strlen(*str); i++) { */
+  for (size_t i=0; (*str)[i]!='\0'; i++) {
+    /* VERBOSE_PRINT("%lu : %c", i, (*str)[i]); */
+    for (size_t ii=0; ii<ty_at.num_escs; ii++) {
+      if ((*str)[i] == ty_at.unescaped[ii][0]) {
+        strOverlap(*str, *str, (*str)+i-1, (*str)+i+1, NULL);
+        strInsert((*str)+i, NULL, ty_at.escaped[ii], NULL);
+        strInsert((*str)+i, NULL, esc_char, NULL);
+        i += strlen(ty_at.escaped[ii])+strlen(esc_char)-1;
+      }
+    }
+    if ((*str)[i]=='\0')
+      break;
+  }
+  strRealloc(str);
+  free(esc_char);
+}
+
+void strRestring(char **str);
+void regexReregex(char **str);
 
 /* Returns the first and last char of the first Str sees */
 /* Returns 1 if found and 0 for not found */

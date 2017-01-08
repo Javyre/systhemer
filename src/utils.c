@@ -718,11 +718,12 @@ void regexUnregex(char **str) {
 
 /* IMPORTANT NOTE: INCOMPLETE WIP FUNCTION
  * (i want to push the commit before i finish this function) */
-void utilRestring(char **str, DELIM_TYPE delim) {
+void utilRestring(char **str, const DELIM_TYPE delim) {
   HANDLE_REALLOC(char, *str, (strlen(*str)*2)+1);
 
   type_attrs ty_at = delim==STR_DELIM ? g_string_attrs : g_regex_attrs;
-  char *esc_char = strdup(&ty_at.esc_char);
+  char esc_char[2] = {ty_at.esc_char,0};
+  char delim_char[2] = {ty_at.delim_char,0};
 
   /* VERBOSE_PRINT("%s", *str); */
   /* for (size_t i=0; i<strlen(*str); i++) { */
@@ -739,8 +740,13 @@ void utilRestring(char **str, DELIM_TYPE delim) {
     if ((*str)[i]=='\0')
       break;
   }
+
+  HANDLE_REALLOC(char, *str, strlen(*str)+2+1);
+
+  strInsert(*str, NULL, delim_char, NULL);
+  strcat(*str, delim_char);
+
   strRealloc(str);
-  free(esc_char);
 }
 
 void strRestring(char **str);

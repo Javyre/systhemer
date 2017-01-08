@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
   exit_on_err = true;
   o_illustrate_recursive_list = true;
   o_illustrate_print_non_friendlied = false;
+  o_illustrate_restring = true;
 
 #ifndef NDEBUG
   /* size_t num_errs = 0; */

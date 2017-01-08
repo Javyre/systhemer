@@ -116,23 +116,32 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
           (name != NULL ? name : ""));
   if (name != NULL)
     /* if there is a friendly name */
-    sprintf(buff, "[" BKGRN "%lu" BKCYN "%s]->", (unsigned long)i, fname);
+    sprintf(buff, "[" BKGRN "%lu" BKCYN "%s]" IPARROW, (unsigned long)i, fname);
   else
     /* if not */
-    sprintf(buff, "[%lu%s]->", (unsigned long)i, fname);
+    sprintf(buff, "[%lu%s]" IPARROW, (unsigned long)i, fname);
 
   /* if it's a string of any type */
   if (mem->content_type[i] == t_str || mem->content_type[i] == t_rgx) {
     /* restring the value */
     value = strdup(mem->content[i]->str);
-    utilRestring(&value, mem->content_type[i] == t_str ? STR_DELIM : REGEX_DELIM);
+    if (o_illustrate_restring) {
+      utilRestring(&value,
+                   mem->content_type[i] == t_str ? STR_DELIM : REGEX_DELIM);
+    }
 
     /* if has a name then highlight value */
-    if (name != NULL) {
-      strcatf(buff, BKYEL "{%s}" BKCYN, value);
+
+    if (o_illustrate_restring) {
+      strcatf(buff, BKYEL "%s%s%s" BKCYN,
+              name != NULL ? BKYEL : BKCYN, value,
+              name != NULL ? BKYEL : BKCYN);
     } else {
-      strcatf(buff, "{%s}", value);
+      strcatf(buff, BKYEL "%s{%s}%s" BKCYN,
+              name != NULL ? BKYEL : BKCYN, value,
+              name != NULL ? BKYEL : BKCYN);
     }
+
     free(value);
     value=NULL;
 

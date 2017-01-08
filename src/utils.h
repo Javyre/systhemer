@@ -85,6 +85,7 @@ extern type_attrs g_regex_attrs;
 
 #define ILISTO   BKRED "(" BKRED
 #define ILISTC   BKRED ")" BKRED
+#define IPARROW  KMAG " -> " 
 
 #define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\x1b[0m" "\n", token);
 
@@ -119,7 +120,7 @@ extern type_attrs g_regex_attrs;
 #define ERROR_PRINT_HELPER(fmt, ...) fprintf(stderr, BKRED PACKAGE " ERROR" ": " fmt "\x1b[0m" " (error in %s)\n", __VA_ARGS__);
 #define ERROR_PRINT(...) if(1) {ERROR_PRINT_HELPER(__VA_ARGS__, __func__);}
 
-#define HANDLE_REALLOC(t, p, s)                                                \
+#define HANDLE_REALLOC(t, p, s)                                         \
   do {                                                                         \
     t *ma_tmp = (t *)realloc(p, sizeof(t) * (s));                              \
     if (ma_tmp != NULL)                                                        \
@@ -164,6 +165,7 @@ bool exit_on_err;
 bool warnings_on;
 bool o_illustrate_recursive_list;
 bool o_illustrate_print_non_friendlied;
+bool o_illustrate_restring;
 
 #ifndef NDEBUG
 bool testsMode;
@@ -201,7 +203,7 @@ void utilUnstring(char **str, DELIM_TYPE delim);
 void strUnstring(char **str);
 void regexUnregex(char **str);
 
-void utilRestring(char **str, DELIM_TYPE delim);
+void utilRestring(char **str, const DELIM_TYPE delim);
 void strRestring(char **str);
 void regexReregex(char **str);
 

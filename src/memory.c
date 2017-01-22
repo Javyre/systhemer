@@ -3,6 +3,15 @@
 #include <stdio.h>
 #include "memory.h"
 
+extern type_attrs g_string_attrs;
+extern type_attrs g_regex_attrs;
+extern type_attrs g_int_attrs;
+
+type_attrs *g_types_attrs[] = {&g_string_attrs,
+                               &g_regex_attrs,
+                               &g_int_attrs
+};
+
 /* Initializes memory holder */
 void memoryInit(memory_holder *mem, size_t initial_size) {
   mem->content = (memory_item **)calloc(initial_size, sizeof(memory_item*));
@@ -116,10 +125,10 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
           (name != NULL ? name : ""));
   if (name != NULL)
     /* if there is a friendly name */
-    sprintf(buff, "[" BKGRN "%lu" BKCYN "%s]" IPARROW, (unsigned long)i, fname);
+    sprintf(buff, IADDRO BKGRN "%lu" BKCYN "%s" IADDRC IPARROW, (unsigned long)i, fname);
   else
     /* if not */
-    sprintf(buff, "[%lu%s]" IPARROW, (unsigned long)i, fname);
+    sprintf(buff, IADDRO "%lu%s" IADDRC IPARROW, (unsigned long)i, fname);
 
   /* if it's a string of any type */
   if (mem->content_type[i] == t_str || mem->content_type[i] == t_rgx) {
@@ -133,11 +142,11 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
     /* if has a name then highlight value */
 
     if (o_illustrate_restring) {
-      strcatf(buff, BKYEL "%s%s%s" BKCYN,
+      strcatf(buff, "%s%s%s" BKCYN,
               name != NULL ? BKYEL : BKCYN, value,
               name != NULL ? BKYEL : BKCYN);
     } else {
-      strcatf(buff, BKYEL "%s{%s}%s" BKCYN,
+      strcatf(buff, "%s{%s}%s" BKCYN,
               name != NULL ? BKYEL : BKCYN, value,
               name != NULL ? BKYEL : BKCYN);
     }
@@ -146,6 +155,22 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
     value=NULL;
 
     /* we treat t_str and t_rgx as final values
+     * so we terminate the buff string and return */
+    if (do_newline)
+      printf(BKCYN "%s\n" KDEFAULT, buff);
+    else
+      printf(BKCYN "%s" KDEFAULT, buff);
+    buff[0] = '\0';
+    list_content[0] = '\0';
+    fname[0] = '\0';
+    return;
+
+  /* if it's an integer */
+  } else if (mem->content_type[i] == t_int) {
+    strcatf(buff, "%s{%d}" BKCYN,
+            name != NULL ? BKYEL : BKCYN, mem->content[i]->integer);
+
+    /* we treat t_int as final values
      * so we terminate the buff string and return */
     if (do_newline)
       printf(BKCYN "%s\n" KDEFAULT, buff);
@@ -175,7 +200,7 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
         memoryIllustrateItem(friendly, mem, mem->content[i]->list->pointers[ii],
                              depth - 1, false);
       else
-        printf(BKCYN "[%lu]", (unsigned long)mem->content[i]->list->pointers[ii]);
+        printf(BKCYN IADDRO "%lu" IADDRC, (unsigned long)mem->content[i]->list->pointers[ii]);
       if (ii != mem->content[i]->list->used-1)
         printf(BKCYN ", ");
     }

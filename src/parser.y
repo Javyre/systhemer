@@ -13,13 +13,15 @@ extern char *yytext;
 extern int yycolumn;
 extern char linebuf[];
 
-int yyerror(char *p);
+int yyerror(const char *p);
 size_t yyerror_count = 0;
 
 
 %}
 
 %union {
+  int  intgr;
+  char operator;
   char *str;
   list *lst;
   t_ptr_list *ptr_lst;
@@ -27,24 +29,30 @@ size_t yyerror_count = 0;
   memory_item *mem_item;
 };
 
-%token KSTRING KREGEX KSEMI KCOMMA KEQUALS LBRACE RBRACE KBEGINDEF KENDDEF KDEF KPERIOD LPAREN RPAREN
+%token KSTRING KREGEX KSEMI KCOMMA KEQUALS KPLUS KMINUS KTIMES KDIVIDED LBRACE RBRACE LSQUBRACE RSQUBRACE KBEGINDEF KENDDEF KDEF KPERIOD LPAREN RPAREN
 %token <str> TSTR TRGXP TIDENTIFIER
+%token <intgr> TINTEGER
 /* %type <addr> first_string_list_item last_string_list_item first_string_list_itemp last_string_list_itemp
  * %type <addr> first_regex_list_item last_regex_list_item first_regex_list_itemp last_regex_list_itemp */
-%type <addr> first_list_item last_list_item first_list_itemp last_list_itemp %type <addr> string_p regex_p list_content_p str_p pointer
+%type <addr> first_list_item last_list_item first_list_itemp last_list_itemp
+%type <addr> int_p string_p regex_p list_content_p str_p pointer
 /* %type <ptr_lst> string_list_content
  * %type <ptr_lst> regex_list_content */
 %type <ptr_lst> list_content
+%type <operator> operator
 
 %destructor { VERBOSE_PRINT("FREEING STRING %s", $$); free($$); } <str>
 %destructor { defsFreeList($$); free($$); } <lst>
 %destructor { VERBOSE_PRINT("FREEING PTR LIST %p", $$); ptrListFree($$); free($$); } <ptr_lst>
 
+%left KPLUS KMINUS
+%left KTIMES KDIVIDED
+
 %%
 
 line
- : %empty
- | line definition KSEMI
+ /* : %empty */
+ : line definition KSEMI
  | definition KSEMI
  | line function_call KSEMI
  | function_call KSEMI
@@ -58,9 +66,24 @@ definition
  *  : TIDENTIFIER LPAREN string_p RPAREN { handleFuncCall($1, $3, T_STRING); } */
 
 pointer
-: list_content_p
+/* : pointer LSQUBRACE pointer RSQUBRACE    { $$=handleListIndex($1, $2); } */
+: LPAREN pointer RPAREN                  { $$=$2; }
+/* | LPAREN pointer operator pointer RPAREN { $$=handleOperation($2, $3, $4); } */
+/* | pointer operator pointer               { $$=handleOperation($1, $2, $3); } */
+| pointer KPLUS    pointer               { $$=handleOperation($1, '+', $3); }
+| pointer KMINUS   pointer               { $$=handleOperation($1, '-', $3); }
+| pointer KTIMES   pointer               { $$=handleOperation($1, '*', $3); }
+| pointer KDIVIDED pointer               { $$=handleOperation($1, '/', $3); }
+| list_content_p
 | str_p
+| int_p
 | TIDENTIFIER { $$ = memoryGetAddresByFriendly(g_friendlies, $1); free($1); }
+
+/* operator */
+/* : KPLUS       { $$='+'; } */
+/* | KMINUS      { $$='-'; } */
+/* | KTIMES      { $$='*'; } */
+/* | KDIVIDED    { $$='/'; } */
 
 function_call
  /* : TIDENTIFIER list_content_p { handleFuncCall($1, $2); } */
@@ -148,27 +171,15 @@ list_content
    VERBOSE_PRINT("-only list item: \t%lu into (%p)", (unsigned long)$1, $$);
  }
 
-/* last_list_item */
-/* : last_list_itemp     { $$ = $1; */
-/*    /\* if (g_memory->content_type[(memoryGetRootAddress(g_memory, $$))] != t_str) */
-/*     *   yyerror("type missmatch"); *\/ */
-/*  } */
-
-/* last_list_itemp */
-/* : pointer               RBRACE      { $$ = $1; } */
-/* | pointer        KCOMMA RBRACE      { $$ = $1; } /\* CAUSES SHIFT/REDUCE CONFLICT *\/ */
-/* | TIDENTIFIER           RBRACE      { $$ = memoryGetAddresByFriendly(g_friendlies , $1); free($1); }
- * | TIDENTIFIER    KCOMMA RBRACE      { $$ = memoryGetAddresByFriendly(g_friendlies , $1); free($1); } */
-
-/* first_list_item */
-/* : LBRACE pointer        KCOMMA      { $$ = $2; } */
-/* | LBRACE TIDENTIFIER    KCOMMA { $$ = memoryGetAddresByFriendly(g_friendlies , $2);
- *    free($2);
- *    /\* if (g_memory->content_type[(memoryGetRootAddress(g_memory, $$))] != t_str)
- *     *   yyerror("type missmatch"); *\/
- *  } */
 
 /* --------------------------------------------------------------------------- */
+int_p
+: TINTEGER   {
+  memory_item *item = malloc(sizeof(memory_item));
+  item->integer = $1;
+  $$ = memoryInsert(g_memory, item, t_int);
+  VERBOSE_PRINT("integer %d in %lu"  , g_memory->content[memoryGetRootAddress(g_memory, $$)]->integer, (unsigned long)$$);
+ }
 
 str_p
 : string_p
@@ -194,7 +205,7 @@ regex_p
 %%
 
 
-int yyerror(char *p) {
+int yyerror(const char *p) {
   char *message = p;
   char *underline, *snippet;
   yylloc.first_column++;

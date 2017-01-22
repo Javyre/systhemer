@@ -41,6 +41,21 @@
 },
 {
   "directory": "/home/javier/Code/cpp/systhemer/build",
+  "command": "/usr/bin/cc_args.py clang   -g -Wall -lpcre2-8   -o CMakeFiles/systhemer.dir/uni_int.c.o   -c /home/javier/Code/cpp/systhemer/src/uni_int.c",
+  "file": "/home/javier/Code/cpp/systhemer/src/uni_int.c"
+},
+{
+  "directory": "/home/javier/Code/cpp/systhemer/build",
+  "command": "/usr/bin/cc_args.py clang   -g -Wall -lpcre2-8   -o CMakeFiles/systhemer.dir/uni_regex.c.o   -c /home/javier/Code/cpp/systhemer/src/uni_regex.c",
+  "file": "/home/javier/Code/cpp/systhemer/src/uni_regex.c"
+},
+{
+  "directory": "/home/javier/Code/cpp/systhemer/build",
+  "command": "/usr/bin/cc_args.py clang   -g -Wall -lpcre2-8   -o CMakeFiles/systhemer.dir/uni_string.c.o   -c /home/javier/Code/cpp/systhemer/src/uni_string.c",
+  "file": "/home/javier/Code/cpp/systhemer/src/uni_string.c"
+},
+{
+  "directory": "/home/javier/Code/cpp/systhemer/build",
   "command": "/usr/bin/cc_args.py clang   -g -Wall -lpcre2-8   -o CMakeFiles/systhemer.dir/unitheme.c.o   -c /home/javier/Code/cpp/systhemer/src/unitheme.c",
   "file": "/home/javier/Code/cpp/systhemer/src/unitheme.c"
 },

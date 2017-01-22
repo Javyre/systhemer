@@ -7,6 +7,8 @@
 #include <stddef.h>
 
 //Package defines and dev options (constant)
+/* #include "memory.h" */
+extern int yyerror(const char *p);
 #define PACKAGE "SysThemer"
 #define VERSION "0.0.1"
 
@@ -17,10 +19,12 @@
 #define RE_REGEX_LITTERAL "(\\/(((\\\\\\/)|[^\\/])+)\\/|(\\/\\/))"
 #define RE_ANY_LITTERAL "(" RE_STRING_LITTERAL "|" RE_REGEX_LITTERAL ")"
 
+/* TODO: rename STRING_TYPE type to something more like VAR_TYPE */
 typedef enum {
   T_NULL = 0,
   T_STRING,
-  T_REGEX
+  T_REGEX,
+  T_INTEGER
 } STRING_TYPE;
 #define SET_STRING_TYPE(str_tp, dlm_chr, scp_chr)                       \
   SET_DELIM_CHAR(((str_tp) == T_NULL ? NULL_DELIM : (str_tp) == 1 ? STR_DELIM : REGEX_DELIM), dlm_chr); \
@@ -51,19 +55,6 @@ typedef enum {
 #define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = (scp_tp == NULL_ESCAPE) ? '\0' : '\\';
 /* #define SET_ESCAPE_CHAR(scp_tp, scp_chr) const char scp_chr = (scp_tp == NULL_ESCAPE) ? '\0' : (scp_tp == 1 ? STR_ESCAPE_CHAR : REGEX_ESCAPE_CHAR); */
 
-typedef struct {
-  const char esc_char;      /* would be '\\' */
-  /* const char *escaped[205];   /\* would be "n" for the newline character ("\\n") *\/
-   * const char *unescaped[5]; /\* would be the actual newline character          *\/ */
-  const char *escaped[26];   /* would be "n" for the newline character ("\\n") */
-  const char *unescaped[26]; /* would be the actual newline character          */
-  const size_t num_escs;
-  const char delim_char;
-  const bool allow_unrecongnized_escs;
-} type_attrs;
-
-extern type_attrs g_string_attrs;
-extern type_attrs g_regex_attrs;
 
 #define KNRM     "\x1B[0m"
 #define BKNRM    "\e[1;0m"
@@ -83,9 +74,12 @@ extern type_attrs g_regex_attrs;
 #define KDEFAULT "\x1b[0m"
 #define BKWHT    "\e[1;37m"
 
+/* I prefix = illustrate */
 #define ILISTO   BKRED "(" BKRED
 #define ILISTC   BKRED ")" BKRED
-#define IPARROW  KMAG " -> " 
+#define IADDRO   BKCYN "["
+#define IADDRC   BKCYN "]"
+#define IPARROW  KMAG "-> "
 
 #define PRINT_VALUE(type, token, color) printf(color #token " is " #type "\x1b[0m" "\n", token);
 
@@ -117,8 +111,8 @@ extern type_attrs g_regex_attrs;
 #endif
 
 /* TODO: perfect error msgs or make an error msg util library of sorts */
-#define ERROR_PRINT_HELPER(fmt, ...) fprintf(stderr, BKRED PACKAGE " ERROR" ": " fmt "\x1b[0m" " (error in %s)\n", __VA_ARGS__);
-#define ERROR_PRINT(...) if(1) {ERROR_PRINT_HELPER(__VA_ARGS__, __func__);}
+#define ERROR_PRINT_HELPER(fmt, ...) fprintf(stderr, BKRED PACKAGE " ERROR" ": " fmt "\x1b[0m" " (error in %s %s)\n", __VA_ARGS__);
+#define ERROR_PRINT(...) if(1) {ERROR_PRINT_HELPER(__VA_ARGS__, __func__, __FILE__);}
 
 #define HANDLE_REALLOC(t, p, s)                                         \
   do {                                                                         \

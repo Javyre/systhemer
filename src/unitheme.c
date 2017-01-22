@@ -468,6 +468,47 @@ void handleFuncCall(char *func_name, memory_address param_list_address) {
   free(func_name);
 }
 
+memory_address handleOperation(memory_address operand1, char operation, memory_address operand2) {
+  if (memoryGetRootType(g_memory, operand1) !=
+      memoryGetRootType(g_memory, operand2)) {
+    ERROR_PRINT("Error while handling operation %c, operand types (%d and %d) "
+                "did not match!",
+                operation, memoryGetRootType(g_memory, operand1),
+                memoryGetRootType(g_memory, operand2));
+    yyerror("runtime error (operation type mismatch)");
+  }
+
+  /* memory_item *result_item = malloc(sizeof(memory_item)); */
+  type_attrs ty_at;
+  for (size_t i=0; i<sizeof(*g_types_attrs); i++) {
+    if (g_types_attrs[i]->t_type==memoryGetRootType(g_memory, operand1)) {
+      ty_at = *g_types_attrs[i];
+      break;
+    }
+  }
+
+  switch (operation){
+  case '+':
+    return ty_at.add(operand1, operand2);
+    break;
+  case '-':
+    return ty_at.subtract(operand1, operand2);
+    break;
+  case '*':
+    return ty_at.multiply(operand1, operand2);
+    break;
+  case '/':
+    return ty_at.divide(operand1, operand2);
+    break;
+  default:
+    ERROR_PRINT("operation '%c' does not exist", operation);
+    yyerror_count++;
+    /* EXIT(1); */
+    break;
+  }
+  /* free(result_item); */
+  return operand1;
+}
 
 /* /\* Allocates memory for the variableList content and initializes some values *\/ */
 /* void varsInit(variableList *vars, size_t initial_size) { */

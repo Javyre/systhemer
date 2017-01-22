@@ -6,7 +6,7 @@ bison -rall -d parser.y
 
 cd ../build
 echo "current dir:" $(pwd)
-cmake ../src && \
+cmake . && \
 make clean -j 3 && \
 make -j 3 && \
 valgrind --tool=memcheck --leak-check=full \

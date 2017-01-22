@@ -134,6 +134,7 @@ typedef struct {
   size_t blocks_used;
   size_t max_blocks_size;
   size_t min_blocks_used;
+
 } output_holder;
 
 /* ---------------------------------------------------------------------- */
@@ -173,6 +174,8 @@ void handlePointerAssig(char *to_name, char *from_name);
 void handleAssigDef(char *var_name, memory_address content);
 
 void handleFuncCall(char *func_name, memory_address param_list_address);
+
+memory_address handleOperation(memory_address operand1, char operation, memory_address operand2);
 
 /* void handleListDef(char *list_name, t_ptr_list *content, STRING_TYPE str_type); */
 

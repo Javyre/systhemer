@@ -49,6 +49,21 @@ CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/tests.h
 CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.h
 CMakeFiles/systhemer.dir/tests.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
 
+CMakeFiles/systhemer.dir/uni_int.c.o: /home/javier/Code/cpp/systhemer/src/memory.h
+CMakeFiles/systhemer.dir/uni_int.c.o: /home/javier/Code/cpp/systhemer/src/uni_int.c
+CMakeFiles/systhemer.dir/uni_int.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.h
+CMakeFiles/systhemer.dir/uni_int.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
+
+CMakeFiles/systhemer.dir/uni_regex.c.o: /home/javier/Code/cpp/systhemer/src/memory.h
+CMakeFiles/systhemer.dir/uni_regex.c.o: /home/javier/Code/cpp/systhemer/src/uni_regex.c
+CMakeFiles/systhemer.dir/uni_regex.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.h
+CMakeFiles/systhemer.dir/uni_regex.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
+
+CMakeFiles/systhemer.dir/uni_string.c.o: /home/javier/Code/cpp/systhemer/src/memory.h
+CMakeFiles/systhemer.dir/uni_string.c.o: /home/javier/Code/cpp/systhemer/src/uni_string.c
+CMakeFiles/systhemer.dir/uni_string.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.h
+CMakeFiles/systhemer.dir/uni_string.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
+
 CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/builtin_funcs.h
 CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/execUnitheme.h
 CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/memory.h
@@ -57,6 +72,7 @@ CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/unith
 CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.h
 CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
 
+CMakeFiles/systhemer.dir/utils.c.o: /home/javier/Code/cpp/systhemer/src/memory.h
 CMakeFiles/systhemer.dir/utils.c.o: /home/javier/Code/cpp/systhemer/src/utils.c
 CMakeFiles/systhemer.dir/utils.c.o: /home/javier/Code/cpp/systhemer/src/utils.h
 

@@ -6,19 +6,12 @@
 #include <unistd.h>
 
 #include "utils.h"
+#include "memory.h"
 
 // Default options (dynamic)
 bool verboseMode = true;
 bool testsMode = false;
 
-type_attrs g_string_attrs = {'\\',
-                             {"\\", "\"", "n",  "t" }, /* escaped   */
-                             {"\\", "\"", "\n", "\t"}, /* unescaped */
-                             4, '\"', false};
-type_attrs g_regex_attrs  = {'\\',
-                             {"/"},
-                             {"/"},
-                             1, '/', true};
 
 void printHelp(const int exval) {
   printf("%s,%s\n", PACKAGE, VERSION);
@@ -574,7 +567,14 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
   /* SET_DELIM_CHAR(delim, delim_char);
    * SET_ESCAPE_CHAR(escape , escape_char); */
 
-  type_attrs ty_at = delim==STR_DELIM ? g_string_attrs : g_regex_attrs;
+  /* type_attrs ty_at = delim==STR_DELIM ? *g_types_attrs[0] : *g_types_attrs[1]; */
+  type_attrs ty_at;
+  for (size_t i=0; i<sizeof(*g_types_attrs); i++) {
+    if (g_types_attrs[i]->s_type == (STRING_TYPE)delim) {
+      ty_at = *g_types_attrs[i];
+      break;
+    }
+  }
 
   bool override_inside = false;
 
@@ -586,16 +586,16 @@ void utilRmEscape(char *str, DELIM_TYPE delim, ESCAPE_TYPE escape) {
         for (size_t i=0; i<ty_at.num_escs; i++) {
           /* using the first char of escaped and unescaped for now
            * (possible future support for multi-char escape modifiers...) */
-          if (src[1] == ty_at.escaped[i][0]) {
+          if (src[1] == ty_at.escaped[i][0]) { /* escaped would be: "\\n" */
             strOverlap(str, str, (src - 1), (src + 1), NULL);
             if (*src == ty_at.delim_char)
               override_inside = !override_inside;
-            *src = ty_at.unescaped[i][0];
+            *src = ty_at.unescaped[i][0];      /* unescaped would be: '\n' */
             has_been_rmed = true;
             break;
           }
         }
-        if (!has_been_rmed && !ty_at.allow_unrecongnized_escs){
+        if (!has_been_rmed && !ty_at.allow_unrecognized_escs){
           fprintf(stderr,
                   BKRED "Error: Found escape character inside of string with "
                   "invalid successor \"%c\": \n\t%s\n\t%s\n",
@@ -721,7 +721,14 @@ void regexUnregex(char **str) {
 void utilRestring(char **str, const DELIM_TYPE delim) {
   HANDLE_REALLOC(char, *str, (strlen(*str)*2)+1);
 
-  type_attrs ty_at = delim==STR_DELIM ? g_string_attrs : g_regex_attrs;
+  type_attrs ty_at;
+  for (size_t i=0; i<sizeof(*g_types_attrs); i++) {
+    if (g_types_attrs[i]->s_type == (STRING_TYPE)delim) {
+      ty_at = *g_types_attrs[i];
+      break;
+    }
+  }
+  /* type_attrs ty_at = delim == STR_DELIM ? *g_types_attrs[0] : *g_types_attrs[1]; */
   char esc_char[2] = {ty_at.esc_char,0};
   char delim_char[2] = {ty_at.delim_char,0};
 

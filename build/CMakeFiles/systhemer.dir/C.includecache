@@ -9,6 +9,10 @@
 /home/javier/Code/cpp/systhemer/src/builtin_funcs.c
 builtin_funcs.h
 /home/javier/Code/cpp/systhemer/src/builtin_funcs.h
+utils.h
+/home/javier/Code/cpp/systhemer/src/utils.h
+memory.h
+/home/javier/Code/cpp/systhemer/src/memory.h
 
 /home/javier/Code/cpp/systhemer/src/builtin_funcs.h
 memory.h
@@ -48,6 +52,8 @@ utils.h
 parser.tab.h
 /home/javier/Code/cpp/systhemer/src/parser.tab.h
 string.h
+-
+stdlib.h
 -
 stdio.h
 -
@@ -176,6 +182,36 @@ priv_unitheme.h
 stdbool.h
 -
 
+/home/javier/Code/cpp/systhemer/src/uni_int.c
+string.h
+-
+memory.h
+/home/javier/Code/cpp/systhemer/src/memory.h
+utils.h
+/home/javier/Code/cpp/systhemer/src/utils.h
+unitheme.h
+/home/javier/Code/cpp/systhemer/src/unitheme.h
+
+/home/javier/Code/cpp/systhemer/src/uni_regex.c
+memory.h
+/home/javier/Code/cpp/systhemer/src/memory.h
+utils.h
+/home/javier/Code/cpp/systhemer/src/utils.h
+unitheme.h
+/home/javier/Code/cpp/systhemer/src/unitheme.h
+string.h
+-
+
+/home/javier/Code/cpp/systhemer/src/uni_string.c
+memory.h
+/home/javier/Code/cpp/systhemer/src/memory.h
+utils.h
+/home/javier/Code/cpp/systhemer/src/utils.h
+unitheme.h
+/home/javier/Code/cpp/systhemer/src/unitheme.h
+string.h
+-
+
 /home/javier/Code/cpp/systhemer/src/unitheme.c
 unitheme.h
 /home/javier/Code/cpp/systhemer/src/unitheme.h
@@ -221,6 +257,8 @@ unistd.h
 -
 utils.h
 /home/javier/Code/cpp/systhemer/src/utils.h
+memory.h
+/home/javier/Code/cpp/systhemer/src/memory.h
 
 /home/javier/Code/cpp/systhemer/src/utils.h
 stdbool.h

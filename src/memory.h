@@ -11,6 +11,7 @@ typedef size_t memory_address;
 
 /* type declarations */
 typedef enum {
+  t_int,
   t_str,
   t_rgx,
   t_list,
@@ -34,9 +35,10 @@ typedef struct {
 } t_ptr_list;
 
 typedef union {
+  int integer;
   t_ptr_list *list;
   char *str;
-  size_t address;
+  memory_address address;
 } memory_item;
 
 typedef struct {
@@ -45,6 +47,43 @@ typedef struct {
   size_t used;
   size_t size;
 } memory_holder;
+
+
+
+typedef memory_address (*mem_operation_func) (const memory_address a, const memory_address b);
+
+typedef struct {
+  const char esc_char;      /* would be '\\' */
+  /* const char *escaped[205];   /\* would be "n" for the newline character ("\\n") *\/
+   * const char *unescaped[5]; /\* would be the actual newline character          *\/ */
+  const char *escaped[26];   /* would be "n" for the newline character ("\\n") */
+  const char *unescaped[26]; /* would be the actual newline character          */
+  const size_t num_escs;
+  const char delim_char;
+  const bool allow_unrecognized_escs;
+  mem_operation_func add;
+  mem_operation_func subtract;
+  mem_operation_func multiply;
+  mem_operation_func divide;
+  /* memory_address (*add)(memory_address a, memory_address b); */
+  /* memory_address (*subtract)(memory_address a, memory_address b); */
+  /* memory_address (*multiply)(memory_address a, memory_address b); */
+  /* memory_address (*divide)(memory_address a, memory_address b); */
+
+  bool is_string_type;
+  STRING_TYPE s_type;
+  t_type t_type;
+} type_attrs;
+
+/* #include "uni_string.h" */
+/* #include "uni_regex.h" */
+/* #include "uni_int.h" */
+/* extern type_attrs g_string_attrs; */
+/* extern type_attrs g_regex_attrs; */
+/* extern type_attrs g_int_attrs; */
+
+extern type_attrs *g_types_attrs[];
+
 
 void memoryInit(memory_holder *mem, size_t initial_size);
 

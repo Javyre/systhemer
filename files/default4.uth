@@ -36,7 +36,11 @@ print{"waht\n"};
 
 def gg = {"test item1", "test item2", "test item3", };
 
-def list1 = {"1", {"98089", "79679"}};
+# def number = -1;
+
+def sum1 = 4+(6-5)*9;
+
+# def list1 = {1, {98089, 79679}};
 
 
 def pr = {"test\n"};
@@ -46,3 +50,4 @@ def ppr = "test2";
 print {"ppr is: ", ppr, "\n"};
 
 def firstField = "Hello, world!";
+def secondField = "Hey" + " there!";

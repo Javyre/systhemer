@@ -50,17 +50,24 @@ extern int yydebug;
     KSEMI = 260,
     KCOMMA = 261,
     KEQUALS = 262,
-    LBRACE = 263,
-    RBRACE = 264,
-    KBEGINDEF = 265,
-    KENDDEF = 266,
-    KDEF = 267,
-    KPERIOD = 268,
-    LPAREN = 269,
-    RPAREN = 270,
-    TSTR = 271,
-    TRGXP = 272,
-    TIDENTIFIER = 273
+    KPLUS = 263,
+    KMINUS = 264,
+    KTIMES = 265,
+    KDIVIDED = 266,
+    LBRACE = 267,
+    RBRACE = 268,
+    LSQUBRACE = 269,
+    RSQUBRACE = 270,
+    KBEGINDEF = 271,
+    KENDDEF = 272,
+    KDEF = 273,
+    KPERIOD = 274,
+    LPAREN = 275,
+    RPAREN = 276,
+    TSTR = 277,
+    TRGXP = 278,
+    TIDENTIFIER = 279,
+    TINTEGER = 280
   };
 #endif
 
@@ -71,13 +78,15 @@ union YYSTYPE
 {
 #line 22 "parser.y" /* yacc.c:1909  */
 
+  int  intgr;
+  char operator;
   char *str;
   list *lst;
   t_ptr_list *ptr_lst;
   memory_address addr;
   memory_item *mem_item;
 
-#line 81 "parser.tab.h" /* yacc.c:1909  */
+#line 90 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

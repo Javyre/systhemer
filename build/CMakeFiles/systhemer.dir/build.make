@@ -252,9 +252,81 @@ CMakeFiles/systhemer.dir/tests.c.o.provides: CMakeFiles/systhemer.dir/tests.c.o.
 CMakeFiles/systhemer.dir/tests.c.o.provides.build: CMakeFiles/systhemer.dir/tests.c.o
 
 
+CMakeFiles/systhemer.dir/uni_int.c.o: CMakeFiles/systhemer.dir/flags.make
+CMakeFiles/systhemer.dir/uni_int.c.o: /home/javier/Code/cpp/systhemer/src/uni_int.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/systhemer.dir/uni_int.c.o"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/uni_int.c.o   -c /home/javier/Code/cpp/systhemer/src/uni_int.c
+
+CMakeFiles/systhemer.dir/uni_int.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/systhemer.dir/uni_int.c.i"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/javier/Code/cpp/systhemer/src/uni_int.c > CMakeFiles/systhemer.dir/uni_int.c.i
+
+CMakeFiles/systhemer.dir/uni_int.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/systhemer.dir/uni_int.c.s"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/javier/Code/cpp/systhemer/src/uni_int.c -o CMakeFiles/systhemer.dir/uni_int.c.s
+
+CMakeFiles/systhemer.dir/uni_int.c.o.requires:
+
+.PHONY : CMakeFiles/systhemer.dir/uni_int.c.o.requires
+
+CMakeFiles/systhemer.dir/uni_int.c.o.provides: CMakeFiles/systhemer.dir/uni_int.c.o.requires
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_int.c.o.provides.build
+.PHONY : CMakeFiles/systhemer.dir/uni_int.c.o.provides
+
+CMakeFiles/systhemer.dir/uni_int.c.o.provides.build: CMakeFiles/systhemer.dir/uni_int.c.o
+
+
+CMakeFiles/systhemer.dir/uni_regex.c.o: CMakeFiles/systhemer.dir/flags.make
+CMakeFiles/systhemer.dir/uni_regex.c.o: /home/javier/Code/cpp/systhemer/src/uni_regex.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/systhemer.dir/uni_regex.c.o"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/uni_regex.c.o   -c /home/javier/Code/cpp/systhemer/src/uni_regex.c
+
+CMakeFiles/systhemer.dir/uni_regex.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/systhemer.dir/uni_regex.c.i"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/javier/Code/cpp/systhemer/src/uni_regex.c > CMakeFiles/systhemer.dir/uni_regex.c.i
+
+CMakeFiles/systhemer.dir/uni_regex.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/systhemer.dir/uni_regex.c.s"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/javier/Code/cpp/systhemer/src/uni_regex.c -o CMakeFiles/systhemer.dir/uni_regex.c.s
+
+CMakeFiles/systhemer.dir/uni_regex.c.o.requires:
+
+.PHONY : CMakeFiles/systhemer.dir/uni_regex.c.o.requires
+
+CMakeFiles/systhemer.dir/uni_regex.c.o.provides: CMakeFiles/systhemer.dir/uni_regex.c.o.requires
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_regex.c.o.provides.build
+.PHONY : CMakeFiles/systhemer.dir/uni_regex.c.o.provides
+
+CMakeFiles/systhemer.dir/uni_regex.c.o.provides.build: CMakeFiles/systhemer.dir/uni_regex.c.o
+
+
+CMakeFiles/systhemer.dir/uni_string.c.o: CMakeFiles/systhemer.dir/flags.make
+CMakeFiles/systhemer.dir/uni_string.c.o: /home/javier/Code/cpp/systhemer/src/uni_string.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/systhemer.dir/uni_string.c.o"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/uni_string.c.o   -c /home/javier/Code/cpp/systhemer/src/uni_string.c
+
+CMakeFiles/systhemer.dir/uni_string.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/systhemer.dir/uni_string.c.i"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/javier/Code/cpp/systhemer/src/uni_string.c > CMakeFiles/systhemer.dir/uni_string.c.i
+
+CMakeFiles/systhemer.dir/uni_string.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/systhemer.dir/uni_string.c.s"
+	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/javier/Code/cpp/systhemer/src/uni_string.c -o CMakeFiles/systhemer.dir/uni_string.c.s
+
+CMakeFiles/systhemer.dir/uni_string.c.o.requires:
+
+.PHONY : CMakeFiles/systhemer.dir/uni_string.c.o.requires
+
+CMakeFiles/systhemer.dir/uni_string.c.o.provides: CMakeFiles/systhemer.dir/uni_string.c.o.requires
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_string.c.o.provides.build
+.PHONY : CMakeFiles/systhemer.dir/uni_string.c.o.provides
+
+CMakeFiles/systhemer.dir/uni_string.c.o.provides.build: CMakeFiles/systhemer.dir/uni_string.c.o
+
+
 CMakeFiles/systhemer.dir/unitheme.c.o: CMakeFiles/systhemer.dir/flags.make
 CMakeFiles/systhemer.dir/unitheme.c.o: /home/javier/Code/cpp/systhemer/src/unitheme.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/systhemer.dir/unitheme.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/systhemer.dir/unitheme.c.o"
 	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/unitheme.c.o   -c /home/javier/Code/cpp/systhemer/src/unitheme.c
 
 CMakeFiles/systhemer.dir/unitheme.c.i: cmake_force
@@ -278,7 +350,7 @@ CMakeFiles/systhemer.dir/unitheme.c.o.provides.build: CMakeFiles/systhemer.dir/u
 
 CMakeFiles/systhemer.dir/utils.c.o: CMakeFiles/systhemer.dir/flags.make
 CMakeFiles/systhemer.dir/utils.c.o: /home/javier/Code/cpp/systhemer/src/utils.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/systhemer.dir/utils.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/systhemer.dir/utils.c.o"
 	/usr/bin/cc_args.py clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/systhemer.dir/utils.c.o   -c /home/javier/Code/cpp/systhemer/src/utils.c
 
 CMakeFiles/systhemer.dir/utils.c.i: cmake_force
@@ -310,6 +382,9 @@ systhemer_OBJECTS = \
 "CMakeFiles/systhemer.dir/parser.tab.c.o" \
 "CMakeFiles/systhemer.dir/systhemerUnitheme.c.o" \
 "CMakeFiles/systhemer.dir/tests.c.o" \
+"CMakeFiles/systhemer.dir/uni_int.c.o" \
+"CMakeFiles/systhemer.dir/uni_regex.c.o" \
+"CMakeFiles/systhemer.dir/uni_string.c.o" \
 "CMakeFiles/systhemer.dir/unitheme.c.o" \
 "CMakeFiles/systhemer.dir/utils.c.o"
 
@@ -324,11 +399,14 @@ systhemer: CMakeFiles/systhemer.dir/memory.c.o
 systhemer: CMakeFiles/systhemer.dir/parser.tab.c.o
 systhemer: CMakeFiles/systhemer.dir/systhemerUnitheme.c.o
 systhemer: CMakeFiles/systhemer.dir/tests.c.o
+systhemer: CMakeFiles/systhemer.dir/uni_int.c.o
+systhemer: CMakeFiles/systhemer.dir/uni_regex.c.o
+systhemer: CMakeFiles/systhemer.dir/uni_string.c.o
 systhemer: CMakeFiles/systhemer.dir/unitheme.c.o
 systhemer: CMakeFiles/systhemer.dir/utils.c.o
 systhemer: CMakeFiles/systhemer.dir/build.make
 systhemer: CMakeFiles/systhemer.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking C executable systhemer"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/javier/Code/cpp/systhemer/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Linking C executable systhemer"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/systhemer.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -344,6 +422,9 @@ CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/memory.c.o.requires
 CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/parser.tab.c.o.requires
 CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/systhemerUnitheme.c.o.requires
 CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/tests.c.o.requires
+CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/uni_int.c.o.requires
+CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/uni_regex.c.o.requires
+CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/uni_string.c.o.requires
 CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/unitheme.c.o.requires
 CMakeFiles/systhemer.dir/requires: CMakeFiles/systhemer.dir/utils.c.o.requires
 

@@ -342,6 +342,87 @@ tests.c.s:
 	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/tests.c.s
 .PHONY : tests.c.s
 
+uni_int.o: uni_int.c.o
+
+.PHONY : uni_int.o
+
+# target to build an object file
+uni_int.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_int.c.o
+.PHONY : uni_int.c.o
+
+uni_int.i: uni_int.c.i
+
+.PHONY : uni_int.i
+
+# target to preprocess a source file
+uni_int.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_int.c.i
+.PHONY : uni_int.c.i
+
+uni_int.s: uni_int.c.s
+
+.PHONY : uni_int.s
+
+# target to generate assembly for a file
+uni_int.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_int.c.s
+.PHONY : uni_int.c.s
+
+uni_regex.o: uni_regex.c.o
+
+.PHONY : uni_regex.o
+
+# target to build an object file
+uni_regex.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_regex.c.o
+.PHONY : uni_regex.c.o
+
+uni_regex.i: uni_regex.c.i
+
+.PHONY : uni_regex.i
+
+# target to preprocess a source file
+uni_regex.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_regex.c.i
+.PHONY : uni_regex.c.i
+
+uni_regex.s: uni_regex.c.s
+
+.PHONY : uni_regex.s
+
+# target to generate assembly for a file
+uni_regex.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_regex.c.s
+.PHONY : uni_regex.c.s
+
+uni_string.o: uni_string.c.o
+
+.PHONY : uni_string.o
+
+# target to build an object file
+uni_string.c.o:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_string.c.o
+.PHONY : uni_string.c.o
+
+uni_string.i: uni_string.c.i
+
+.PHONY : uni_string.i
+
+# target to preprocess a source file
+uni_string.c.i:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_string.c.i
+.PHONY : uni_string.c.i
+
+uni_string.s: uni_string.c.s
+
+.PHONY : uni_string.s
+
+# target to generate assembly for a file
+uni_string.c.s:
+	$(MAKE) -f CMakeFiles/systhemer.dir/build.make CMakeFiles/systhemer.dir/uni_string.c.s
+.PHONY : uni_string.c.s
+
 unitheme.o: unitheme.c.o
 
 .PHONY : unitheme.o
@@ -429,6 +510,15 @@ help:
 	@echo "... tests.o"
 	@echo "... tests.i"
 	@echo "... tests.s"
+	@echo "... uni_int.o"
+	@echo "... uni_int.i"
+	@echo "... uni_int.s"
+	@echo "... uni_regex.o"
+	@echo "... uni_regex.i"
+	@echo "... uni_regex.s"
+	@echo "... uni_string.o"
+	@echo "... uni_string.i"
+	@echo "... uni_string.s"
 	@echo "... unitheme.o"
 	@echo "... unitheme.i"
 	@echo "... unitheme.s"

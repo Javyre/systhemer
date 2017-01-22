@@ -1,4 +1,6 @@
 #include "builtin_funcs.h"
+#include "utils.h"
+#include "memory.h"
 extern int yyerror(const char *p);
 extern size_t yyerror_count;
 

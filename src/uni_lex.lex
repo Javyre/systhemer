@@ -7,8 +7,9 @@
 #include "utils.h"
 #include "parser.tab.h"
 #include <string.h>
+#include <stdlib.h>
 
-extern void yyerror(char *p);
+extern int yyerror(const char *p);
 
 char linebuf[512];
 int yycolumn = 0;
@@ -31,7 +32,10 @@ STRING     (\"((\\[^\r\n\t\f ])|[^\\\"])+\"|\"\")
 REGEXPR    (\/((\\\/)|(\\\\)|[^\/\\])+\/|\/\/)
 COMMENT    [ \t]*#.*
 
-IDENTIFIER [a-zA-Z0-9_-]+
+IDENTIFIER [a-zA-Z0-9_]+
+
+/* INTEGER [-]?[0-9]+ */
+INTEGER [0-9]+
 
 LIST_REGEX "def"{WHITESPACE}+(\S+){BLANK}*"{"{REGEX}
 
@@ -48,10 +52,18 @@ LIST_REGEX "def"{WHITESPACE}+(\S+){BLANK}*"{"{REGEX}
 ";"                           { return KSEMI;   }
 ","														{ return KCOMMA;  }
 "."                           { return KPERIOD; }
-"="														{ return KEQUALS; }
+
+"="														{ return KEQUALS;  }
+"+"														{ return KPLUS;    }
+"-"														{ return KMINUS;   }
+"*"														{ return KTIMES;   }
+"/"														{ return KDIVIDED; }
 
 "{" 													{ return LBRACE; }
 "}"														{ return RBRACE; }
+
+"[" 													{ return LSQUBRACE; }
+"]"														{ return RSQUBRACE; }
 
 "("                           { return LPAREN; }
 ")"                           { return RPAREN; }
@@ -60,5 +72,8 @@ LIST_REGEX "def"{WHITESPACE}+(\S+){BLANK}*"{"{REGEX}
 "enddef"    							    { return KENDDEF;   }
 "def"													{ return KDEF;      }
 
+{INTEGER}                     { yylval.intgr = (int)strtol(yytext, NULL, 10); return TINTEGER; }
+
 {IDENTIFIER}									{ yylval.str = strdup(yytext); return TIDENTIFIER; }
+
 .															{ yyerror("lexical error (unexpected character)"); }

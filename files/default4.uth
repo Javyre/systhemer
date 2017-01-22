@@ -44,6 +44,7 @@ def sum1 = 4+(6-5)*9;
 
 
 def pr = {"test\n"};
+def pr1 = pr[0];
 print pr;
 
 def ppr = "test2";

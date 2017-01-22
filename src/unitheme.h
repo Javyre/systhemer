@@ -177,6 +177,8 @@ void handleFuncCall(char *func_name, memory_address param_list_address);
 
 memory_address handleOperation(memory_address operand1, char operation, memory_address operand2);
 
+memory_address handleListIndex(memory_address list, memory_address index);
+
 /* void handleListDef(char *list_name, t_ptr_list *content, STRING_TYPE str_type); */
 
 /* ---------------------------------------------------------------------- */

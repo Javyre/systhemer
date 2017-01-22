@@ -34,15 +34,15 @@ size_t yyerror_count = 0;
 %token <intgr> TINTEGER
 /* %type <addr> first_string_list_item last_string_list_item first_string_list_itemp last_string_list_itemp
  * %type <addr> first_regex_list_item last_regex_list_item first_regex_list_itemp last_regex_list_itemp */
-%type <addr> first_list_item last_list_item first_list_itemp last_list_itemp
+/* %type <addr> first_list_item last_list_item first_list_itemp last_list_itemp */
 %type <addr> int_p string_p regex_p list_content_p str_p pointer
 /* %type <ptr_lst> string_list_content
  * %type <ptr_lst> regex_list_content */
 %type <ptr_lst> list_content
-%type <operator> operator
+/* %type <operator> operator */
 
 %destructor { VERBOSE_PRINT("FREEING STRING %s", $$); free($$); } <str>
-%destructor { defsFreeList($$); free($$); } <lst>
+/* %destructor { defsFreeList($$); free($$); } <lst> */
 %destructor { VERBOSE_PRINT("FREEING PTR LIST %p", $$); ptrListFree($$); free($$); } <ptr_lst>
 
 %left KPLUS KMINUS
@@ -66,8 +66,8 @@ definition
  *  : TIDENTIFIER LPAREN string_p RPAREN { handleFuncCall($1, $3, T_STRING); } */
 
 pointer
-/* : pointer LSQUBRACE pointer RSQUBRACE    { $$=handleListIndex($1, $2); } */
-: LPAREN pointer RPAREN                  { $$=$2; }
+: pointer LSQUBRACE pointer RSQUBRACE    { $$=handleListIndex($1, $3);      }
+| LPAREN pointer RPAREN                  { $$=$2; }
 /* | LPAREN pointer operator pointer RPAREN { $$=handleOperation($2, $3, $4); } */
 /* | pointer operator pointer               { $$=handleOperation($1, $2, $3); } */
 | pointer KPLUS    pointer               { $$=handleOperation($1, '+', $3); }

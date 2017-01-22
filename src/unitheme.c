@@ -510,6 +510,33 @@ memory_address handleOperation(memory_address operand1, char operation, memory_a
   return operand1;
 }
 
+memory_address handleListIndex(memory_address list, memory_address index) {
+  memory_address root_list_a = memoryGetRootAddress(g_memory, list);
+  memory_address root_index_a = memoryGetRootAddress(g_memory, index);
+  if (memoryGetType(g_memory, root_list_a) != t_list) {
+    yyerror("semantic error: pointer does not represent a list!");
+    return list;
+  }
+  if (memoryGetType(g_memory, root_index_a) != t_int) {
+    yyerror("semantic error: index in square brackets does not represent an integer!");
+    return list;
+  }
+
+  memory_item *out_item = malloc(sizeof(memory_item));
+  out_item->address =
+    memoryGetItem(g_memory, root_list_a)
+    ->list->pointers[memoryGetItem(g_memory, root_index_a)->integer];
+  memory_address out = memoryInsert(g_memory, out_item, t_addr);
+
+  VERBOSE_PRINT("value of %lu index %d is: %lu",
+                list, memoryGetItem(g_memory, root_index_a)->integer,
+                out_item->address);
+  printf("out is: ");
+  memoryIllustrateItem(g_friendlies, g_memory, out, 999, true);
+
+  return out;
+}
+
 /* /\* Allocates memory for the variableList content and initializes some values *\/ */
 /* void varsInit(variableList *vars, size_t initial_size) { */
 /*   /\* *vars = (variableList *)calloc(1, sizeof(variableList)); *\/ */

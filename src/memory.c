@@ -306,9 +306,12 @@ void friendlyInit(friendly_names *friendly, size_t initial_size) {
 }
 
 void friendlyInsert(friendly_names *friendly, char *identifier, memory_address address) {
-  if (friendly->size == friendly->used+1) {
-    friendly->identifiers = realloc(friendly->identifiers, friendly->size + 20);
-    friendly->addresses = realloc(friendly->addresses, friendly->size + 20);
+  VERBOSE_PRINT("INSERTING FRIENDLY NAME: %s for memory address: %lu", identifier, address);
+  VERBOSE_PRINT("friendly size: %lu used: %lu", friendly->size, friendly->used);
+  if (friendly->size <= friendly->used+1) {
+    friendly->identifiers = realloc(friendly->identifiers, sizeof(char*) * (friendly->size + 20));
+    friendly->addresses = realloc(friendly->addresses, sizeof(memory_address) * (friendly->size + 20));
+    friendly->size += 20;
   }
 
   friendly->addresses[friendly->used] = address;

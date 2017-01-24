@@ -7,12 +7,6 @@ Terminals unused in grammar
    KPERIOD
 
 
-State 43 conflicts: 1 shift/reduce
-State 44 conflicts: 1 shift/reduce
-State 45 conflicts: 1 shift/reduce
-State 46 conflicts: 1 shift/reduce
-
-
 Grammar
 
     0 $accept: line $end
@@ -793,7 +787,7 @@ State 43
 
     7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
     9        | pointer . KPLUS pointer
-    9        | pointer KPLUS pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, LBRACE, RBRACE, LSQUBRACE, RSQUBRACE, LPAREN, RPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
+    9        | pointer KPLUS pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
    10        | pointer . KMINUS pointer
    11        | pointer . KTIMES pointer
    12        | pointer . KDIVIDED pointer
@@ -802,13 +796,13 @@ State 43
     KDIVIDED   shift, and go to state 33
     LSQUBRACE  shift, and go to state 34
 
-    LSQUBRACE  [reduce using rule 9 (pointer)]
-    $default   reduce using rule 9 (pointer)
+    $default  reduce using rule 9 (pointer)
 
     Conflict between rule 9 and token KPLUS resolved as reduce (%left KPLUS).
     Conflict between rule 9 and token KMINUS resolved as reduce (%left KMINUS).
     Conflict between rule 9 and token KTIMES resolved as shift (KPLUS < KTIMES).
     Conflict between rule 9 and token KDIVIDED resolved as shift (KPLUS < KDIVIDED).
+    Conflict between rule 9 and token LSQUBRACE resolved as shift (KPLUS < LSQUBRACE).
 
 
 State 44
@@ -816,7 +810,7 @@ State 44
     7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
     9        | pointer . KPLUS pointer
    10        | pointer . KMINUS pointer
-   10        | pointer KMINUS pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, LBRACE, RBRACE, LSQUBRACE, RSQUBRACE, LPAREN, RPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
+   10        | pointer KMINUS pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
    11        | pointer . KTIMES pointer
    12        | pointer . KDIVIDED pointer
 
@@ -824,13 +818,13 @@ State 44
     KDIVIDED   shift, and go to state 33
     LSQUBRACE  shift, and go to state 34
 
-    LSQUBRACE  [reduce using rule 10 (pointer)]
-    $default   reduce using rule 10 (pointer)
+    $default  reduce using rule 10 (pointer)
 
     Conflict between rule 10 and token KPLUS resolved as reduce (%left KPLUS).
     Conflict between rule 10 and token KMINUS resolved as reduce (%left KMINUS).
     Conflict between rule 10 and token KTIMES resolved as shift (KMINUS < KTIMES).
     Conflict between rule 10 and token KDIVIDED resolved as shift (KMINUS < KDIVIDED).
+    Conflict between rule 10 and token LSQUBRACE resolved as shift (KMINUS < LSQUBRACE).
 
 
 State 45
@@ -839,18 +833,18 @@ State 45
     9        | pointer . KPLUS pointer
    10        | pointer . KMINUS pointer
    11        | pointer . KTIMES pointer
-   11        | pointer KTIMES pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, KTIMES, KDIVIDED, LBRACE, RBRACE, LSQUBRACE, RSQUBRACE, LPAREN, RPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
+   11        | pointer KTIMES pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, KTIMES, KDIVIDED, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
    12        | pointer . KDIVIDED pointer
 
     LSQUBRACE  shift, and go to state 34
 
-    LSQUBRACE  [reduce using rule 11 (pointer)]
-    $default   reduce using rule 11 (pointer)
+    $default  reduce using rule 11 (pointer)
 
     Conflict between rule 11 and token KPLUS resolved as reduce (KPLUS < KTIMES).
     Conflict between rule 11 and token KMINUS resolved as reduce (KMINUS < KTIMES).
     Conflict between rule 11 and token KTIMES resolved as reduce (%left KTIMES).
     Conflict between rule 11 and token KDIVIDED resolved as reduce (%left KDIVIDED).
+    Conflict between rule 11 and token LSQUBRACE resolved as shift (KTIMES < LSQUBRACE).
 
 
 State 46
@@ -860,17 +854,17 @@ State 46
    10        | pointer . KMINUS pointer
    11        | pointer . KTIMES pointer
    12        | pointer . KDIVIDED pointer
-   12        | pointer KDIVIDED pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, KTIMES, KDIVIDED, LBRACE, RBRACE, LSQUBRACE, RSQUBRACE, LPAREN, RPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
+   12        | pointer KDIVIDED pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, KTIMES, KDIVIDED, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
 
     LSQUBRACE  shift, and go to state 34
 
-    LSQUBRACE  [reduce using rule 12 (pointer)]
-    $default   reduce using rule 12 (pointer)
+    $default  reduce using rule 12 (pointer)
 
     Conflict between rule 12 and token KPLUS resolved as reduce (KPLUS < KDIVIDED).
     Conflict between rule 12 and token KMINUS resolved as reduce (KMINUS < KDIVIDED).
     Conflict between rule 12 and token KTIMES resolved as reduce (%left KTIMES).
     Conflict between rule 12 and token KDIVIDED resolved as reduce (%left KDIVIDED).
+    Conflict between rule 12 and token LSQUBRACE resolved as shift (KDIVIDED < LSQUBRACE).
 
 
 State 47

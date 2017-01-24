@@ -490,9 +490,9 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    55,    55,    56,    57,    58,    59,    62,    69,    70,
-      73,    74,    75,    76,    77,    78,    79,    80,    90,   104,
-     121,   135,   146,   156,   165,   177,   185,   186,   189,   198
+       0,    56,    56,    57,    58,    59,    60,    63,    70,    71,
+      74,    75,    76,    77,    78,    79,    80,    81,    91,   105,
+     122,   136,   147,   157,   166,   178,   186,   187,   190,   199
 };
 #endif
 
@@ -1419,49 +1419,49 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 69 "parser.y" /* yacc.c:1646  */
+#line 70 "parser.y" /* yacc.c:1646  */
     { (yyval.addr)=handleListIndex((yyvsp[-3].addr), (yyvsp[-1].addr));      }
 #line 1425 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 70 "parser.y" /* yacc.c:1646  */
+#line 71 "parser.y" /* yacc.c:1646  */
     { (yyval.addr)=(yyvsp[-1].addr); }
 #line 1431 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 73 "parser.y" /* yacc.c:1646  */
+#line 74 "parser.y" /* yacc.c:1646  */
     { (yyval.addr)=handleOperation((yyvsp[-2].addr), '+', (yyvsp[0].addr)); }
 #line 1437 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 74 "parser.y" /* yacc.c:1646  */
+#line 75 "parser.y" /* yacc.c:1646  */
     { (yyval.addr)=handleOperation((yyvsp[-2].addr), '-', (yyvsp[0].addr)); }
 #line 1443 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 75 "parser.y" /* yacc.c:1646  */
+#line 76 "parser.y" /* yacc.c:1646  */
     { (yyval.addr)=handleOperation((yyvsp[-2].addr), '*', (yyvsp[0].addr)); }
 #line 1449 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 76 "parser.y" /* yacc.c:1646  */
+#line 77 "parser.y" /* yacc.c:1646  */
     { (yyval.addr)=handleOperation((yyvsp[-2].addr), '/', (yyvsp[0].addr)); }
 #line 1455 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 80 "parser.y" /* yacc.c:1646  */
+#line 81 "parser.y" /* yacc.c:1646  */
     { (yyval.addr) = memoryGetAddresByFriendly(g_friendlies, (yyvsp[0].str)); free((yyvsp[0].str)); }
 #line 1461 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 90 "parser.y" /* yacc.c:1646  */
+#line 91 "parser.y" /* yacc.c:1646  */
     {
    if(memoryGetRootType(g_memory, (yyvsp[0].addr)) == t_list) {
      handleFuncCall((yyvsp[-1].str), (yyvsp[0].addr));
@@ -1474,13 +1474,13 @@ yyreduce:
     break;
 
   case 19:
-#line 104 "parser.y" /* yacc.c:1646  */
+#line 105 "parser.y" /* yacc.c:1646  */
     { handleAssigDef((yyvsp[-2].str), (yyvsp[0].addr)); }
 #line 1480 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 121 "parser.y" /* yacc.c:1646  */
+#line 122 "parser.y" /* yacc.c:1646  */
     {
    /* create mem_item for insertion into memory */
    memory_item *item = malloc(sizeof(memory_item));
@@ -1493,7 +1493,7 @@ yyreduce:
     break;
 
   case 21:
-#line 135 "parser.y" /* yacc.c:1646  */
+#line 136 "parser.y" /* yacc.c:1646  */
     {
    if ((yyval.ptr_lst)->yy_has_last_item) {
      yyerror("semantic error: list content already contains last item");
@@ -1508,7 +1508,7 @@ yyreduce:
     break;
 
   case 22:
-#line 146 "parser.y" /* yacc.c:1646  */
+#line 147 "parser.y" /* yacc.c:1646  */
     {
    if ((yyval.ptr_lst)->yy_has_last_item) {
      yyerror("semantic error: list content already contains last item");
@@ -1522,7 +1522,7 @@ yyreduce:
     break;
 
   case 23:
-#line 156 "parser.y" /* yacc.c:1646  */
+#line 157 "parser.y" /* yacc.c:1646  */
     {
    (yyval.ptr_lst) = (t_ptr_list *)malloc(sizeof(t_ptr_list));
    ptrListInit((yyval.ptr_lst), 20);
@@ -1535,7 +1535,7 @@ yyreduce:
     break;
 
   case 24:
-#line 165 "parser.y" /* yacc.c:1646  */
+#line 166 "parser.y" /* yacc.c:1646  */
     {
    (yyval.ptr_lst) = (t_ptr_list *)malloc(sizeof(t_ptr_list));
    ptrListInit((yyval.ptr_lst), 20);
@@ -1548,7 +1548,7 @@ yyreduce:
     break;
 
   case 25:
-#line 177 "parser.y" /* yacc.c:1646  */
+#line 178 "parser.y" /* yacc.c:1646  */
     {
   memory_item *item = malloc(sizeof(memory_item));
   item->integer = (yyvsp[0].intgr);
@@ -1559,7 +1559,7 @@ yyreduce:
     break;
 
   case 28:
-#line 189 "parser.y" /* yacc.c:1646  */
+#line 190 "parser.y" /* yacc.c:1646  */
     {
   memory_item *item = malloc(sizeof(memory_item));
   item->str = (yyvsp[0].str);
@@ -1571,7 +1571,7 @@ yyreduce:
     break;
 
   case 29:
-#line 198 "parser.y" /* yacc.c:1646  */
+#line 199 "parser.y" /* yacc.c:1646  */
     {
   memory_item *item = malloc(sizeof(memory_item));
   item->str = (yyvsp[0].str);
@@ -1818,7 +1818,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 205 "parser.y" /* yacc.c:1906  */
+#line 206 "parser.y" /* yacc.c:1906  */
 
 
 

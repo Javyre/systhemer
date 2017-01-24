@@ -47,6 +47,7 @@ size_t yyerror_count = 0;
 
 %left KPLUS KMINUS
 %left KTIMES KDIVIDED
+%left LSQUBRACE RSQUBRACE
 
 %%
 

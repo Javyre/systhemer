@@ -40,11 +40,16 @@ def gg = {"test item1", "test item2", "test item3", };
 
 def sum1 = 4+(6-5)*9;
 
-# def list1 = {1, {98089, 79679}};
+def list1 = {1, {98089, 79679}};
+def l1 = list1[0];
+def l2 = list1[1];
+def l3 = list1[1][0];
+def l4 = list1[list1[0]-1];
 
 
-def pr = {"test\n"};
+def pr = {"test\n", "second item"};
 def pr1 = pr[0];
+def pr2 = pr[2-1];
 print pr;
 
 def ppr = "test2";

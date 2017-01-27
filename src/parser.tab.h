@@ -64,10 +64,11 @@ extern int yydebug;
     KPERIOD = 274,
     LPAREN = 275,
     RPAREN = 276,
-    TSTR = 277,
-    TRGXP = 278,
-    TIDENTIFIER = 279,
-    TINTEGER = 280
+    KCOLON = 277,
+    TSTR = 278,
+    TRGXP = 279,
+    TIDENTIFIER = 280,
+    TINTEGER = 281
   };
 #endif
 
@@ -86,7 +87,7 @@ union YYSTYPE
   memory_address addr;
   memory_item *mem_item;
 
-#line 90 "parser.tab.h" /* yacc.c:1909  */
+#line 91 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

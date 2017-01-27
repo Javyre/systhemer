@@ -29,7 +29,7 @@ size_t yyerror_count = 0;
   memory_item *mem_item;
 };
 
-%token KSTRING KREGEX KSEMI KCOMMA KEQUALS KPLUS KMINUS KTIMES KDIVIDED LBRACE RBRACE LSQUBRACE RSQUBRACE KBEGINDEF KENDDEF KDEF KPERIOD LPAREN RPAREN
+%token KSTRING KREGEX KSEMI KCOMMA KEQUALS KPLUS KMINUS KTIMES KDIVIDED LBRACE RBRACE LSQUBRACE RSQUBRACE KBEGINDEF KENDDEF KDEF KPERIOD LPAREN RPAREN KCOLON
 %token <str> TSTR TRGXP TIDENTIFIER
 %token <intgr> TINTEGER
 /* %type <addr> first_string_list_item last_string_list_item first_string_list_itemp last_string_list_itemp
@@ -67,7 +67,9 @@ definition
  *  : TIDENTIFIER LPAREN string_p RPAREN { handleFuncCall($1, $3, T_STRING); } */
 
 pointer
-: pointer LSQUBRACE pointer RSQUBRACE    { $$=handleListIndex($1, $3);      }
+: pointer LSQUBRACE pointer RSQUBRACE                   { $$=handleListIndex($1, $3);      }
+| pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE    { $$=handleListSublist($1, $3, $5);      }
+
 | LPAREN pointer RPAREN                  { $$=$2; }
 /* | LPAREN pointer operator pointer RPAREN { $$=handleOperation($2, $3, $4); } */
 /* | pointer operator pointer               { $$=handleOperation($1, $2, $3); } */

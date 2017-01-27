@@ -179,6 +179,8 @@ memory_address handleOperation(memory_address operand1, char operation, memory_a
 
 memory_address handleListIndex(memory_address list, memory_address index);
 
+memory_address handleListSublist(memory_address list, memory_address from, memory_address to);
+
 /* void handleListDef(char *list_name, t_ptr_list *content, STRING_TYPE str_type); */
 
 /* ---------------------------------------------------------------------- */

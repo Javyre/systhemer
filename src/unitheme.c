@@ -537,6 +537,50 @@ memory_address handleListIndex(memory_address list, memory_address index) {
   return out;
 }
 
+memory_address handleListSublist(memory_address list, memory_address from, memory_address to) {
+  memory_address root_list_a = memoryGetRootAddress(g_memory, list);
+  memory_item *root_list_i = memoryGetItem(g_memory, root_list_a);
+  memory_address root_from_a = memoryGetRootAddress(g_memory, from);
+  memory_item *root_from_i = memoryGetItem(g_memory, root_from_a);
+  memory_address root_to_a = memoryGetRootAddress(g_memory, to);
+  memory_item *root_to_i = memoryGetItem(g_memory, root_to_a);
+  if (memoryGetType(g_memory, root_list_a) != t_list) {
+    ERROR_PRINT("ERROR: trying to get sublist from non-list memory item!");
+    yyerror("(semantic error) wrong type for argument 'list'");
+    return list;
+  }
+  if (memoryGetType(g_memory, root_from_a) != t_int) {
+    ERROR_PRINT("ERROR: trying to get sublist with value 'from' from non-integer memory item!");
+    yyerror("(semantic error) wrong type for argument 'from'");
+    return list;
+  }
+  if (memoryGetType(g_memory, root_to_a) != t_int) {
+    ERROR_PRINT("ERROR: trying to get sublist with value 'to' from non-integer memory item!");
+    yyerror("(semantic error) wrong type for argument 'to'");
+    return list;
+  }
+  if (root_from_i->integer>(int)root_list_i->list->size) {
+    ERROR_PRINT("ERROR: parameter 'from' is larger than list size");
+    yyerror("(semantic error) argument 'from' out of bounds");
+    return list;
+  }
+  if (root_to_i->integer>(int)root_list_i->list->size) {
+    ERROR_PRINT("ERROR: parameter 'to' is larger than list size");
+    yyerror("(semantic error) argument 'to' out of bounds");
+    return list;
+  }
+
+  memory_item *sublist = malloc(sizeof(memory_item));
+  sublist->list = (t_ptr_list *)malloc(sizeof(t_ptr_list));
+  ptrListInit(sublist->list, 20);
+  for (size_t i=(size_t)root_from_i->integer; i<=(size_t)root_to_i->integer; i++) {
+    ptrListInsert(sublist->list, root_list_i->list->pointers[i]);
+  }
+  memory_address sublist_a = memoryInsert(g_memory, sublist, t_list);
+
+  return sublist_a;
+}
+
 /* /\* Allocates memory for the variableList content and initializes some values *\/ */
 /* void varsInit(variableList *vars, size_t initial_size) { */
 /*   /\* *vars = (variableList *)calloc(1, sizeof(variableList)); *\/ */

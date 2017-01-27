@@ -49,6 +49,7 @@ LIST_REGEX "def"{WHITESPACE}+(\S+){BLANK}*"{"{REGEX}
 "string"                      { return KSTRING; }
 "regex"                       { return KREGEX;  }
 
+":"                           { return KCOLON;  }
 ";"                           { return KSEMI;   }
 ","														{ return KCOMMA;  }
 "."                           { return KPERIOD; }

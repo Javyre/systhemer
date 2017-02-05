@@ -19,7 +19,7 @@ int yycolumn = 0;
 }
 /* --------------------------------------- */
 /* STRING  https://regex101.com/r/9Navnv/4 */
-/* REGEXPR https://regex101.com/r/GOrFiv/1 */
+/* REGEXPR https://regex101.com/r/GOrFiv/2 */
 /* COMMENT https://regex101.com/r/4FTMVM/1 */
 /* --------------------------------------- */
 
@@ -29,8 +29,9 @@ BLANK      \s*\n*\s*
  * STRING     (\"((\\\S)|[^\\\"])+\"|\"\")
  * \S is not supported by flex so we use equivalent: [^\r\n\t\f ] */
 STRING     (\"((\\[^\r\n\t\f ])|[^\\\"])+\"|\"\")
-REGEXPR    (\/((\\\/)|(\\\\)|[^\/\\])+\/|\/\/)
-COMMENT    [ \t]*#.*
+REGEXPR    (\/((\\\/)|(\\\\)|[^\/\\\n])+\/|\/\/)
+/* COMMENT    [ \t]*#.* */
+COMMENT    #.*
 
 IDENTIFIER [a-zA-Z0-9_]+
 
@@ -42,7 +43,7 @@ LIST_REGEX "def"{WHITESPACE}+(\S+){BLANK}*"{"{REGEX}
 %%
 \n.*  { strncpy(linebuf, yytext+1, sizeof(linebuf)); yycolumn = -1; yyless(1); }
 [ \t\v\f]											;
-{COMMENT}                     /* skip comments */
+{COMMENT}                     ; /* skip comments */
 
 {STRING}                      { yylval.str = strdup(yytext); return TSTR;  }
 {REGEXPR}                     { yylval.str = strdup(yytext); return TRGXP; }

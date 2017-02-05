@@ -36,9 +36,15 @@ print{"waht\n"};
 
 def gg = {"test item1", "test item2", "test item3", };
 
-# def number = -1;
+def number = -1;
 
 def sum1 = 4+(6-5)*9;
+def operation1 =   ((2-9)*-6)/-(7+3);
+
+
+
+
+def operation2 = 9/2;
 
 def list1 = {1, {98089, 79679}};
 def l1 = list1[0];

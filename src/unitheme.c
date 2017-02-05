@@ -500,6 +500,8 @@ memory_address handleOperation(memory_address operand1, char operation, memory_a
   case '/':
     return ty_at.divide(operand1, operand2);
     break;
+  case 'n':
+    return ty_at.negate(operand1, operand1);
   default:
     ERROR_PRINT("operation '%c' does not exist", operation);
     yyerror_count++;
@@ -531,8 +533,10 @@ memory_address handleListIndex(memory_address list, memory_address index) {
   VERBOSE_PRINT("value of %lu index %d is: %lu",
                 list, memoryGetItem(g_memory, root_index_a)->integer,
                 out_item->address);
-  printf("out is: ");
-  memoryIllustrateItem(g_friendlies, g_memory, out, 999, true);
+  if (verboseMode){
+    printf("out is: ");
+    memoryIllustrateItem(g_friendlies, g_memory, out, 999, true);
+  }
 
   return out;
 }

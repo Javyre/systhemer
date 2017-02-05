@@ -12,6 +12,11 @@ type_attrs *g_types_attrs[] = {&g_string_attrs,
                                &g_int_attrs
 };
 
+memory_address mem_operation_func_unsupported(const memory_address a, const memory_address b) {
+  yyerror("(runtime error) Invalid operation on type!");
+  return a;
+}
+
 /* Initializes memory holder */
 void memoryInit(memory_holder *mem, size_t initial_size) {
   mem->content = (memory_item **)calloc(initial_size, sizeof(memory_item*));

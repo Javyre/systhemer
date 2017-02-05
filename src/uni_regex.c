@@ -20,6 +20,7 @@ type_attrs g_regex_attrs = {
   .subtract                = g_regex_attrs_subtract,
   .multiply                = g_regex_attrs_multiply,
   .divide                  = g_regex_attrs_divide,
+  .negate                  = mem_operation_func_unsupported,
   .is_string_type          = true,
   .s_type                  = T_REGEX,
   .t_type                  = t_rgx

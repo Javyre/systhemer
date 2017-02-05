@@ -51,6 +51,7 @@ typedef struct {
 
 
 typedef memory_address (*mem_operation_func) (const memory_address a, const memory_address b);
+memory_address mem_operation_func_unsupported(const memory_address a, const memory_address b);
 
 typedef struct {
   const char esc_char;      /* would be '\\' */
@@ -65,6 +66,7 @@ typedef struct {
   mem_operation_func subtract;
   mem_operation_func multiply;
   mem_operation_func divide;
+  mem_operation_func negate;
   /* memory_address (*add)(memory_address a, memory_address b); */
   /* memory_address (*subtract)(memory_address a, memory_address b); */
   /* memory_address (*multiply)(memory_address a, memory_address b); */

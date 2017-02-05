@@ -8,6 +8,7 @@ memory_address g_int_attrs_add(const memory_address a, const memory_address b);
 memory_address g_int_attrs_subtract(const memory_address a, const memory_address b);
 memory_address g_int_attrs_multiply(const memory_address a, const memory_address b);
 memory_address g_int_attrs_divide(const memory_address a, const memory_address b);
+memory_address g_int_attrs_negate(const memory_address a, const memory_address b);
 
 type_attrs g_int_attrs = {
   .esc_char                = '\0',
@@ -20,6 +21,7 @@ type_attrs g_int_attrs = {
   .subtract                = g_int_attrs_subtract,
   .multiply                = g_int_attrs_multiply,
   .divide                  = g_int_attrs_divide,
+  .negate                  = g_int_attrs_negate,
   .is_string_type          = false,
   .s_type                  = T_INTEGER,
   .t_type                  = t_int
@@ -51,4 +53,9 @@ memory_address g_int_attrs_divide(const memory_address a, const memory_address b
   result_item->integer = memoryGetRootItem(g_memory, a)->integer /
     memoryGetRootItem(g_memory, b)->integer;
   return memoryInsert(g_memory, result_item, t_int);
+}
+
+memory_address g_int_attrs_negate(const memory_address a, const memory_address b) {
+  memoryGetRootItem(g_memory, a)->integer *= -1;
+  return a;
 }

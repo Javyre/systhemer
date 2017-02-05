@@ -73,6 +73,7 @@ pointer
 | LPAREN pointer RPAREN                  { $$=$2; }
 /* | LPAREN pointer operator pointer RPAREN { $$=handleOperation($2, $3, $4); } */
 /* | pointer operator pointer               { $$=handleOperation($1, $2, $3); } */
+| KMINUS pointer                         { $$=handleOperation($2, 'n', $2); }
 | pointer KPLUS    pointer               { $$=handleOperation($1, '+', $3); }
 | pointer KMINUS   pointer               { $$=handleOperation($1, '-', $3); }
 | pointer KTIMES   pointer               { $$=handleOperation($1, '*', $3); }
@@ -221,7 +222,7 @@ int yyerror(const char *p) {
   }
 
   /* print main message */
-  fprintf(stderr, BKRED "Error: %s : line %d:%d:%d: " BKMAG "%s\n" KDEFAULT,
+  fprintf(stderr, BKRED "Error: %s : line %d:%d:%d: " BKYEL "%s\n" KDEFAULT,
           message, yylineno, yylloc.first_column, yylloc.last_column, yytext);
 
   /* print out snippet of code and highlight the bad part */

@@ -20,6 +20,7 @@ type_attrs g_string_attrs = {
   .subtract                = g_string_attrs_subtract,
   .multiply                = g_string_attrs_multiply,
   .divide                  = g_string_attrs_divide,
+  .negate                  = mem_operation_func_unsupported,
   .is_string_type          = true,
   .s_type                  = T_STRING,
   .t_type                  = t_str

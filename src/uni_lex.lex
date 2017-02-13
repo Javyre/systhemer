@@ -61,6 +61,9 @@ LIST_REGEX "def"{WHITESPACE}+(\S+){BLANK}*"{"{REGEX}
 "*"														{ return KTIMES;   }
 "/"														{ return KDIVIDED; }
 
+"^"                           { return KPOW;     }
+"%"                           { return KPERCENT; }
+
 "{" 													{ return LBRACE; }
 "}"														{ return RBRACE; }
 

@@ -438,7 +438,9 @@ void handleAssigDef(char *var_name, memory_address content) {
  *   }
  * } */
 
-
+#define CHECK_FUNC(func)                                                       \
+  if (strcmp(func_name, #func) == 0)                                           \
+    uni_##func(param_list_address);
 void handleFuncCall(char *func_name, memory_address param_list_address) {
   /* keep parsing but dont actually handle anything if errors occur */
   if (yyerror_count != 0) {
@@ -449,12 +451,19 @@ void handleFuncCall(char *func_name, memory_address param_list_address) {
   }
 
   /* Built-in functions (written here in C) */
-  if (strcmp(func_name, "mkblock") == 0)
-    uni_mkblock(param_list_address);
-  else if (strcmp(func_name, "print") == 0)
-    uni_print(param_list_address);
-  else if (strcmp(func_name, "set_color") == 0)
-    uni_set_color(param_list_address);
+  /* if (strcmp(func_name, "mkblock") == 0) */
+  /*   uni_mkblock(param_list_address); */
+  /* else if (strcmp(func_name, "print") == 0) */
+  /*   uni_print(param_list_address); */
+  /* else if (strcmp(func_name, "set_color") == 0) */
+  /*   uni_set_color(param_list_address); */
+
+
+  /* Built-in functions (written here in C) */
+  CHECK_FUNC(mkblock)
+  else CHECK_FUNC(print)
+  else CHECK_FUNC(set_color)
+  else CHECK_FUNC(assert)
   else {
     yyerror("Runtime error while running function: function does not exist");
     free(func_name);
@@ -515,6 +524,8 @@ memory_address handleOperation(memory_address operand1, char operation, memory_a
 memory_address handleListIndex(memory_address list, memory_address index) {
   memory_address root_list_a = memoryGetRootAddress(g_memory, list);
   memory_address root_index_a = memoryGetRootAddress(g_memory, index);
+  memory_item *root_list_i = memoryGetItem(g_memory, root_list_a);
+  memory_item *root_index_i = memoryGetItem(g_memory, root_index_a);
   if (memoryGetType(g_memory, root_list_a) != t_list) {
     yyerror("semantic error: pointer does not represent a list!");
     return list;
@@ -524,10 +535,15 @@ memory_address handleListIndex(memory_address list, memory_address index) {
     return list;
   }
 
+  /* /\* flip index: 0 -> -1, -1 -> 0 *\/ */
+  /* int index_i = (root_index_i->integer+1)*-1; */
+  /* /\* handle reverse indexes eg.: foo[-1] is last item *\/ */
+  /* if (index_i < 0) { */
+  /*   index_i = root_list_i->list->used - index_i -1; */
+  /* } */
+
   memory_item *out_item = malloc(sizeof(memory_item));
-  out_item->address =
-    memoryGetItem(g_memory, root_list_a)
-    ->list->pointers[memoryGetItem(g_memory, root_index_a)->integer];
+  out_item->address = listGetItem(root_list_i->list, root_index_i->integer);
   memory_address out = memoryInsert(g_memory, out_item, t_addr);
 
   VERBOSE_PRINT("value of %lu index %d is: %lu",
@@ -575,11 +591,14 @@ memory_address handleListSublist(memory_address list, memory_address from, memor
   }
 
   memory_item *sublist = malloc(sizeof(memory_item));
-  sublist->list = (t_ptr_list *)malloc(sizeof(t_ptr_list));
-  ptrListInit(sublist->list, 20);
-  for (size_t i=(size_t)root_from_i->integer; i<=(size_t)root_to_i->integer; i++) {
-    ptrListInsert(sublist->list, root_list_i->list->pointers[i]);
-  }
+  sublist->list = listGetSublist(root_list_i->list,
+                                 root_from_i->integer,
+                                 root_to_i->integer);
+  /* sublist->list = (t_ptr_list *)malloc(sizeof(t_ptr_list)); */
+  /* ptrListInit(sublist->list, 20); */
+  /* for (size_t i=(size_t)root_from_i->integer; i<=(size_t)root_to_i->integer; i++) { */
+  /*   ptrListInsert(sublist->list, root_list_i->list->pointers[i]); */
+  /* } */
   memory_address sublist_a = memoryInsert(g_memory, sublist, t_list);
 
   return sublist_a;

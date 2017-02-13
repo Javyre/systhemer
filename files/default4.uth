@@ -38,31 +38,41 @@ def gg = {"test item1", "test item2", "test item3", };
 
 def number = -1;
 
-def sum1 = 4+(6-5)*9;
+def operation0 = 4+(6-5)*9;
 def operation1 =   ((2-9)*-6)/-(7+3);
-
-
-
-
 def operation2 = 9/2;
+def operation3 = 1---+2;
+assert{operation0, 13};
+assert{operation1, -4};
+assert{operation2, 4};
+assert{operation3, -1};
 
 def list1 = {1, {98089, 79679}};
 def l1 = list1[0];
 def l2 = list1[1];
-def l3 = list1[1][0];
+def l3 = list1[-1][0];
 def l4 = list1[list1[0]-1];
+assert{l1, 1,
+       l3, 98089,
+       l4, 1};
 
 def longlist = {1, 2, 3, 4, 5, 6};
 def subl1 = longlist[1:4];
 
 
 def pr = {"test\n", "second item"};
-def pr1 = pr[0];
-def pr2 = pr[2-1];
+# def pr1 = pr[0];
+# def pr2 = pr[2-1];
 print pr;
 
 def ppr = "test2";
 print {"ppr is: ", ppr, "\n"};
 
 def firstField = "Hello, world!";
-def secondField = "Hey" + " there!";
+def secondField = "Hello" + ", world!";
+assert{firstField, secondField};
+
+def operations = {1+2, 1-4, "a", --2, -8*(-1-3)/3};
+def results    = {3,   -3,  "a", 2,   10};
+assert{operations, results};
+

@@ -103,6 +103,69 @@ memory_address memoryGetRootAddress(memory_holder *mem, memory_address mem_addr)
   return mem_addr;
 }
 
+memory_address listGetItem(t_ptr_list *list, int index) {
+  /* VERBOSE_PRINT("CONTENTS OF LIST ARE:") */
+  /* for (int i=0; i<(int)list->used; i++) */
+  /*   VERBOSE_PRINT("-%d: %lu", i, (unsigned long)list->pointers[i]) */
+
+  /* nessessary because lists are now all flipped (last item first) */
+  /* flip index: 0 -> -1, -1 -> 0 */
+  index = (index+1)*-1;
+
+  /* handle reverse indexes eg.: foo[-1] is last item */
+  if (index < 0){
+    index = list->used + index;
+  }
+
+  /* VERBOSE_PRINT("RETURNING ADDRESS: %lu FOR INDEX %d", (unsigned long)list->pointers[index], index); */
+  return list->pointers[index];
+}
+
+bool listGetNextItem(t_ptr_list *list, memory_address *out, bool *is_last) {
+  static t_ptr_list *last_list;
+  static int index = 0;
+
+  if (list != NULL) {
+    last_list = list;
+    index = 0;
+    return true;
+  } else if (last_list != NULL) {
+    if (index == (int)last_list->used){
+      index = 0;
+      return false;
+    } else {
+      *out = listGetItem(last_list, index);
+      index++;
+      if (is_last != NULL)
+        *is_last = (index == (int)last_list->used);
+      return true;
+    }
+  }
+  return false;
+}
+
+t_ptr_list *listGetSublist(t_ptr_list *list, int from, int to) {
+  t_ptr_list *sublist= (t_ptr_list *)malloc(sizeof(t_ptr_list));
+
+
+  if (to < 0){
+    to = list->used + to;
+  }
+
+  if (from < 0 || from > to) {
+    ERROR_PRINT("value of 'from' makes no sense (it's either less than 0 or "
+                "more than the to index)");
+    EXIT(1);
+  }
+
+  ptrListInit(sublist, 20);
+  for (int i=to; i>=from; i--){
+    ptrListInsert(sublist, listGetItem(list, i));
+  }
+
+  return sublist;
+}
+
 void memoryIllustrateMap(friendly_names *friendly, memory_holder *mem,
                           size_t depth) {
   for (memory_address i=0; i<mem->used; i++) {
@@ -117,7 +180,8 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
   char list_content[(256*8)+1];
   char *name, *name2;
   char *value;
-  char fname[256], fname2[256];
+  char fname[256];
+  /* char fname2[256]; */
   memory_address a;
   /* for (memory_address i=0; i<mem->used; i++) { */
 
@@ -199,14 +263,16 @@ void memoryIllustrateItem(friendly_names *friendly, memory_holder *mem,
     printf(BKCYN "%s" KDEFAULT, buff);
 
     /* Print contents of list (not expanding like for addresses section) */
-    for (size_t ii=0; ii<mem->content[i]->list->used; ii++) {
-      /* strcatf(list_content, "%lu, ", (unsigned long)mem->content[i]->list->pointers[ii]); */
+    memory_address addr;
+    bool is_last;
+    listGetNextItem(mem->content[i]->list, NULL, NULL);
+    while (listGetNextItem(NULL, &addr, &is_last)){
       if (o_illustrate_recursive_list)
-        memoryIllustrateItem(friendly, mem, mem->content[i]->list->pointers[ii],
+        memoryIllustrateItem(friendly, mem, addr,
                              depth - 1, false);
       else
-        printf(BKCYN IADDRO "%lu" IADDRC, (unsigned long)mem->content[i]->list->pointers[ii]);
-      if (ii != mem->content[i]->list->used-1)
+        printf(BKCYN IADDRO "%lu" IADDRC, (unsigned long)addr);
+      if (!is_last)
         printf(BKCYN ", ");
     }
 
@@ -329,4 +395,37 @@ void friendlyFree(friendly_names *friendly) {
   for (size_t i=0; i<friendly->used; i++)
     free(friendly->identifiers[i]);
   free(friendly->identifiers);
+}
+
+RETURN_CODE memoryCompare(memory_holder *mem, memory_address addr1, memory_address addr2) {
+  memory_item *i1 = memoryGetRootItem(mem, addr1);
+  memory_item *i2 = memoryGetRootItem(mem, addr2);
+  t_type t = memoryGetRootType(mem, addr1);
+  RETURN_CODE result;
+  if (t != memoryGetRootType(mem, addr2))
+    return TYPE_MISMATCH;
+
+
+  if (t == t_list) {
+    if (i1->list->used != i2->list->used)
+      return SIZE_MISMATCH;
+
+    for (size_t i=0; i<i1->list->used; i++) {
+      result = memoryCompare(mem, listGetItem(i1->list, i), listGetItem(i2->list, i));
+      if (result != EQUAL)
+        return result;
+    }
+    return EQUAL;
+
+  } else {
+    type_attrs ty_at;
+    for (size_t i=0; i<sizeof(*g_types_attrs); i++) {
+      if (g_types_attrs[i]->t_type == t) {
+        ty_at = *g_types_attrs[i];
+        break;
+      }
+    }
+    return ty_at.compare(addr1, addr2);
+  }
+
 }

@@ -2,13 +2,9 @@ Terminals unused in grammar
 
    KSTRING
    KREGEX
+   KPERIOD
    KBEGINDEF
    KENDDEF
-   KPERIOD
-
-
-State 29 conflicts: 1 shift/reduce
-State 43 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -23,38 +19,40 @@ Grammar
 
     6 definition: variable_def
 
-    7 pointer: pointer LSQUBRACE pointer RSQUBRACE
-    8        | pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | LPAREN pointer RPAREN
-   10        | KMINUS pointer
-   11        | pointer KPLUS pointer
-   12        | pointer KMINUS pointer
-   13        | pointer KTIMES pointer
-   14        | pointer KDIVIDED pointer
-   15        | list_content_p
-   16        | str_p
-   17        | int_p
-   18        | TIDENTIFIER
+    7 expr: list_content_p
+    8     | str_p
+    9     | int_p
+   10     | TIDENTIFIER
+   11     | expr KPLUS expr
+   12     | expr KMINUS expr
+   13     | expr KTIMES expr
+   14     | expr KDIVIDED expr
+   15     | expr KPERCENT expr
+   16     | KPLUS expr
+   17     | KMINUS expr
+   18     | expr KPOW expr
+   19     | LPAREN expr RPAREN
+   20     | expr LSQUBRACE expr RSQUBRACE
+   21     | expr LSQUBRACE expr KCOLON expr RSQUBRACE
 
-   19 function_call: TIDENTIFIER pointer
+   22 function_call: TIDENTIFIER expr
 
-   20 variable_def: KDEF TIDENTIFIER KEQUALS pointer
+   23 variable_def: KDEF TIDENTIFIER KEQUALS expr
 
-   21 list_content_p: LBRACE list_content RBRACE
+   24 list_content_p: LBRACE list_content RBRACE
 
-   22 list_content: list_content pointer
-   23             | list_content pointer KCOMMA
-   24             | pointer KCOMMA
-   25             | pointer
+   25 list_content: expr KCOMMA list_content
+   26             | expr KCOMMA
+   27             | expr
 
-   26 int_p: TINTEGER
+   28 int_p: TINTEGER
 
-   27 str_p: string_p
-   28      | regex_p
+   29 str_p: string_p
+   30      | regex_p
 
-   29 string_p: TSTR
+   31 string_p: TSTR
 
-   30 regex_p: TRGXP
+   32 regex_p: TRGXP
 
 
 Terminals, with rules where they appear
@@ -64,56 +62,59 @@ error (256) 5
 KSTRING (258)
 KREGEX (259)
 KSEMI (260) 1 2 3 4 5
-KCOMMA (261) 23 24
-KEQUALS (262) 20
-KPLUS (263) 11
-KMINUS (264) 10 12
-KTIMES (265) 13
-KDIVIDED (266) 14
-LBRACE (267) 21
-RBRACE (268) 21
-LSQUBRACE (269) 7 8
-RSQUBRACE (270) 7 8
+KCOMMA (261) 25 26
+KPERIOD (262)
+KCOLON (263) 21
+KEQUALS (264) 23
+LBRACE (265) 24
+RBRACE (266) 24
+LSQUBRACE (267) 20 21
+RSQUBRACE (268) 20 21
+LPAREN (269) 19
+RPAREN (270) 19
 KBEGINDEF (271)
 KENDDEF (272)
-KDEF (273) 20
-KPERIOD (274)
-LPAREN (275) 9
-RPAREN (276) 9
-KCOLON (277) 8
-TSTR (278) 29
-TRGXP (279) 30
-TIDENTIFIER (280) 18 19 20
-TINTEGER (281) 26
+KDEF (273) 23
+TSTR (274) 31
+TRGXP (275) 32
+TIDENTIFIER (276) 10 22 23
+TINTEGER (277) 28
+KPLUS (278) 11 16
+KMINUS (279) 12 17
+KTIMES (280) 13
+KDIVIDED (281) 14
+KPERCENT (282) 15
+NEG (283)
+KPOW (284) 18
 
 
 Nonterminals, with rules where they appear
 
-$accept (27)
+$accept (30)
     on left: 0
-line (28)
+line (31)
     on left: 1 2 3 4 5, on right: 0 1 3 5
-definition (29)
+definition (32)
     on left: 6, on right: 1 2
-pointer (30)
-    on left: 7 8 9 10 11 12 13 14 15 16 17 18, on right: 7 8 9 10 11
-    12 13 14 19 20 22 23 24 25
-function_call (31)
-    on left: 19, on right: 3 4
-variable_def (32)
-    on left: 20, on right: 6
-list_content_p (33)
-    on left: 21, on right: 15
-list_content (34)
-    on left: 22 23 24 25, on right: 21 22 23
-int_p (35)
-    on left: 26, on right: 17
-str_p (36)
-    on left: 27 28, on right: 16
-string_p (37)
-    on left: 29, on right: 27
-regex_p (38)
-    on left: 30, on right: 28
+expr (33)
+    on left: 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21, on right: 11
+    12 13 14 15 16 17 18 19 20 21 22 23 25 26 27
+function_call (34)
+    on left: 22, on right: 3 4
+variable_def (35)
+    on left: 23, on right: 6
+list_content_p (36)
+    on left: 24, on right: 7
+list_content (37)
+    on left: 25 26 27, on right: 24 25
+int_p (38)
+    on left: 28, on right: 9
+str_p (39)
+    on left: 29 30, on right: 8
+string_p (40)
+    on left: 31, on right: 29
+regex_p (41)
+    on left: 32, on right: 30
 
 
 State 0
@@ -125,8 +126,8 @@ State 0
     4     | . function_call KSEMI
     5     | . line error KSEMI
     6 definition: . variable_def
-   19 function_call: . TIDENTIFIER pointer
-   20 variable_def: . KDEF TIDENTIFIER KEQUALS pointer
+   22 function_call: . TIDENTIFIER expr
+   23 variable_def: . KDEF TIDENTIFIER KEQUALS expr
 
     KDEF         shift, and go to state 1
     TIDENTIFIER  shift, and go to state 2
@@ -139,47 +140,51 @@ State 0
 
 State 1
 
-   20 variable_def: KDEF . TIDENTIFIER KEQUALS pointer
+   23 variable_def: KDEF . TIDENTIFIER KEQUALS expr
 
     TIDENTIFIER  shift, and go to state 7
 
 
 State 2
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   19 function_call: TIDENTIFIER . pointer
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   22 function_call: TIDENTIFIER . expr
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    pointer         go to state 15
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    expr            go to state 16
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 3
@@ -189,16 +194,16 @@ State 3
     3     | line . function_call KSEMI
     5     | line . error KSEMI
     6 definition: . variable_def
-   19 function_call: . TIDENTIFIER pointer
-   20 variable_def: . KDEF TIDENTIFIER KEQUALS pointer
+   22 function_call: . TIDENTIFIER expr
+   23 variable_def: . KDEF TIDENTIFIER KEQUALS expr
 
-    $end         shift, and go to state 21
-    error        shift, and go to state 22
+    $end         shift, and go to state 22
+    error        shift, and go to state 23
     KDEF         shift, and go to state 1
     TIDENTIFIER  shift, and go to state 2
 
-    definition     go to state 23
-    function_call  go to state 24
+    definition     go to state 24
+    function_call  go to state 25
     variable_def   go to state 6
 
 
@@ -206,14 +211,14 @@ State 4
 
     2 line: definition . KSEMI
 
-    KSEMI  shift, and go to state 25
+    KSEMI  shift, and go to state 26
 
 
 State 5
 
     4 line: function_call . KSEMI
 
-    KSEMI  shift, and go to state 26
+    KSEMI  shift, and go to state 27
 
 
 State 6
@@ -225,850 +230,1120 @@ State 6
 
 State 7
 
-   20 variable_def: KDEF TIDENTIFIER . KEQUALS pointer
+   23 variable_def: KDEF TIDENTIFIER . KEQUALS expr
 
-    KEQUALS  shift, and go to state 27
+    KEQUALS  shift, and go to state 28
 
 
 State 8
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   10        | KMINUS . pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   24               | LBRACE . list_content RBRACE
+   25 list_content: . expr KCOMMA list_content
+   26             | . expr KCOMMA
+   27             | . expr
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    pointer         go to state 28
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    expr            go to state 29
+    list_content_p  go to state 17
+    list_content    go to state 30
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 9
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   21               | LBRACE . list_content RBRACE
-   22 list_content: . list_content pointer
-   23             | . list_content pointer KCOMMA
-   24             | . pointer KCOMMA
-   25             | . pointer
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   19     | LPAREN . expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    pointer         go to state 29
-    list_content_p  go to state 16
-    list_content    go to state 30
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    expr            go to state 31
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 10
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-    9        | LPAREN . pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+   31 string_p: TSTR .
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
-
-    pointer         go to state 31
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    $default  reduce using rule 31 (string_p)
 
 
 State 11
 
-   29 string_p: TSTR .
+   32 regex_p: TRGXP .
 
-    $default  reduce using rule 29 (string_p)
+    $default  reduce using rule 32 (regex_p)
 
 
 State 12
 
-   30 regex_p: TRGXP .
+   10 expr: TIDENTIFIER .
 
-    $default  reduce using rule 30 (regex_p)
+    $default  reduce using rule 10 (expr)
 
 
 State 13
 
-   18 pointer: TIDENTIFIER .
+   28 int_p: TINTEGER .
 
-    $default  reduce using rule 18 (pointer)
+    $default  reduce using rule 28 (int_p)
 
 
 State 14
 
-   26 int_p: TINTEGER .
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   16     | KPLUS . expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    $default  reduce using rule 26 (int_p)
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
+
+    expr            go to state 32
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 15
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
-   19 function_call: TIDENTIFIER pointer .  [KSEMI]
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   17     | KMINUS . expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KPLUS      shift, and go to state 32
-    KMINUS     shift, and go to state 33
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    $default  reduce using rule 19 (function_call)
+    expr            go to state 33
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 16
 
-   15 pointer: list_content_p .
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
+   22 function_call: TIDENTIFIER expr .  [KSEMI]
 
-    $default  reduce using rule 15 (pointer)
+    LSQUBRACE  shift, and go to state 34
+    KPLUS      shift, and go to state 35
+    KMINUS     shift, and go to state 36
+    KTIMES     shift, and go to state 37
+    KDIVIDED   shift, and go to state 38
+    KPERCENT   shift, and go to state 39
+    KPOW       shift, and go to state 40
+
+    $default  reduce using rule 22 (function_call)
 
 
 State 17
 
-   17 pointer: int_p .
+    7 expr: list_content_p .
 
-    $default  reduce using rule 17 (pointer)
+    $default  reduce using rule 7 (expr)
 
 
 State 18
 
-   16 pointer: str_p .
+    9 expr: int_p .
 
-    $default  reduce using rule 16 (pointer)
+    $default  reduce using rule 9 (expr)
 
 
 State 19
 
-   27 str_p: string_p .
+    8 expr: str_p .
 
-    $default  reduce using rule 27 (str_p)
+    $default  reduce using rule 8 (expr)
 
 
 State 20
 
-   28 str_p: regex_p .
+   29 str_p: string_p .
 
-    $default  reduce using rule 28 (str_p)
+    $default  reduce using rule 29 (str_p)
 
 
 State 21
+
+   30 str_p: regex_p .
+
+    $default  reduce using rule 30 (str_p)
+
+
+State 22
 
     0 $accept: line $end .
 
     $default  accept
 
 
-State 22
+State 23
 
     5 line: line error . KSEMI
 
-    KSEMI  shift, and go to state 37
-
-
-State 23
-
-    1 line: line definition . KSEMI
-
-    KSEMI  shift, and go to state 38
+    KSEMI  shift, and go to state 41
 
 
 State 24
 
-    3 line: line function_call . KSEMI
+    1 line: line definition . KSEMI
 
-    KSEMI  shift, and go to state 39
+    KSEMI  shift, and go to state 42
 
 
 State 25
+
+    3 line: line function_call . KSEMI
+
+    KSEMI  shift, and go to state 43
+
+
+State 26
 
     2 line: definition KSEMI .
 
     $default  reduce using rule 2 (line)
 
 
-State 26
+State 27
 
     4 line: function_call KSEMI .
 
     $default  reduce using rule 4 (line)
 
 
-State 27
-
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   20 variable_def: KDEF TIDENTIFIER KEQUALS . pointer
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
-
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
-
-    pointer         go to state 40
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
-
-
 State 28
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   10        | KMINUS pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, KCOLON, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   23 variable_def: KDEF TIDENTIFIER KEQUALS . expr
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    $default  reduce using rule 10 (pointer)
-
-    Conflict between rule 10 and token KPLUS resolved as reduce (%left KPLUS).
-    Conflict between rule 10 and token KMINUS resolved as reduce (%left KMINUS).
-    Conflict between rule 10 and token KTIMES resolved as shift (KMINUS < KTIMES).
-    Conflict between rule 10 and token KDIVIDED resolved as shift (KMINUS < KDIVIDED).
-    Conflict between rule 10 and token LSQUBRACE resolved as shift (KMINUS < LSQUBRACE).
+    expr            go to state 44
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 29
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
-   24 list_content: pointer . KCOMMA
-   25             | pointer .  [KMINUS, LBRACE, RBRACE, LPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
+   25 list_content: expr . KCOMMA list_content
+   26             | expr . KCOMMA
+   27             | expr .  [RBRACE]
 
-    KCOMMA     shift, and go to state 41
-    KPLUS      shift, and go to state 32
-    KMINUS     shift, and go to state 33
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
+    KCOMMA     shift, and go to state 45
+    LSQUBRACE  shift, and go to state 34
+    KPLUS      shift, and go to state 35
+    KMINUS     shift, and go to state 36
+    KTIMES     shift, and go to state 37
+    KDIVIDED   shift, and go to state 38
+    KPERCENT   shift, and go to state 39
+    KPOW       shift, and go to state 40
 
-    KMINUS    [reduce using rule 25 (list_content)]
-    $default  reduce using rule 25 (list_content)
+    $default  reduce using rule 27 (list_content)
 
 
 State 30
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   21               | LBRACE list_content . RBRACE
-   22 list_content: list_content . pointer
-   23             | list_content . pointer KCOMMA
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+   24 list_content_p: LBRACE list_content . RBRACE
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    RBRACE       shift, and go to state 42
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
-
-    pointer         go to state 43
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    RBRACE  shift, and go to state 46
 
 
 State 31
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | LPAREN pointer . RPAREN
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   19     | LPAREN expr . RPAREN
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    KPLUS      shift, and go to state 32
-    KMINUS     shift, and go to state 33
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
-    RPAREN     shift, and go to state 44
+    LSQUBRACE  shift, and go to state 34
+    RPAREN     shift, and go to state 47
+    KPLUS      shift, and go to state 35
+    KMINUS     shift, and go to state 36
+    KTIMES     shift, and go to state 37
+    KDIVIDED   shift, and go to state 38
+    KPERCENT   shift, and go to state 39
+    KPOW       shift, and go to state 40
 
 
 State 32
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   11        | pointer KPLUS . pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   16     | KPLUS expr .  [KSEMI, KCOMMA, KCOLON, RBRACE, LSQUBRACE, RSQUBRACE, RPAREN, KPLUS, KMINUS, KTIMES, KDIVIDED, KPERCENT]
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    KPOW  shift, and go to state 40
 
-    pointer         go to state 45
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    $default  reduce using rule 16 (expr)
+
+    Conflict between rule 16 and token LSQUBRACE resolved as reduce (LSQUBRACE < NEG).
+    Conflict between rule 16 and token KPLUS resolved as reduce (KPLUS < NEG).
+    Conflict between rule 16 and token KMINUS resolved as reduce (KMINUS < NEG).
+    Conflict between rule 16 and token KTIMES resolved as reduce (KTIMES < NEG).
+    Conflict between rule 16 and token KDIVIDED resolved as reduce (KDIVIDED < NEG).
+    Conflict between rule 16 and token KPERCENT resolved as reduce (KPERCENT < NEG).
+    Conflict between rule 16 and token KPOW resolved as shift (NEG < KPOW).
 
 
 State 33
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   12        | pointer KMINUS . pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   17     | KMINUS expr .  [KSEMI, KCOMMA, KCOLON, RBRACE, LSQUBRACE, RSQUBRACE, RPAREN, KPLUS, KMINUS, KTIMES, KDIVIDED, KPERCENT]
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    KPOW  shift, and go to state 40
 
-    pointer         go to state 46
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    $default  reduce using rule 17 (expr)
+
+    Conflict between rule 17 and token LSQUBRACE resolved as reduce (LSQUBRACE < NEG).
+    Conflict between rule 17 and token KPLUS resolved as reduce (KPLUS < NEG).
+    Conflict between rule 17 and token KMINUS resolved as reduce (KMINUS < NEG).
+    Conflict between rule 17 and token KTIMES resolved as reduce (KTIMES < NEG).
+    Conflict between rule 17 and token KDIVIDED resolved as reduce (KDIVIDED < NEG).
+    Conflict between rule 17 and token KPERCENT resolved as reduce (KPERCENT < NEG).
+    Conflict between rule 17 and token KPOW resolved as shift (NEG < KPOW).
 
 
 State 34
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   13        | pointer KTIMES . pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   20     | expr LSQUBRACE . expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   21     | expr LSQUBRACE . expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    pointer         go to state 47
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    expr            go to state 48
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 35
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   14        | pointer KDIVIDED . pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   11     | expr KPLUS . expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    pointer         go to state 48
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    expr            go to state 49
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 36
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    7        | pointer LSQUBRACE . pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    8        | pointer LSQUBRACE . pointer KCOLON pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   12     | expr KMINUS . expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    pointer         go to state 49
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    expr            go to state 50
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 37
+
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   13     | expr KTIMES . expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
+
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
+
+    expr            go to state 51
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
+
+
+State 38
+
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   14     | expr KDIVIDED . expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
+
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
+
+    expr            go to state 52
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
+
+
+State 39
+
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   15     | expr KPERCENT . expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
+
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
+
+    expr            go to state 53
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
+
+
+State 40
+
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   18     | expr KPOW . expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
+
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
+
+    expr            go to state 54
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
+
+
+State 41
 
     5 line: line error KSEMI .
 
     $default  reduce using rule 5 (line)
 
 
-State 38
+State 42
 
     1 line: line definition KSEMI .
 
     $default  reduce using rule 1 (line)
 
 
-State 39
+State 43
 
     3 line: line function_call KSEMI .
 
     $default  reduce using rule 3 (line)
 
 
-State 40
-
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
-   20 variable_def: KDEF TIDENTIFIER KEQUALS pointer .  [KSEMI]
-
-    KPLUS      shift, and go to state 32
-    KMINUS     shift, and go to state 33
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
-
-    $default  reduce using rule 20 (variable_def)
-
-
-State 41
-
-   24 list_content: pointer KCOMMA .
-
-    $default  reduce using rule 24 (list_content)
-
-
-State 42
-
-   21 list_content_p: LBRACE list_content RBRACE .
-
-    $default  reduce using rule 21 (list_content_p)
-
-
-State 43
-
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
-   22 list_content: list_content pointer .  [KMINUS, LBRACE, RBRACE, LPAREN, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
-   23             | list_content pointer . KCOMMA
-
-    KCOMMA     shift, and go to state 50
-    KPLUS      shift, and go to state 32
-    KMINUS     shift, and go to state 33
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
-
-    KMINUS    [reduce using rule 22 (list_content)]
-    $default  reduce using rule 22 (list_content)
-
-
 State 44
 
-    9 pointer: LPAREN pointer RPAREN .
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
+   23 variable_def: KDEF TIDENTIFIER KEQUALS expr .  [KSEMI]
 
-    $default  reduce using rule 9 (pointer)
+    LSQUBRACE  shift, and go to state 34
+    KPLUS      shift, and go to state 35
+    KMINUS     shift, and go to state 36
+    KTIMES     shift, and go to state 37
+    KDIVIDED   shift, and go to state 38
+    KPERCENT   shift, and go to state 39
+    KPOW       shift, and go to state 40
+
+    $default  reduce using rule 23 (variable_def)
 
 
 State 45
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   11        | pointer KPLUS pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, KCOLON, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   25 list_content: . expr KCOMMA list_content
+   25             | expr KCOMMA . list_content
+   26             | . expr KCOMMA
+   26             | expr KCOMMA .  [RBRACE]
+   27             | . expr
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
 
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
 
-    $default  reduce using rule 11 (pointer)
+    $default  reduce using rule 26 (list_content)
 
-    Conflict between rule 11 and token KPLUS resolved as reduce (%left KPLUS).
-    Conflict between rule 11 and token KMINUS resolved as reduce (%left KMINUS).
-    Conflict between rule 11 and token KTIMES resolved as shift (KPLUS < KTIMES).
-    Conflict between rule 11 and token KDIVIDED resolved as shift (KPLUS < KDIVIDED).
-    Conflict between rule 11 and token LSQUBRACE resolved as shift (KPLUS < LSQUBRACE).
+    expr            go to state 29
+    list_content_p  go to state 17
+    list_content    go to state 55
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
 
 
 State 46
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   12        | pointer KMINUS pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, KCOLON, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
+   24 list_content_p: LBRACE list_content RBRACE .
 
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
-
-    $default  reduce using rule 12 (pointer)
-
-    Conflict between rule 12 and token KPLUS resolved as reduce (%left KPLUS).
-    Conflict between rule 12 and token KMINUS resolved as reduce (%left KMINUS).
-    Conflict between rule 12 and token KTIMES resolved as shift (KMINUS < KTIMES).
-    Conflict between rule 12 and token KDIVIDED resolved as shift (KMINUS < KDIVIDED).
-    Conflict between rule 12 and token LSQUBRACE resolved as shift (KMINUS < LSQUBRACE).
+    $default  reduce using rule 24 (list_content_p)
 
 
 State 47
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   13        | pointer KTIMES pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, KTIMES, KDIVIDED, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, KCOLON, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
-   14        | pointer . KDIVIDED pointer
+   19 expr: LPAREN expr RPAREN .
 
-    LSQUBRACE  shift, and go to state 36
-
-    $default  reduce using rule 13 (pointer)
-
-    Conflict between rule 13 and token KPLUS resolved as reduce (KPLUS < KTIMES).
-    Conflict between rule 13 and token KMINUS resolved as reduce (KMINUS < KTIMES).
-    Conflict between rule 13 and token KTIMES resolved as reduce (%left KTIMES).
-    Conflict between rule 13 and token KDIVIDED resolved as reduce (%left KDIVIDED).
-    Conflict between rule 13 and token LSQUBRACE resolved as shift (KTIMES < LSQUBRACE).
+    $default  reduce using rule 19 (expr)
 
 
 State 48
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
-   14        | pointer KDIVIDED pointer .  [KSEMI, KCOMMA, KPLUS, KMINUS, KTIMES, KDIVIDED, LBRACE, RBRACE, RSQUBRACE, LPAREN, RPAREN, KCOLON, TSTR, TRGXP, TIDENTIFIER, TINTEGER]
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   20     | expr LSQUBRACE expr . RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
+   21     | expr LSQUBRACE expr . KCOLON expr RSQUBRACE
 
-    LSQUBRACE  shift, and go to state 36
-
-    $default  reduce using rule 14 (pointer)
-
-    Conflict between rule 14 and token KPLUS resolved as reduce (KPLUS < KDIVIDED).
-    Conflict between rule 14 and token KMINUS resolved as reduce (KMINUS < KDIVIDED).
-    Conflict between rule 14 and token KTIMES resolved as reduce (%left KTIMES).
-    Conflict between rule 14 and token KDIVIDED resolved as reduce (%left KDIVIDED).
-    Conflict between rule 14 and token LSQUBRACE resolved as shift (KDIVIDED < LSQUBRACE).
+    KCOLON     shift, and go to state 56
+    LSQUBRACE  shift, and go to state 34
+    RSQUBRACE  shift, and go to state 57
+    KPLUS      shift, and go to state 35
+    KMINUS     shift, and go to state 36
+    KTIMES     shift, and go to state 37
+    KDIVIDED   shift, and go to state 38
+    KPERCENT   shift, and go to state 39
+    KPOW       shift, and go to state 40
 
 
 State 49
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    7        | pointer LSQUBRACE pointer . RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    8        | pointer LSQUBRACE pointer . KCOLON pointer RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
+   11 expr: expr . KPLUS expr
+   11     | expr KPLUS expr .  [KSEMI, KCOMMA, KCOLON, RBRACE, LSQUBRACE, RSQUBRACE, RPAREN, KPLUS, KMINUS]
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    KPLUS      shift, and go to state 32
-    KMINUS     shift, and go to state 33
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
-    RSQUBRACE  shift, and go to state 51
-    KCOLON     shift, and go to state 52
+    KTIMES    shift, and go to state 37
+    KDIVIDED  shift, and go to state 38
+    KPERCENT  shift, and go to state 39
+    KPOW      shift, and go to state 40
+
+    $default  reduce using rule 11 (expr)
+
+    Conflict between rule 11 and token LSQUBRACE resolved as reduce (LSQUBRACE < KPLUS).
+    Conflict between rule 11 and token KPLUS resolved as reduce (%left KPLUS).
+    Conflict between rule 11 and token KMINUS resolved as reduce (%left KMINUS).
+    Conflict between rule 11 and token KTIMES resolved as shift (KPLUS < KTIMES).
+    Conflict between rule 11 and token KDIVIDED resolved as shift (KPLUS < KDIVIDED).
+    Conflict between rule 11 and token KPERCENT resolved as shift (KPLUS < KPERCENT).
+    Conflict between rule 11 and token KPOW resolved as shift (KPLUS < KPOW).
 
 
 State 50
 
-   23 list_content: list_content pointer KCOMMA .
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   12     | expr KMINUS expr .  [KSEMI, KCOMMA, KCOLON, RBRACE, LSQUBRACE, RSQUBRACE, RPAREN, KPLUS, KMINUS]
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    $default  reduce using rule 23 (list_content)
+    KTIMES    shift, and go to state 37
+    KDIVIDED  shift, and go to state 38
+    KPERCENT  shift, and go to state 39
+    KPOW      shift, and go to state 40
+
+    $default  reduce using rule 12 (expr)
+
+    Conflict between rule 12 and token LSQUBRACE resolved as reduce (LSQUBRACE < KMINUS).
+    Conflict between rule 12 and token KPLUS resolved as reduce (%left KPLUS).
+    Conflict between rule 12 and token KMINUS resolved as reduce (%left KMINUS).
+    Conflict between rule 12 and token KTIMES resolved as shift (KMINUS < KTIMES).
+    Conflict between rule 12 and token KDIVIDED resolved as shift (KMINUS < KDIVIDED).
+    Conflict between rule 12 and token KPERCENT resolved as shift (KMINUS < KPERCENT).
+    Conflict between rule 12 and token KPOW resolved as shift (KMINUS < KPOW).
 
 
 State 51
 
-    7 pointer: pointer LSQUBRACE pointer RSQUBRACE .
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   13     | expr KTIMES expr .  [KSEMI, KCOMMA, KCOLON, RBRACE, LSQUBRACE, RSQUBRACE, RPAREN, KPLUS, KMINUS, KTIMES, KDIVIDED, KPERCENT]
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    $default  reduce using rule 7 (pointer)
+    KPOW  shift, and go to state 40
+
+    $default  reduce using rule 13 (expr)
+
+    Conflict between rule 13 and token LSQUBRACE resolved as reduce (LSQUBRACE < KTIMES).
+    Conflict between rule 13 and token KPLUS resolved as reduce (KPLUS < KTIMES).
+    Conflict between rule 13 and token KMINUS resolved as reduce (KMINUS < KTIMES).
+    Conflict between rule 13 and token KTIMES resolved as reduce (%left KTIMES).
+    Conflict between rule 13 and token KDIVIDED resolved as reduce (%left KDIVIDED).
+    Conflict between rule 13 and token KPERCENT resolved as reduce (%left KPERCENT).
+    Conflict between rule 13 and token KPOW resolved as shift (KTIMES < KPOW).
 
 
 State 52
 
-    7 pointer: . pointer LSQUBRACE pointer RSQUBRACE
-    8        | . pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    8        | pointer LSQUBRACE pointer KCOLON . pointer RSQUBRACE
-    9        | . LPAREN pointer RPAREN
-   10        | . KMINUS pointer
-   11        | . pointer KPLUS pointer
-   12        | . pointer KMINUS pointer
-   13        | . pointer KTIMES pointer
-   14        | . pointer KDIVIDED pointer
-   15        | . list_content_p
-   16        | . str_p
-   17        | . int_p
-   18        | . TIDENTIFIER
-   21 list_content_p: . LBRACE list_content RBRACE
-   26 int_p: . TINTEGER
-   27 str_p: . string_p
-   28      | . regex_p
-   29 string_p: . TSTR
-   30 regex_p: . TRGXP
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   14     | expr KDIVIDED expr .  [KSEMI, KCOMMA, KCOLON, RBRACE, LSQUBRACE, RSQUBRACE, RPAREN, KPLUS, KMINUS, KTIMES, KDIVIDED, KPERCENT]
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    KMINUS       shift, and go to state 8
-    LBRACE       shift, and go to state 9
-    LPAREN       shift, and go to state 10
-    TSTR         shift, and go to state 11
-    TRGXP        shift, and go to state 12
-    TIDENTIFIER  shift, and go to state 13
-    TINTEGER     shift, and go to state 14
+    KPOW  shift, and go to state 40
 
-    pointer         go to state 53
-    list_content_p  go to state 16
-    int_p           go to state 17
-    str_p           go to state 18
-    string_p        go to state 19
-    regex_p         go to state 20
+    $default  reduce using rule 14 (expr)
+
+    Conflict between rule 14 and token LSQUBRACE resolved as reduce (LSQUBRACE < KDIVIDED).
+    Conflict between rule 14 and token KPLUS resolved as reduce (KPLUS < KDIVIDED).
+    Conflict between rule 14 and token KMINUS resolved as reduce (KMINUS < KDIVIDED).
+    Conflict between rule 14 and token KTIMES resolved as reduce (%left KTIMES).
+    Conflict between rule 14 and token KDIVIDED resolved as reduce (%left KDIVIDED).
+    Conflict between rule 14 and token KPERCENT resolved as reduce (%left KPERCENT).
+    Conflict between rule 14 and token KPOW resolved as shift (KDIVIDED < KPOW).
 
 
 State 53
 
-    7 pointer: pointer . LSQUBRACE pointer RSQUBRACE
-    8        | pointer . LSQUBRACE pointer KCOLON pointer RSQUBRACE
-    8        | pointer LSQUBRACE pointer KCOLON pointer . RSQUBRACE
-   11        | pointer . KPLUS pointer
-   12        | pointer . KMINUS pointer
-   13        | pointer . KTIMES pointer
-   14        | pointer . KDIVIDED pointer
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   15     | expr KPERCENT expr .  [KSEMI, KCOMMA, KCOLON, RBRACE, LSQUBRACE, RSQUBRACE, RPAREN, KPLUS, KMINUS, KTIMES, KDIVIDED, KPERCENT]
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    KPLUS      shift, and go to state 32
-    KMINUS     shift, and go to state 33
-    KTIMES     shift, and go to state 34
-    KDIVIDED   shift, and go to state 35
-    LSQUBRACE  shift, and go to state 36
-    RSQUBRACE  shift, and go to state 54
+    KPOW  shift, and go to state 40
+
+    $default  reduce using rule 15 (expr)
+
+    Conflict between rule 15 and token LSQUBRACE resolved as reduce (LSQUBRACE < KPERCENT).
+    Conflict between rule 15 and token KPLUS resolved as reduce (KPLUS < KPERCENT).
+    Conflict between rule 15 and token KMINUS resolved as reduce (KMINUS < KPERCENT).
+    Conflict between rule 15 and token KTIMES resolved as reduce (%left KTIMES).
+    Conflict between rule 15 and token KDIVIDED resolved as reduce (%left KDIVIDED).
+    Conflict between rule 15 and token KPERCENT resolved as reduce (%left KPERCENT).
+    Conflict between rule 15 and token KPOW resolved as shift (KPERCENT < KPOW).
 
 
 State 54
 
-    8 pointer: pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE .
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   18     | expr KPOW expr .  [KSEMI, KCOMMA, KCOLON, RBRACE, LSQUBRACE, RSQUBRACE, RPAREN, KPLUS, KMINUS, KTIMES, KDIVIDED, KPERCENT]
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
 
-    $default  reduce using rule 8 (pointer)
+    KPOW  shift, and go to state 40
+
+    $default  reduce using rule 18 (expr)
+
+    Conflict between rule 18 and token LSQUBRACE resolved as reduce (LSQUBRACE < KPOW).
+    Conflict between rule 18 and token KPLUS resolved as reduce (KPLUS < KPOW).
+    Conflict between rule 18 and token KMINUS resolved as reduce (KMINUS < KPOW).
+    Conflict between rule 18 and token KTIMES resolved as reduce (KTIMES < KPOW).
+    Conflict between rule 18 and token KDIVIDED resolved as reduce (KDIVIDED < KPOW).
+    Conflict between rule 18 and token KPERCENT resolved as reduce (KPERCENT < KPOW).
+    Conflict between rule 18 and token KPOW resolved as shift (%right KPOW).
+
+
+State 55
+
+   25 list_content: expr KCOMMA list_content .
+
+    $default  reduce using rule 25 (list_content)
+
+
+State 56
+
+    7 expr: . list_content_p
+    8     | . str_p
+    9     | . int_p
+   10     | . TIDENTIFIER
+   11     | . expr KPLUS expr
+   12     | . expr KMINUS expr
+   13     | . expr KTIMES expr
+   14     | . expr KDIVIDED expr
+   15     | . expr KPERCENT expr
+   16     | . KPLUS expr
+   17     | . KMINUS expr
+   18     | . expr KPOW expr
+   19     | . LPAREN expr RPAREN
+   20     | . expr LSQUBRACE expr RSQUBRACE
+   21     | . expr LSQUBRACE expr KCOLON expr RSQUBRACE
+   21     | expr LSQUBRACE expr KCOLON . expr RSQUBRACE
+   24 list_content_p: . LBRACE list_content RBRACE
+   28 int_p: . TINTEGER
+   29 str_p: . string_p
+   30      | . regex_p
+   31 string_p: . TSTR
+   32 regex_p: . TRGXP
+
+    LBRACE       shift, and go to state 8
+    LPAREN       shift, and go to state 9
+    TSTR         shift, and go to state 10
+    TRGXP        shift, and go to state 11
+    TIDENTIFIER  shift, and go to state 12
+    TINTEGER     shift, and go to state 13
+    KPLUS        shift, and go to state 14
+    KMINUS       shift, and go to state 15
+
+    expr            go to state 58
+    list_content_p  go to state 17
+    int_p           go to state 18
+    str_p           go to state 19
+    string_p        go to state 20
+    regex_p         go to state 21
+
+
+State 57
+
+   20 expr: expr LSQUBRACE expr RSQUBRACE .
+
+    $default  reduce using rule 20 (expr)
+
+
+State 58
+
+   11 expr: expr . KPLUS expr
+   12     | expr . KMINUS expr
+   13     | expr . KTIMES expr
+   14     | expr . KDIVIDED expr
+   15     | expr . KPERCENT expr
+   18     | expr . KPOW expr
+   20     | expr . LSQUBRACE expr RSQUBRACE
+   21     | expr . LSQUBRACE expr KCOLON expr RSQUBRACE
+   21     | expr LSQUBRACE expr KCOLON expr . RSQUBRACE
+
+    LSQUBRACE  shift, and go to state 34
+    RSQUBRACE  shift, and go to state 59
+    KPLUS      shift, and go to state 35
+    KMINUS     shift, and go to state 36
+    KTIMES     shift, and go to state 37
+    KDIVIDED   shift, and go to state 38
+    KPERCENT   shift, and go to state 39
+    KPOW       shift, and go to state 40
+
+
+State 59
+
+   21 expr: expr LSQUBRACE expr KCOLON expr RSQUBRACE .
+
+    $default  reduce using rule 21 (expr)

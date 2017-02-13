@@ -8,6 +8,7 @@ memory_address g_string_attrs_add(const memory_address a, const memory_address b
 memory_address g_string_attrs_subtract(const memory_address a, const memory_address b);
 memory_address g_string_attrs_multiply(const memory_address a, const memory_address b);
 memory_address g_string_attrs_divide(const memory_address a, const memory_address b);
+RETURN_CODE g_string_attrs_compare(const memory_address a, const memory_address b);
 
 type_attrs g_string_attrs = {
   .esc_char                = '\\',
@@ -21,6 +22,7 @@ type_attrs g_string_attrs = {
   .multiply                = g_string_attrs_multiply,
   .divide                  = g_string_attrs_divide,
   .negate                  = mem_operation_func_unsupported,
+  .compare                 = g_string_attrs_compare,
   .is_string_type          = true,
   .s_type                  = T_STRING,
   .t_type                  = t_str
@@ -52,4 +54,10 @@ memory_address g_string_attrs_multiply(const memory_address a, const memory_addr
 memory_address g_string_attrs_divide(const memory_address a, const memory_address b) {
   ERROR_PRINT("Invalid operation on type string!");
   return a;
+}
+
+RETURN_CODE g_string_attrs_compare(const memory_address a, const memory_address b) {
+  if (strcmp(memoryGetRootItem(g_memory, a)->str,memoryGetRootItem(g_memory, b)->str) == 0)
+    return EQUAL;
+  return UNEQUAL;
 }

@@ -29,13 +29,20 @@ size_t yyerror_count = 0;
   memory_item *mem_item;
 };
 
-%token KSTRING KREGEX KSEMI KCOMMA KEQUALS KPLUS KMINUS KTIMES KDIVIDED LBRACE RBRACE LSQUBRACE RSQUBRACE KBEGINDEF KENDDEF KDEF KPERIOD LPAREN RPAREN KCOLON
+%token KSTRING KREGEX
+%token KSEMI KCOMMA KPERIOD KCOLON
+%token KEQUALS
+/* %token KPLUS KMINUS KTIMES KDIVIDED KPOW KPERCENT */
+%token LBRACE RBRACE LSQUBRACE RSQUBRACE LPAREN RPAREN
+%token KBEGINDEF KENDDEF KDEF
+
 %token <str> TSTR TRGXP TIDENTIFIER
 %token <intgr> TINTEGER
 /* %type <addr> first_string_list_item last_string_list_item first_string_list_itemp last_string_list_itemp
  * %type <addr> first_regex_list_item last_regex_list_item first_regex_list_itemp last_regex_list_itemp */
 /* %type <addr> first_list_item last_list_item first_list_itemp last_list_itemp */
-%type <addr> int_p string_p regex_p list_content_p str_p pointer
+%type <addr> int_p string_p regex_p list_content_p str_p
+%type <addr> expr
 /* %type <ptr_lst> string_list_content
  * %type <ptr_lst> regex_list_content */
 %type <ptr_lst> list_content
@@ -45,9 +52,11 @@ size_t yyerror_count = 0;
 /* %destructor { defsFreeList($$); free($$); } <lst> */
 %destructor { VERBOSE_PRINT("FREEING PTR LIST %p", $$); ptrListFree($$); free($$); } <ptr_lst>
 
+%precedence LSQUBRACE RSQUBRACE
 %left KPLUS KMINUS
-%left KTIMES KDIVIDED
-%left LSQUBRACE RSQUBRACE
+%left KTIMES KDIVIDED KPERCENT
+%precedence NEG
+%right KPOW
 
 %%
 
@@ -58,30 +67,67 @@ line
  | line function_call KSEMI
  | function_call KSEMI
  | line error KSEMI
+ ;
 
 definition
  : variable_def
+ ;
  /* | list_def */
 
 /* function_call
  *  : TIDENTIFIER LPAREN string_p RPAREN { handleFuncCall($1, $3, T_STRING); } */
 
-pointer
-: pointer LSQUBRACE pointer RSQUBRACE                   { $$=handleListIndex($1, $3);      }
-| pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE    { $$=handleListSublist($1, $3, $5);      }
+/* pointer */
+/* : expr */
+/* ; */
 
-| LPAREN pointer RPAREN                  { $$=$2; }
+/* | LPAREN pointer RPAREN                  { $$=$2; } */
 /* | LPAREN pointer operator pointer RPAREN { $$=handleOperation($2, $3, $4); } */
 /* | pointer operator pointer               { $$=handleOperation($1, $2, $3); } */
-| KMINUS pointer                         { $$=handleOperation($2, 'n', $2); }
-| pointer KPLUS    pointer               { $$=handleOperation($1, '+', $3); }
-| pointer KMINUS   pointer               { $$=handleOperation($1, '-', $3); }
-| pointer KTIMES   pointer               { $$=handleOperation($1, '*', $3); }
-| pointer KDIVIDED pointer               { $$=handleOperation($1, '/', $3); }
-| list_content_p
+/* | KMINUS pointer                         { $$=handleOperation($2, 'n', $2); } */
+/* | pointer KPLUS    pointer               { $$=handleOperation($1, '+', $3); } */
+/* | pointer KMINUS   pointer               { $$=handleOperation($1, '-', $3); } */
+/* | pointer KTIMES   pointer               { $$=handleOperation($1, '*', $3); } */
+/* | pointer KDIVIDED pointer               { $$=handleOperation($1, '/', $3); } */
+/* | list_content_p */
+/* | str_p */
+/* | int_p */
+/* | TIDENTIFIER { $$ = memoryGetAddresByFriendly(g_friendlies, $1); free($1); } */
+
+expr
+: list_content_p
 | str_p
 | int_p
-| TIDENTIFIER { $$ = memoryGetAddresByFriendly(g_friendlies, $1); free($1); }
+| TIDENTIFIER    { $$ = memoryGetAddresByFriendly(g_friendlies, $1); free($1); }
+
+| expr    KPLUS    expr         { $$=handleOperation($1, '+', $3); }
+| expr    KMINUS   expr         { $$=handleOperation($1, '-', $3); }
+| expr    KTIMES   expr         { $$=handleOperation($1, '*', $3); }
+| expr    KDIVIDED expr         { $$=handleOperation($1, '/', $3); }
+| expr    KPERCENT expr         { $$=handleOperation($1, '%', $3); }
+| KPLUS   expr     %prec NEG    { $$=$2; }
+| KMINUS  expr     %prec NEG    { $$=handleOperation($2, 'n', $2); }
+| expr    KPOW     expr         { $$=handleOperation($1, '^', $3); }
+
+| LPAREN  expr      RPAREN                       { $$=$2; }
+| expr    LSQUBRACE expr   RSQUBRACE             { $$=handleListIndex($1, $3);       }
+| expr    LSQUBRACE expr   KCOLON expr RSQUBRACE { $$=handleListSublist($1, $3, $5); }
+;
+
+
+/* primary */
+/* : literal */
+/* | TIDENTIFIER                                         { $$ = memoryGetAddresByFriendly(g_friendlies, $1); free($1); } */
+/* | LPAREN pointer RPAREN                               { $$ = $2; } */
+/* | pointer LSQUBRACE pointer RSQUBRACE                 { $$=handleListIndex($1, $3);       } */
+/* | pointer LSQUBRACE pointer KCOLON pointer RSQUBRACE  { $$=handleListSublist($1, $3, $5); } */
+/* ; */
+
+/* literal */
+/* : list_content_p */
+/* | str_p */
+/* | int_p */
+/* ; */
 
 /* operator */
 /* : KPLUS       { $$='+'; } */
@@ -91,21 +137,23 @@ pointer
 
 function_call
  /* : TIDENTIFIER list_content_p { handleFuncCall($1, $2); } */
- : TIDENTIFIER pointer {
+ : TIDENTIFIER expr {
    if(memoryGetRootType(g_memory, $2) == t_list) {
      handleFuncCall($1, $2);
    } else {
-     yyerror("semantic error (pointer root does not represent a list)");
+     yyerror("semantic error (expr root does not represent a list)");
      YYERROR;
    }
  }
+;
 /* | TIDENTIFIER TIDENTIFIER    {
  *   handleFuncCall($1, memoryGetAddresByFriendly(g_friendlies, $2));
  *   free($2);
  * } */
 
 variable_def
-: KDEF TIDENTIFIER KEQUALS pointer         { handleAssigDef($2, $4); }
+: KDEF TIDENTIFIER KEQUALS expr { handleAssigDef($2, $4); }
+;
 /* | KDEF TIDENTIFIER KEQUALS TIDENTIFIER     { handlePointerAssig($2, $4); } */
  /* : KDEF TIDENTIFIER KEQUALS string_p        { handleAssigDef($2, $4); }
   * | KDEF TIDENTIFIER KEQUALS regex_p         { handleAssigDef($2, $4); }
@@ -130,50 +178,59 @@ list_content_p
    /* insert item and keep address */
    $$ = memoryInsert(g_memory, item, t_list);
  }
+;
 
-/* NOTE: currently printing pointer values to suppress some bison gen warnings */
+/* NOTE: currently printing pointer values to suppress some bison gen warnings (pretty sad solution)*/
+/* TODO: use $0 to see if previous token was KCOMMA instead os using weird yy_has_last_item thing */
+/* TODO: add empty rule for empty lists */
 /* ==== list content ==== */
 
 list_content
 /* last item */
- : list_content pointer{
-   if ($$->yy_has_last_item) {
-     yyerror("semantic error: list content already contains last item");
-     YYERROR;
-     /* EXIT(1); */
-   }
-   $$->yy_has_last_item = true;
-   ptrListInsert($$, $2);
-   VERBOSE_PRINT("-last list item: \t%lu into (%p)", (unsigned long)$2, $$);
- }
+ /* : list_content expr { */
+ /*   if ($$->yy_has_last_item) { */
+ /*     yyerror("semantic error: list content already contains last item"); */
+ /*     YYERROR; */
+ /*     /\* EXIT(1); *\/ */
+ /*   } */
+ /*   $$->yy_has_last_item = true; */
+ /*   ptrListInsert($$, $2); */
+ /*   VERBOSE_PRINT("-last list item: \t%lu into (%p)", (unsigned long)$2, $$); */
+ /* } */
 /* nth item */
- | list_content pointer KCOMMA {
-   if ($$->yy_has_last_item) {
-     yyerror("semantic error: list content already contains last item");
-     YYERROR;
-     /* EXIT(1); */
-   }
-   ptrListInsert($$, $2);
-   VERBOSE_PRINT("-list item: \t%lu into (%p)", (unsigned long)$2, $$);
+: expr KCOMMA list_content {
+  /* VERBOSE_PRINT("%p, last: %s", $$, memoryGetRootItem(g_memory, $1)->str); */
+   /* if ($$->yy_has_last_item) { */
+   /*   yyerror("semantic error: list content already contains last item"); */
+   /*   YYERROR; */
+   /*   /\* EXIT(1); *\/ */
+   /* } */
+   ptrListInsert($3, $1);
+   VERBOSE_PRINT("-list item: \t%lu into (%p)", (unsigned long)$1, $3);
+   /* for (size_t i=0; i<$3->used; i++) { */
+   /*   VERBOSE_PRINT("%s", memoryGetRootItem(g_memory, $3->pointers[i])->str); */
+   /* } */
+   $$ = $3;
  }
 /* first item */
- | pointer KCOMMA {
+| expr KCOMMA {
    $$ = (t_ptr_list *)malloc(sizeof(t_ptr_list));
    ptrListInit($$, 20);
-   $$->yy_has_last_item = false;
+   /* $$->yy_has_last_item = false; */
 
    ptrListInsert($$, $1);
    VERBOSE_PRINT("-first list item: \t%lu into (%p)", (unsigned long)$1, $$);
  }
 /* only item */
- | pointer {
+| expr {
    $$ = (t_ptr_list *)malloc(sizeof(t_ptr_list));
    ptrListInit($$, 20);
-   $$->yy_has_last_item = true;
+   /* $$->yy_has_last_item = true; */
 
    ptrListInsert($$, $1);
    VERBOSE_PRINT("-only list item: \t%lu into (%p)", (unsigned long)$1, $$);
  }
+;
 
 
 /* --------------------------------------------------------------------------- */
@@ -184,10 +241,12 @@ int_p
   $$ = memoryInsert(g_memory, item, t_int);
   VERBOSE_PRINT("integer %d in %lu"  , g_memory->content[memoryGetRootAddress(g_memory, $$)]->integer, (unsigned long)$$);
  }
+;
 
 str_p
 : string_p
 | regex_p
+;
 
 string_p
 : TSTR {
@@ -197,6 +256,7 @@ string_p
   strUnstring(&g_memory->content[memoryGetRootAddress(g_memory, $$)]->str);
   VERBOSE_PRINT("string litteral %s in %lu"  , g_memory->content[memoryGetRootAddress(g_memory, $$)]->str , (unsigned long)$$);
  }
+;
 
 regex_p
 : TRGXP {
@@ -206,6 +266,7 @@ regex_p
   regexUnregex(&g_memory->content[memoryGetRootAddress(g_memory, $$)]->str);
   VERBOSE_PRINT("regex litteral %s in %lu"  , g_memory->content[memoryGetRootAddress(g_memory, $$)]->str, (unsigned long)$$);
  }
+;
 %%
 
 

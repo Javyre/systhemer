@@ -48,10 +48,23 @@ typedef struct {
   size_t size;
 } memory_holder;
 
+typedef enum{
+  SUCCESS,
+  FAIL,
+
+  EQUAL,
+  GREATER,
+  SMALLER,
+  UNEQUAL,
+
+  SIZE_MISMATCH,
+  TYPE_MISMATCH,
+} RETURN_CODE;
 
 
 typedef memory_address (*mem_operation_func) (const memory_address a, const memory_address b);
 memory_address mem_operation_func_unsupported(const memory_address a, const memory_address b);
+RETURN_CODE mem_comparison_func_unsupported(const memory_address a, const memory_address b);
 
 typedef struct {
   const char esc_char;      /* would be '\\' */
@@ -67,6 +80,7 @@ typedef struct {
   mem_operation_func multiply;
   mem_operation_func divide;
   mem_operation_func negate;
+  RETURN_CODE (*compare) (const memory_address a, const memory_address b);
   /* memory_address (*add)(memory_address a, memory_address b); */
   /* memory_address (*subtract)(memory_address a, memory_address b); */
   /* memory_address (*multiply)(memory_address a, memory_address b); */
@@ -103,6 +117,12 @@ t_type memoryGetRootType(memory_holder *mem, memory_address addr);
 
 memory_address memoryGetRootAddress(memory_holder *mem, memory_address mem_addr);
 
+memory_address listGetItem(t_ptr_list *list, int index);
+
+bool listGetNextItem(t_ptr_list *list, memory_address *out, bool *is_last);
+
+t_ptr_list *listGetSublist(t_ptr_list *list, int from, int to);
+
 
 void memoryIllustrateMap(friendly_names *friendly, memory_holder *mem, size_t depth);
 
@@ -125,5 +145,7 @@ void friendlyInit(friendly_names *friendly, size_t initial_size);
 void friendlyInsert(friendly_names *friendly, char *identifier, memory_address address);
 
 void friendlyFree(friendly_names *friendly);
+
+RETURN_CODE memoryCompare(memory_holder *mem, memory_address addr1, memory_address addr2);
 
 #endif

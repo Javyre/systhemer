@@ -9,6 +9,7 @@ memory_address g_int_attrs_subtract(const memory_address a, const memory_address
 memory_address g_int_attrs_multiply(const memory_address a, const memory_address b);
 memory_address g_int_attrs_divide(const memory_address a, const memory_address b);
 memory_address g_int_attrs_negate(const memory_address a, const memory_address b);
+RETURN_CODE g_int_attrs_compare(const memory_address a, const memory_address b);
 
 type_attrs g_int_attrs = {
   .esc_char                = '\0',
@@ -22,6 +23,7 @@ type_attrs g_int_attrs = {
   .multiply                = g_int_attrs_multiply,
   .divide                  = g_int_attrs_divide,
   .negate                  = g_int_attrs_negate,
+  .compare                 = g_int_attrs_compare,
   .is_string_type          = false,
   .s_type                  = T_INTEGER,
   .t_type                  = t_int
@@ -59,3 +61,17 @@ memory_address g_int_attrs_negate(const memory_address a, const memory_address b
   memoryGetRootItem(g_memory, a)->integer *= -1;
   return a;
 }
+
+RETURN_CODE g_int_attrs_compare(const memory_address a, const memory_address b) {
+  int i1 = memoryGetRootItem(g_memory, a)->integer;
+  int i2 = memoryGetRootItem(g_memory, b)->integer;
+  if (i1 == i2)
+    return EQUAL;
+  if (i1 > i2)
+    return GREATER;
+  if (i1 < i2)
+    return SMALLER;
+
+  return FAIL;
+}
+

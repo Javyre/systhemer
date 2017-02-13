@@ -4,6 +4,8 @@
 extern int yyerror(const char *p);
 extern size_t yyerror_count;
 
+extern int yylineno;
+
 char *g_current_print_color = NULL;
 
 #define FUNC_CALL_ERR(...) do {} while (0);
@@ -11,7 +13,7 @@ char *g_current_print_color = NULL;
 void uni_mkblock (memory_address block_name_addr){
   memory_item *root_list = memoryGetRootItem(g_memory, block_name_addr);
   if (root_list->list->used != 1 ||
-      memoryGetRootType(g_memory, root_list->list->pointers[0]) != t_str) {
+      memoryGetRootType(g_memory, listGetItem(root_list->list, 0)) != t_str) {
     yyerror("runtime error"
             " (mkblock takes only one parameter of type string!)");
     return;
@@ -21,13 +23,14 @@ void uni_mkblock (memory_address block_name_addr){
    * then decide if it should dup it or just use and then free the place in
    * memory (also TODO: make memory esable by item for optimization) */
   outputCreateMemBlock(
-      strdup(memoryGetRootItem(g_memory, root_list->list->pointers[0])->str));
+      strdup(memoryGetRootItem(g_memory, listGetItem(root_list->list, 0))
+                 ->str));
 }
 
 void uni_set_color(memory_address color_name_addr) {
   memory_item *root_list = memoryGetRootItem(g_memory, color_name_addr);
   if (root_list->list->used != 1 ||
-      memoryGetRootType(g_memory, root_list->list->pointers[0]) != t_str) {
+      memoryGetRootType(g_memory, listGetItem(root_list->list, 0)) != t_str) {
     yyerror("runtime error"
             " (set_color takes only one parameter of type string!)");
     return;
@@ -36,7 +39,7 @@ void uni_set_color(memory_address color_name_addr) {
   if (g_current_print_color != NULL)
     free(g_current_print_color);
 
-  char *tmp = memoryGetRootItem(g_memory, root_list->list->pointers[0])->str;
+  char *tmp = memoryGetRootItem(g_memory, listGetItem(root_list->list, 0))->str;
   if (strcmp(tmp, "default") == 0)
     g_current_print_color = strdup(KDEFAULT);
   else if (strcmp(tmp, "red") == 0)
@@ -57,27 +60,75 @@ void uni_set_color(memory_address color_name_addr) {
 
 void uni_print(memory_address string_list_addr) {
   memory_item *root_list = memoryGetRootItem(g_memory, string_list_addr);
+  memory_address addr;
 
-  for (size_t i=0; i<root_list->list->used; i++)
-    if (memoryGetRootType(g_memory, root_list->list->pointers[i]) != t_str) {
+
+  /* addr = listGetNextItem(root_list->list, &is_last); */
+  listGetNextItem(root_list->list, NULL, NULL);
+  while (listGetNextItem(NULL, &addr, NULL)){
+    if (memoryGetRootType(g_memory, addr) != t_str) {
       yyerror("runtime error (one of the arguments passed to print function is't of type string)");
       return;
     }
+  }
 
 
-  for (size_t i = 0; i < root_list->list->used; i++) {
+  listGetNextItem(root_list->list, NULL, NULL);
+  while (listGetNextItem(NULL, &addr, NULL)){
     memory_item *root_item;
-    root_item = memoryGetRootItem(g_memory, root_list->list->pointers[i]);
-
-    /* printf("%d", memoryGetRootType(
-     *                  g_memory, memoryGetRootAddress(
-     *                                g_memory, root_list->list->pointers[i]))); */
+    root_item = memoryGetRootItem(g_memory, addr);
 
     printf("%s%s" KDEFAULT,
            g_current_print_color != NULL ? g_current_print_color : KDEFAULT,
            root_item->str);
   }
 
+
+}
+
+void uni_assert(memory_address args) {
+  memory_item *root_args = memoryGetRootItem(g_memory, args);
+  memory_address addr1;
+  memory_address addr2;
+  memory_item *item1;
+  memory_item *item2;
+  t_type t1, t2;
+  bool is_last;
+  char *val1;
+  char *val2;
+
+  /* loop through args */
+  listGetNextItem(root_args->list, NULL, NULL);
+  while (listGetNextItem(NULL, &addr1, &is_last)) {
+    /* if is_last then that means there is an odd number of args: error! */
+    if (!is_last) {
+      /* get the second item in pair */
+      listGetNextItem(NULL, &addr2, &is_last);
+      item1 = memoryGetRootItem(g_memory, addr1);
+      item2 = memoryGetRootItem(g_memory, addr2);
+
+      /* t1 = memoryGetRootType(g_memory, addr1); */
+      /* t2 = memoryGetRootType(g_memory, addr2); */
+
+      RETURN_CODE result = memoryCompare(g_memory, addr1, addr2);
+
+      /* check type mismatch */
+      if (result == TYPE_MISMATCH){
+        yyerror("runtime error: types of pair do not match!");
+        return;
+      }
+      if (result != EQUAL) {
+        ERROR_PRINT("assert failed! address %lu != address %lu",
+                    (unsigned long)addr1,
+                    (unsigned long)addr2)
+      }
+
+      if (is_last)
+        break;
+    } else {
+      ERROR_PRINT("gave odd number of args to assert function!");
+    }
+  }
 }
 
 void uni_garbage_collect() {

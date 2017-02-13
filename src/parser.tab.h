@@ -49,26 +49,29 @@ extern int yydebug;
     KREGEX = 259,
     KSEMI = 260,
     KCOMMA = 261,
-    KEQUALS = 262,
-    KPLUS = 263,
-    KMINUS = 264,
-    KTIMES = 265,
-    KDIVIDED = 266,
-    LBRACE = 267,
-    RBRACE = 268,
-    LSQUBRACE = 269,
-    RSQUBRACE = 270,
+    KPERIOD = 262,
+    KCOLON = 263,
+    KEQUALS = 264,
+    LBRACE = 265,
+    RBRACE = 266,
+    LSQUBRACE = 267,
+    RSQUBRACE = 268,
+    LPAREN = 269,
+    RPAREN = 270,
     KBEGINDEF = 271,
     KENDDEF = 272,
     KDEF = 273,
-    KPERIOD = 274,
-    LPAREN = 275,
-    RPAREN = 276,
-    KCOLON = 277,
-    TSTR = 278,
-    TRGXP = 279,
-    TIDENTIFIER = 280,
-    TINTEGER = 281
+    TSTR = 274,
+    TRGXP = 275,
+    TIDENTIFIER = 276,
+    TINTEGER = 277,
+    KPLUS = 278,
+    KMINUS = 279,
+    KTIMES = 280,
+    KDIVIDED = 281,
+    KPERCENT = 282,
+    NEG = 283,
+    KPOW = 284
   };
 #endif
 
@@ -87,7 +90,7 @@ union YYSTYPE
   memory_address addr;
   memory_item *mem_item;
 
-#line 91 "parser.tab.h" /* yacc.c:1909  */
+#line 94 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
